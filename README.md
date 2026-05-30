@@ -28,6 +28,9 @@ AI Content Workspace tiếng Việt cho creator, agency và người làm conten
 | `npm run start` | Chạy production server |
 | `npm run lint` | ESLint check |
 | `npm run type-check` | TypeScript check |
+| `npm run supabase:start` | Khởi động Supabase local (Docker) |
+| `npm run supabase:test` | Test query kết nối Supabase |
+| `npm run supabase:reset` | Reset DB + chạy migrations |
 
 ## Cấu trúc
 
@@ -63,6 +66,10 @@ src/
    ```
 
    Điền Supabase credentials vào `.env.local`.
+
+   **Local dev:** chạy `npm run supabase:start`, copy keys từ `npm run supabase:status` vào `.env.local`, rồi `npm run supabase:test`.
+
+   Chi tiết: [supabase/README.md](./supabase/README.md)
 
 3. Chạy dev server:
 
