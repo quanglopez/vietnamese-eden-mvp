@@ -1,46 +1,22 @@
-import Link from "next/link";
+import { Suspense } from "react";
 
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LoginForm } from "@/components/custom/auth/login-form";
 
 export default function LoginPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Đăng nhập</CardTitle>
-          <CardDescription>
-            Truy cập workspace AI content của bạn
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="ban@example.com" />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Mật khẩu</Label>
-            <Input id="password" type="password" placeholder="••••••••" />
-          </div>
-          <Button className="w-full" type="button">
-            Đăng nhập
-          </Button>
-          <p className="text-center text-sm text-muted-foreground">
-            Chưa có tài khoản?{" "}
-            <Link href="/signup" className="font-medium text-primary underline-offset-4 hover:underline">
-              Đăng ký
-            </Link>
-          </p>
-        </CardContent>
-      </Card>
+      <Suspense fallback={<AuthFormSkeleton title="Đăng nhập" />}>
+        <LoginForm />
+      </Suspense>
     </main>
+  );
+}
+
+function AuthFormSkeleton({ title }: { title: string }) {
+  return (
+    <div className="w-full max-w-md rounded-xl border bg-card p-6 shadow-sm">
+      <h1 className="text-lg font-semibold">{title}</h1>
+      <p className="mt-4 text-sm text-muted-foreground">Đang tải...</p>
+    </div>
   );
 }

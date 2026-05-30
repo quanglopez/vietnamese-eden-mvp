@@ -12,7 +12,8 @@
     "supabase:stop": "supabase stop",
     "supabase:reset": "supabase db reset",
     "supabase:status": "supabase status",
-    "supabase:test": "tsx scripts/test-supabase-connection.ts"
+    "supabase:test": "tsx scripts/test-supabase-connection.ts",
+    "auth:test": "tsx scripts/test-auth-flow.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
