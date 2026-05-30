@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Vietnamese Eden MVP
 
-## Getting Started
+AI Content Workspace tiếng Việt cho creator, agency và người làm content.
 
-First, run the development server:
+## Tính năng chính
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- 📌 **Swipe Board**: Lưu bài viral tiếng Việt
+- 🤖 **AI Breakdown**: Phân tích Hook, Angle, Structure, CTA
+- 🎙️ **Voice Profile**: Học giọng viết cá nhân
+- ✨ **Remix Generator**: Biến content thành nội dung mới
+- 📅 **Content Calendar**: Lên lịch publish
+
+## Tech Stack
+
+- Next.js 14 App Router + TypeScript strict
+- Tailwind CSS + shadcn/ui (base color: slate)
+- Supabase (PostgreSQL + Auth + Edge Functions)
+- OpenAI / Anthropic API
+- TanStack Query
+- Zod + React Hook Form
+
+## Scripts
+
+| Lệnh | Mô tả |
+|------|-------|
+| `npm run dev` | Dev server tại `http://localhost:3000` |
+| `npm run build` | Production build |
+| `npm run start` | Chạy production server |
+| `npm run lint` | ESLint check |
+| `npm run type-check` | TypeScript check |
+
+## Cấu trúc
+
+```
+src/
+├── app/                    # Routes + layouts (App Router)
+│   ├── (auth)/             # Route group cho auth
+│   │   ├── login/
+│   │   └── signup/
+│   ├── layout.tsx
+│   ├── page.tsx
+│   └── globals.css
+├── components/
+│   ├── ui/                 # shadcn/ui components
+│   └── custom/             # App-specific components
+├── lib/                    # Utils, API clients
+├── types/                  # TypeScript interfaces
+└── hooks/                  # Custom React hooks
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Cài dependencies:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   ```bash
+   npm install
+   ```
 
-## Learn More
+2. Copy biến môi trường:
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   cp .env.example .env.local
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   Điền Supabase credentials vào `.env.local`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. Chạy dev server:
 
-## Deploy on Vercel
+   ```bash
+   npm run dev
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+4. Mở [http://localhost:3000](http://localhost:3000)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License
+
+Private — Rex Ai (1/2)
