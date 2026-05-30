@@ -1,5 +1,13 @@
 # Supabase — Vietnamese Eden MVP
 
+## Schema (ALE-63)
+
+ERD + documentation: [`docs/database/ERD.md`](../docs/database/ERD.md)
+
+10 bảng chính: `profiles`, `workspaces`, `workspace_members`, `boards`, `content_items`, `board_content_items`, `content_analyses`, `voice_profiles`, `generated_outputs`, `content_calendar_items`
+
+Migration: `supabase/migrations/20260530130000_initial_schema.sql`
+
 ## Local development (Docker)
 
 ```bash
