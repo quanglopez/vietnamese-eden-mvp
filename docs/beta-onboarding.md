@@ -44,7 +44,7 @@ Hướng dẫn cho **10–20 beta users** đầu tiên. Không cần cài đặt
 | 2 | Mở board → **Thêm content** → tab **Paste text** | Card content mới |
 | 3 | **Phân tích AI** (Breakdown) | Hook, Angle, Structure, CTA hiển thị |
 | 4 | **Tạo remix** — Format Facebook hoặc TikTok, **5 biến thể** | ≥ 5 output |
-| 5 | (Tuỳ chọn) **Giọng văn** — dán ≥ 500 ký tự bài cũ → **Phân tích & lưu** | Profile lưu thành công |
+| 5 | (Tuỳ chọn) **Giọng văn** — dán ≥ 500 ký tự bài cũ → **Huấn luyện AI với giọng của tôi** | Profile lưu thành công |
 | 6 | Remix lại với voice profile (nếu có) | Output bám giọng hơn |
 | 7 | Một output → **Đưa vào lịch** | Toast OK |
 | 8 | **Lịch nội dung** → refresh trang | Item còn trên lịch |
@@ -53,7 +53,7 @@ Hướng dẫn cho **10–20 beta users** đầu tiên. Không cần cài đặt
 - Nếu chưa có Voice Profile: làm **remix baseline trước** → tạo Voice Profile → **remix lại để so sánh** sự khác biệt.
 - Nếu đã có Voice Profile: chọn voice khi tạo remix ngay từ đầu.
 
-**⏳ AI chậm là bình thường:** Breakdown 30–90s, Remix 30–120s, Voice Profile 60–120s. **Không refresh trang** khi đang chạy — AI vẫn đang xử lý phía sau.
+**⏳ AI chậm là bình thường:** Breakdown 30–90s, Remix 30–120s, Voice Profile 60–120s. **Không refresh trang** khi đang chạy — AI vẫn đang xử lý phía sau. App hiển thị overlay tiến độ + tin nhắn xoay vòng; trình duyệt có thể hỏi xác nhận nếu bạn cố tải lại trang.
 
 ---
 
