@@ -1,4 +1,5 @@
 import { AiProviderError } from "@/lib/ai/errors";
+import { parseAiJsonOrThrow } from "@/lib/ai/json";
 
 export type ChatCompletionConfig = {
   apiKey: string;
@@ -7,17 +8,7 @@ export type ChatCompletionConfig = {
   providerName: string;
 };
 
-export function extractJsonObject(text: string): string {
-  const trimmed = text.trim();
-  if (trimmed.startsWith("{")) {
-    return trimmed;
-  }
-  const match = trimmed.match(/\{[\s\S]*\}/);
-  if (!match) {
-    throw new AiProviderError("AI không trả về JSON hợp lệ.", "invalid_response");
-  }
-  return match[0];
-}
+export { extractJsonObject, extractJsonCandidate, parseAiJsonText } from "@/lib/ai/json";
 
 export function normalizeChatApiBaseUrl(baseUrl: string): string {
   const trimmed = baseUrl.trim().replace(/\/+$/, "");
@@ -89,12 +80,5 @@ export async function chatJsonCompletion(
     );
   }
 
-  try {
-    return JSON.parse(extractJsonObject(content));
-  } catch {
-    throw new AiProviderError(
-      `Không parse được JSON từ ${config.providerName}.`,
-      "invalid_response",
-    );
-  }
+  return parseAiJsonOrThrow(content, config.providerName);
 }

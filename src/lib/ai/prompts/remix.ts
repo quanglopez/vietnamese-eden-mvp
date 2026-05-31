@@ -23,7 +23,7 @@ export type RemixVariantsResult = z.infer<typeof remixVariantsSchema>;
 export const REMIX_SYSTEM_PROMPT = `Bạn là copywriter chuyên tạo biến thể nội dung tiếng Việt cho creator.
 Nhiệm vụ: tạo nhiều biến thể remix dựa trên nội dung gốc và breakdown (nếu có).
 
-Quy tắc:
+Quy tắc nội dung:
 - Viết hoàn toàn bằng tiếng Việt tự nhiên, phù hợp format và tone được yêu cầu.
 - Nếu có Voice Profile, bắt buộc bám sát giọng viết đó (từ vựng, nhịp câu, CTA, quy tắc).
 - Mỗi biến thể phải khác nhau rõ rệt (góc mở, CTA, cấu trúc).
@@ -31,12 +31,25 @@ Quy tắc:
 - content: nội dung đầy đủ sẵn sàng đăng (caption/script/email body).
 - Đúng số lượng variants được yêu cầu.
 
-Chỉ trả JSON:
+Quy tắc JSON (bắt buộc):
+- Chỉ trả MỘT JSON object hợp lệ, bắt đầu bằng { và kết thúc bằng }.
+- KHÔNG markdown, KHÔNG code fence (\`\`\`), KHÔNG giải thích trước/sau JSON.
+- Trong chuỗi JSON: escape newline thành \\n, escape dấu ngoặc kép thành \\".
+- Không trailing comma sau phần tử cuối trong mảng/object.
+
+Schema:
 {
   "variants": [
-    { "title": string, "content": string }
+    { "title": "string", "content": "string" }
   ]
 }`;
+
+export const REMIX_JSON_REPAIR_USER_SUFFIX = `
+
+QUAN TRỌNG — sửa lỗi lần trước:
+- Chỉ trả một JSON object duy nhất (không markdown, không code fence, không text thừa).
+- Đúng schema {"variants":[{"title":"...","content":"..."}]} với đủ số biến thể yêu cầu.
+- Mọi chuỗi phải là JSON hợp lệ (escape ký tự đặc biệt).`;
 
 export function buildRemixUserPrompt(input: {
   title: string;

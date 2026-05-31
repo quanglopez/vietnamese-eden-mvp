@@ -12,6 +12,7 @@ import {
 import {
   buildRemixUserPrompt,
   remixVariantsSchema,
+  REMIX_JSON_REPAIR_USER_SUFFIX,
   REMIX_SYSTEM_PROMPT,
   type RemixVariantsResult,
 } from "@/lib/ai/prompts/remix";
@@ -69,15 +70,38 @@ export class OpenAiCompatibleRemixGeneratorProvider
   async generateVariants(
     input: RemixProviderInput,
   ): Promise<RemixVariantsResult> {
+    try {
+      return await this.generateVariantsOnce(input, false);
+    } catch (error) {
+      if (
+        error instanceof AiProviderError &&
+        error.code === "invalid_response"
+      ) {
+        return this.generateVariantsOnce(input, true);
+      }
+      throw error;
+    }
+  }
+
+  private async generateVariantsOnce(
+    input: RemixProviderInput,
+    isRepairAttempt: boolean,
+  ): Promise<RemixVariantsResult> {
+    const userPrompt = buildRemixUserPrompt(input);
     const parsed = await chatJsonCompletion(this.chat, {
       systemPrompt: REMIX_SYSTEM_PROMPT,
-      userPrompt: buildRemixUserPrompt(input),
-      temperature: 0.7,
+      userPrompt: isRepairAttempt
+        ? `${userPrompt}${REMIX_JSON_REPAIR_USER_SUFFIX}`
+        : userPrompt,
+      temperature: isRepairAttempt ? 0.5 : 0.7,
     });
 
     const validated = remixVariantsSchema.safeParse(parsed);
     if (!validated.success) {
-      throw new AiProviderError("JSON remix không đúng schema.", "invalid_response");
+      throw new AiProviderError(
+        "JSON remix không đúng schema (thiếu variants hoặc title/content).",
+        "invalid_response",
+      );
     }
 
     if (validated.data.variants.length < input.variantCount) {
