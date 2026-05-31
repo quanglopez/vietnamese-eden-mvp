@@ -3,7 +3,9 @@ import { z } from "zod";
 import type { ContentAnalysisView } from "@/types/analysis";
 import type { RemixFormat, RemixTone } from "@/types/remix";
 
+import { buildVoiceProfilePromptBlock } from "@/lib/ai/prompts/voice";
 import { getRemixFormatLabel, getRemixToneLabel } from "@/lib/remix/constants";
+import type { VoiceProfileView } from "@/types/voice";
 
 export const remixVariantsSchema = z.object({
   variants: z
@@ -23,6 +25,7 @@ Nhiệm vụ: tạo nhiều biến thể remix dựa trên nội dung gốc và 
 
 Quy tắc:
 - Viết hoàn toàn bằng tiếng Việt tự nhiên, phù hợp format và tone được yêu cầu.
+- Nếu có Voice Profile, bắt buộc bám sát giọng viết đó (từ vựng, nhịp câu, CTA, quy tắc).
 - Mỗi biến thể phải khác nhau rõ rệt (góc mở, CTA, cấu trúc).
 - title: tiêu đề ngắn gọn cho biến thể (không trùng nhau).
 - content: nội dung đầy đủ sẵn sàng đăng (caption/script/email body).
@@ -43,6 +46,7 @@ export function buildRemixUserPrompt(input: {
   tone: RemixTone;
   variantCount: number;
   analysis: ContentAnalysisView | null;
+  voiceProfile: VoiceProfileView | null;
 }): string {
   const formatLabel = getRemixFormatLabel(input.format);
   const toneLabel = getRemixToneLabel(input.tone);
@@ -61,12 +65,21 @@ export function buildRemixUserPrompt(input: {
       ].join("\n")
     : null;
 
+  const voiceBlock = input.voiceProfile
+    ? buildVoiceProfilePromptBlock({
+        name: input.voiceProfile.name,
+        tone: input.voiceProfile.tone,
+        style: input.voiceProfile.style,
+      })
+    : null;
+
   return [
     `Tạo đúng ${input.variantCount} biến thể remix.`,
     `Format: ${formatLabel}`,
-    `Tone: ${toneLabel}`,
+    `Tone remix (preset): ${toneLabel}`,
     `Tiêu đề gốc: ${input.title}`,
     `Nền tảng: ${input.platform}`,
+    voiceBlock ? ["", voiceBlock].join("\n") : null,
     "",
     "Nội dung gốc:",
     input.rawContent,

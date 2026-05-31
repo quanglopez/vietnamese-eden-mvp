@@ -3,8 +3,10 @@ import { notFound } from "next/navigation";
 
 import { RemixView } from "@/components/custom/remix/remix-view";
 import { getRemixPageContext, listGeneratedOutputsByItemId } from "@/lib/content/remix-queries";
+import { listVoiceProfilesForUser, toVoiceListItem } from "@/lib/voice/queries";
 import { createClient } from "@/lib/supabase/server";
 import { isValidUuid } from "@/lib/boards/utils";
+import { getCurrentWorkspace } from "@/lib/workspaces/queries";
 
 type RemixItemPageProps = {
   params: { contentItemId: string };
@@ -23,6 +25,10 @@ export default async function RemixItemPage({ params }: RemixItemPageProps) {
   }
 
   const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const { context, error: contextError } = await getRemixPageContext(supabase, contentItemId);
 
   if (!context) {
@@ -34,7 +40,31 @@ export default async function RemixItemPage({ params }: RemixItemPageProps) {
     contentItemId,
   );
 
-  const fetchError = [contextError, outputsError].filter(Boolean).join(" ") || null;
+  let voiceProfiles: ReturnType<typeof toVoiceListItem>[] = [];
+  let voiceError: string | null = null;
 
-  return <RemixView context={context} outputs={outputs} fetchError={fetchError} />;
+  if (user) {
+    const { workspace } = await getCurrentWorkspace(supabase, user.id);
+    if (workspace) {
+      const { profiles, error } = await listVoiceProfilesForUser(
+        supabase,
+        workspace.id,
+        user.id,
+      );
+      voiceProfiles = profiles.map(toVoiceListItem);
+      voiceError = error;
+    }
+  }
+
+  const fetchError =
+    [contextError, outputsError, voiceError].filter(Boolean).join(" ") || null;
+
+  return (
+    <RemixView
+      context={context}
+      outputs={outputs}
+      voiceProfiles={voiceProfiles}
+      fetchError={fetchError}
+    />
+  );
 }

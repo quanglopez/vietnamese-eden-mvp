@@ -231,6 +231,45 @@ export type Database = {
         };
         Relationships: [];
       };
+      voice_profiles: {
+        Row: {
+          id: string;
+          workspace_id: string;
+          user_id: string;
+          name: string;
+          tone: string | null;
+          style_notes: string | null;
+          sample_count: number;
+          is_default: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          workspace_id: string;
+          user_id: string;
+          name: string;
+          tone?: string | null;
+          style_notes?: string | null;
+          sample_count?: number;
+          is_default?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          workspace_id?: string;
+          user_id?: string;
+          name?: string;
+          tone?: string | null;
+          style_notes?: string | null;
+          sample_count?: number;
+          is_default?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       generated_outputs: {
         Row: {
           id: string;

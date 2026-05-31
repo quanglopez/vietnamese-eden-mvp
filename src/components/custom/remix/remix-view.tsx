@@ -12,14 +12,16 @@ import { RemixOutputList } from "@/components/custom/remix/remix-output-list";
 import { RemixOutputToolbar } from "@/components/custom/remix/remix-output-toolbar";
 import { Button } from "@/components/ui/button";
 import type { GeneratedOutputView, RemixPageContext } from "@/types/remix";
+import type { VoiceProfileListItem } from "@/types/voice";
 
 type RemixViewProps = {
   context: RemixPageContext;
   outputs: GeneratedOutputView[];
+  voiceProfiles: VoiceProfileListItem[];
   fetchError: string | null;
 };
 
-export function RemixView({ context, outputs, fetchError }: RemixViewProps) {
+export function RemixView({ context, outputs, voiceProfiles, fetchError }: RemixViewProps) {
   const router = useRouter();
   const formRef = useRef<HTMLDivElement>(null);
   const [toast, setToast] = useState<RemixToast | null>(null);
@@ -80,6 +82,7 @@ export function RemixView({ context, outputs, fetchError }: RemixViewProps) {
           <div ref={formRef} className="space-y-4 scroll-mt-24">
             <RemixForm
               contentItemId={context.itemId}
+              voiceProfiles={voiceProfiles}
               disabled={formDisabled}
               disabledMessage={disabledMessage}
               onSuccess={() => {

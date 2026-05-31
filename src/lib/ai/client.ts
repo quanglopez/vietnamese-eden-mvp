@@ -1,9 +1,15 @@
 import { AiProviderError } from "@/lib/ai/errors";
 import { MockContentAnalysisProvider } from "@/lib/ai/providers/mock";
 import { MockRemixGeneratorProvider } from "@/lib/ai/providers/mock-remix";
+import { MockVoiceAnalysisProvider } from "@/lib/ai/providers/mock-voice";
 import { OpenAiContentAnalysisProvider } from "@/lib/ai/providers/openai";
 import { OpenAiRemixGeneratorProvider } from "@/lib/ai/providers/openai-remix";
-import type { ContentAnalysisProvider, RemixGeneratorProvider } from "@/lib/ai/types";
+import { OpenAiVoiceAnalysisProvider } from "@/lib/ai/providers/openai-voice";
+import type {
+  ContentAnalysisProvider,
+  RemixGeneratorProvider,
+  VoiceAnalysisProvider,
+} from "@/lib/ai/types";
 
 function resolveAiConfig() {
   const apiKey = process.env.OPENAI_API_KEY?.trim();
@@ -28,6 +34,23 @@ export function getContentAnalysisProvider(): ContentAnalysisProvider {
   }
 
   return new OpenAiContentAnalysisProvider(apiKey, model);
+}
+
+export function getVoiceAnalysisProvider(): VoiceAnalysisProvider {
+  const { apiKey, useMock, isProduction, model } = resolveAiConfig();
+
+  if (useMock && !isProduction) {
+    return new MockVoiceAnalysisProvider();
+  }
+
+  if (!apiKey) {
+    throw new AiProviderError(
+      "Thiếu OPENAI_API_KEY. Thêm key vào .env.local hoặc bật AI_USE_MOCK=true (chỉ dev).",
+      "missing_api_key",
+    );
+  }
+
+  return new OpenAiVoiceAnalysisProvider(apiKey, model);
 }
 
 export function getRemixGeneratorProvider(): RemixGeneratorProvider {
@@ -62,4 +85,11 @@ export async function generateRemixVariants(
 ) {
   const provider = getRemixGeneratorProvider();
   return provider.generateVariants(input);
+}
+
+export async function analyzeVoiceProfile(
+  input: Parameters<VoiceAnalysisProvider["analyzeVoice"]>[0],
+) {
+  const provider = getVoiceAnalysisProvider();
+  return provider.analyzeVoice(input);
 }

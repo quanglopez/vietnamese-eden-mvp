@@ -13,12 +13,14 @@ import {
   REMIX_TONE_OPTIONS,
 } from "@/lib/remix/constants";
 import type { RemixFormat, RemixTone } from "@/types/remix";
+import type { VoiceProfileListItem } from "@/types/voice";
 
 const selectClassName =
   "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50";
 
 type RemixFormProps = {
   contentItemId: string;
+  voiceProfiles: VoiceProfileListItem[];
   disabled?: boolean;
   disabledMessage?: string | null;
   onSuccess?: () => void;
@@ -26,12 +28,16 @@ type RemixFormProps = {
 
 export function RemixForm({
   contentItemId,
+  voiceProfiles,
   disabled = false,
   disabledMessage,
   onSuccess,
 }: RemixFormProps) {
+  const defaultVoiceId =
+    voiceProfiles.find((p) => p.isDefault)?.id ?? voiceProfiles[0]?.id ?? "";
   const [format, setFormat] = useState<RemixFormat>("facebook_post");
   const [tone, setTone] = useState<RemixTone>("friendly");
+  const [voiceProfileId, setVoiceProfileId] = useState(defaultVoiceId);
   const [variantCount, setVariantCount] = useState(DEFAULT_REMIX_VARIANT_COUNT);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -49,6 +55,7 @@ export function RemixForm({
         format,
         tone,
         variantCount,
+        voiceProfileId: voiceProfileId || null,
       });
       if (!result.success) {
         setError(result.error);
@@ -80,6 +87,41 @@ export function RemixForm({
           {disabledMessage}
         </p>
       ) : null}
+
+      {voiceProfiles.length > 0 ? (
+        <div className="space-y-2">
+          <Label htmlFor="remix-voice">Voice profile</Label>
+          <select
+            id="remix-voice"
+            value={voiceProfileId}
+            onChange={(event) => setVoiceProfileId(event.target.value)}
+            disabled={disabled || isPending}
+            className={selectClassName}
+          >
+            <option value="">Không dùng voice profile</option>
+            {voiceProfiles.map((profile) => (
+              <option key={profile.id} value={profile.id}>
+                {profile.name}
+                {profile.isDefault ? " (mặc định)" : ""}
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-muted-foreground">
+            Remix sẽ bám giọng viết đã phân tích.{" "}
+            <a href="/voice" className="text-brand hover:underline">
+              Quản lý voice
+            </a>
+          </p>
+        </div>
+      ) : (
+        <p className="text-xs text-muted-foreground rounded-lg bg-muted/40 px-3 py-2">
+          Chưa có voice profile.{" "}
+          <a href="/voice" className="text-brand hover:underline">
+            Tạo tại /voice
+          </a>{" "}
+          để remix đúng giọng hơn.
+        </p>
+      )}
 
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="space-y-2">

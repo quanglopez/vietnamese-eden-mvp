@@ -22,9 +22,11 @@ export class MockRemixGeneratorProvider implements RemixGeneratorProvider {
           "",
           snippet ? `Mở đầu: ${snippet}…` : "Nội dung remix mẫu cho dev.",
           "",
-          input.analysis
-            ? `Góc: ${input.analysis.angle.slice(0, 120)}…`
-            : "Dựa trên nội dung gốc.",
+          input.voiceProfile
+            ? `Giọng ${input.voiceProfile.name}: ${input.voiceProfile.tone.slice(0, 80)}…`
+            : input.analysis
+              ? `Góc: ${input.analysis.angle.slice(0, 120)}…`
+              : "Dựa trên nội dung gốc.",
           "",
           `CTA: Bình luận "${n}" để nhận thêm tài liệu.`,
         ].join("\n"),

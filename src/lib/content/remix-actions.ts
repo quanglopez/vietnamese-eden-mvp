@@ -16,6 +16,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getPlatformLabel } from "@/lib/content/platform-styles";
 import type { RemixFormat, RemixTone } from "@/types/remix";
 
+import { getVoiceProfileById } from "@/lib/voice/queries";
+
 import { getContentAnalysisByItemId, getContentItemById } from "./analysis-queries";
 
 const FORMAT_SET = new Set<RemixFormat>([
@@ -39,8 +41,9 @@ export async function generateRemixAction(input: {
   format: RemixFormat;
   tone: RemixTone;
   variantCount?: number;
+  voiceProfileId?: string | null;
 }): Promise<ActionResult<{ outputIds: string[] }>> {
-  const { contentItemId, format, tone } = input;
+  const { contentItemId, format, tone, voiceProfileId } = input;
   const variantCount = input.variantCount ?? DEFAULT_REMIX_VARIANT_COUNT;
 
   if (!isValidUuid(contentItemId)) {
@@ -104,6 +107,25 @@ export async function generateRemixAction(input: {
     };
   }
 
+  let voiceProfile = null;
+  if (voiceProfileId) {
+    if (!isValidUuid(voiceProfileId)) {
+      return { success: false, error: "Voice profile không hợp lệ." };
+    }
+    const { profile, error: voiceError } = await getVoiceProfileById(
+      supabase,
+      voiceProfileId,
+      user.id,
+    );
+    if (voiceError) {
+      return { success: false, error: voiceError };
+    }
+    if (!profile) {
+      return { success: false, error: "Không tìm thấy voice profile." };
+    }
+    voiceProfile = profile;
+  }
+
   let remixResult;
   try {
     remixResult = await generateRemixVariants({
@@ -114,6 +136,7 @@ export async function generateRemixAction(input: {
       tone,
       variantCount,
       analysis,
+      voiceProfile,
     });
   } catch (error) {
     if (error instanceof AiProviderError) {
@@ -128,6 +151,7 @@ export async function generateRemixAction(input: {
   const rows = remixResult.variants.map((variant, index) => ({
     workspace_id: item.workspaceId,
     source_content_item_id: contentItemId,
+    voice_profile_id: voiceProfile?.id ?? null,
     title: buildOutputTitle({ format, tone, variantIndex: index + 1 }),
     content: variant.content,
     status: "draft" as const,
