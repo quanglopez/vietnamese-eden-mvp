@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Loader2, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -38,6 +38,10 @@ export function RemixForm({
   const [format, setFormat] = useState<RemixFormat>("facebook_post");
   const [tone, setTone] = useState<RemixTone>("friendly");
   const [voiceProfileId, setVoiceProfileId] = useState(defaultVoiceId);
+
+  useEffect(() => {
+    setVoiceProfileId(defaultVoiceId);
+  }, [defaultVoiceId]);
   const [variantCount, setVariantCount] = useState(DEFAULT_REMIX_VARIANT_COUNT);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();

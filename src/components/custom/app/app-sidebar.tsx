@@ -91,9 +91,9 @@ export function AppSidebar({ onAdd }: { onAdd: () => void }) {
       </nav>
 
       <div className="m-3 rounded-2xl p-4 bg-gradient-brand-soft border border-border/60">
-        <div className="text-xs font-semibold text-foreground">Bạn còn 7 ngày dùng thử</div>
+        <div className="text-xs font-semibold text-foreground">Beta MVP</div>
         <div className="text-[11px] text-muted-foreground mt-1">
-          Nâng cấp để mở khoá Remix AI không giới hạn.
+          Gói cước và billing sẽ có ở phiên bản sau.
         </div>
         <Link href="/pricing">
           <Button
