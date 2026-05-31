@@ -1,6 +1,6 @@
 # Beta invite messages — Vietnamese Eden MVP
 
-**Production:** https://vietnamese-eden-mvp.vercel.app/  
+**Production:** [https://vietnamese-eden-mvp.vercel.app/](https://vietnamese-eden-mvp.vercel.app/)  
 **Onboarding:** [beta-onboarding.md](./beta-onboarding.md)  
 **Limitations:** [known-limitations.md](./known-limitations.md)
 
@@ -52,7 +52,7 @@ Bắt đầu:
 3. Ghi nhận giới hạn beta: [known-limitations — tóm tắt: chưa scrape link, chưa auto-post]
 
 Feedback:
-Sau khi test (trong 7 ngày), vui lòng điền form: [URL form — owner điền]
+Sau khi test (trong 7 ngày), vui lòng điền form: https://docs.google.com/forms/d/1JkPFQji46AIJISC4oKNY92QgovarNzafUgqVzQ1hMe4/
 Hoặc trả lời email này với screenshot nếu gặp lỗi.
 
 Mình sẽ follow-up sau 48h nếu chưa thấy bạn vào app.
@@ -105,10 +105,12 @@ Chúc bạn làm content vui!
 
 ## 5. Ghi chú gửi tin
 
-| Kênh | Gợi ý |
-|------|--------|
-| Telegram / Zalo | Tin ngắn + link signup + onboarding paste |
-| Email | Bản dài + form feedback |
-| Facebook group | Xin phép admin; không spam; 1 post + comment FAQ |
+
+| Kênh            | Gợi ý                                            |
+| --------------- | ------------------------------------------------ |
+| Telegram / Zalo | Tin ngắn + link signup + onboarding paste        |
+| Email           | Bản dài + form feedback                          |
+| Facebook group  | Xin phép admin; không spam; 1 post + comment FAQ |
+
 
 **Không hứa:** giá cụ thể, ngày launch trả phí, feature chưa có (auto-post, scrape URL).

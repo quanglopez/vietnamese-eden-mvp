@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { Loader2, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
+
+import {
+  AiErrorBanner,
+  AiLoadingOverlay,
+  useAiLoadingTimer,
+} from "@/components/custom/app/ai-loading-state";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -45,6 +51,7 @@ export function RemixForm({
   const [variantCount, setVariantCount] = useState(DEFAULT_REMIX_VARIANT_COUNT);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const loading = useAiLoadingTimer(isPending, "remix");
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -72,8 +79,9 @@ export function RemixForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-2xl border border-border/60 bg-gradient-brand-soft p-5 space-y-4"
+      className="relative rounded-2xl border border-border/60 bg-gradient-brand-soft p-5 space-y-4"
     >
+      <div className={isPending ? "space-y-4 opacity-50 pointer-events-none select-none" : "space-y-4"}>
       <div className="flex items-center gap-3">
         <div className="h-10 w-10 rounded-xl bg-gradient-brand grid place-items-center shadow-glow">
           <Sparkles className="h-5 w-5 text-white" />
@@ -177,9 +185,7 @@ export function RemixForm({
         />
       </div>
 
-      {error ? (
-        <p className="text-sm text-destructive bg-destructive/5 rounded-lg px-3 py-2">{error}</p>
-      ) : null}
+      {error ? <AiErrorBanner message={error} /> : null}
 
       <Button
         type="submit"
@@ -187,10 +193,7 @@ export function RemixForm({
         className="w-full gap-2 bg-foreground text-background"
       >
         {isPending ? (
-          <>
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Đang tạo remix…
-          </>
+          <>Đang tạo remix…</>
         ) : (
           <>
             <Sparkles className="h-4 w-4" />
@@ -198,6 +201,16 @@ export function RemixForm({
           </>
         )}
       </Button>
+      </div>
+
+      <AiLoadingOverlay
+        isLoading={isPending}
+        title="Đang tạo remix"
+        subtitle={`Đang tạo ${variantCount} biến thể, có thể mất 30–120 giây`}
+        stepText={loading.stepText}
+        message={loading.message}
+        progress={loading.progress}
+      />
     </form>
   );
 }

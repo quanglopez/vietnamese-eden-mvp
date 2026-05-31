@@ -177,7 +177,11 @@ export function BreakdownStatusBanner({
         className="bg-foreground text-background gap-2"
       >
         <Sparkles className="h-4 w-4" />
-        {hasAnalysis ? "Phân tích lại" : "Phân tích AI"}
+        {isAnalyzing
+          ? "Đang phân tích…"
+          : hasAnalysis
+            ? "Phân tích lại"
+            : "Phân tích AI"}
       </Button>
     </div>
   );

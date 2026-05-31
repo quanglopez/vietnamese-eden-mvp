@@ -3,9 +3,14 @@
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Link2, Loader2, Wand2 } from "lucide-react";
+import { ArrowLeft, Link2, Wand2 } from "lucide-react";
 
 import { AppShell } from "@/components/custom/app/app-shell";
+import {
+  AiErrorBanner,
+  AiLoadingOverlay,
+  useAiLoadingTimer,
+} from "@/components/custom/app/ai-loading-state";
 import {
   BreakdownSections,
   BreakdownStatusBanner,
@@ -36,6 +41,7 @@ export function BreakdownView({
   const [analysis, setAnalysis] = useState(initialAnalysis);
   const [formError, setFormError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const loading = useAiLoadingTimer(isPending, "breakdown");
 
   useEffect(() => {
     setAnalysis(initialAnalysis);
@@ -114,49 +120,55 @@ export function BreakdownView({
             </div>
           ) : (
             <>
-              <BreakdownStatusBanner
-                hasAnalysis={Boolean(analysis)}
-                aiModel={analysis?.aiModel ?? null}
-                onReanalyze={handleAnalyze}
-                isAnalyzing={isPending}
-              />
+              <div className="relative space-y-4">
+                <div
+                  className={
+                    isPending ? "space-y-4 opacity-50 pointer-events-none select-none" : "space-y-4"
+                  }
+                >
+                  <BreakdownStatusBanner
+                    hasAnalysis={Boolean(analysis)}
+                    aiModel={analysis?.aiModel ?? null}
+                    onReanalyze={handleAnalyze}
+                    isAnalyzing={isPending}
+                  />
 
-              {isPending ? (
-                <div className="flex items-center gap-2 text-muted-foreground py-8 justify-center">
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  <span>Đang phân tích bằng AI…</span>
-                </div>
-              ) : null}
+                  {analysis && !isPending ? <BreakdownSections analysis={analysis} /> : null}
 
-              {formError ? (
-                <div className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
-                  {formError}
-                </div>
-              ) : null}
+                  {canOpenRemix ? (
+                    <div className="pt-2">
+                      <Button asChild variant="outline" className="gap-2 w-full sm:w-auto">
+                        <Link href={remixHref}>
+                          <Wand2 className="h-4 w-4" />
+                          Tạo remix
+                        </Link>
+                      </Button>
+                      {!analysis ? (
+                        <p className="mt-2 text-xs text-muted-foreground">
+                          Cần phân tích AI trước khi generate remix.
+                        </p>
+                      ) : null}
+                    </div>
+                  ) : null}
 
-              {analysis && !isPending ? <BreakdownSections analysis={analysis} /> : null}
-
-              {canOpenRemix ? (
-                <div className="pt-2">
-                  <Button asChild variant="outline" className="gap-2 w-full sm:w-auto">
-                    <Link href={remixHref}>
-                      <Wand2 className="h-4 w-4" />
-                      Tạo remix
-                    </Link>
-                  </Button>
-                  {!analysis ? (
-                    <p className="mt-2 text-xs text-muted-foreground">
-                      Cần phân tích AI trước khi generate remix.
-                    </p>
+                  {!analysis && !isPending && !formError ? (
+                    <div className="rounded-2xl border border-dashed border-border/80 p-8 text-center text-muted-foreground">
+                      Bấm &quot;Phân tích AI&quot; để tạo breakdown cho nội dung này.
+                    </div>
                   ) : null}
                 </div>
-              ) : null}
 
-              {!analysis && !isPending && !formError ? (
-                <div className="rounded-2xl border border-dashed border-border/80 p-8 text-center text-muted-foreground">
-                  Bấm &quot;Phân tích AI&quot; để tạo breakdown cho nội dung này.
-                </div>
-              ) : null}
+                <AiLoadingOverlay
+                  isLoading={isPending}
+                  title="AI Breakdown"
+                  subtitle="Có thể mất 30–90 giây · Có thể lâu hơn với nội dung dài"
+                  stepText={loading.stepText}
+                  message={loading.message}
+                  progress={loading.progress}
+                />
+              </div>
+
+              {formError ? <AiErrorBanner message={formError} /> : null}
             </>
           )}
         </div>
