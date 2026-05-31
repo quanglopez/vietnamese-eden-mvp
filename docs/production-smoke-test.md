@@ -10,6 +10,57 @@ Chạy sau khi hoàn tất [supabase-cloud-setup.md](./supabase-cloud-setup.md) 
 
 ---
 
+## ALE-86 — Xiaomi MiMo V2.5 deploy + production AI retest (2026-05-31)
+
+| Field | Value |
+|-------|--------|
+| **Test date** | 2026-05-31 |
+| **Environment** | Production — https://vietnamese-eden-mvp.vercel.app/ |
+| **GitHub `main`** | `21ec18e` (AI provider abstraction + Xiaomi; commit message docs-only) |
+| **Vercel env** | `AI_PROVIDER=xiaomi`, `AI_MODEL=mimo-v2.5`, `XIAOMI_API_KEY`, `XIAOMI_BASE_URL`, `AI_USE_MOCK=false` |
+| **Method** | Playwright MCP |
+| **Account** | Login `ale85prodretest20260531@example.com` |
+
+### AI provider verification
+
+| Signal | Result |
+|--------|--------|
+| Breakdown model label | **`Model: xiaomi:mimo-v2.5`** |
+| Error prefix OpenAI | **No** — Xiaomi active on production |
+| OpenAI-compatible API | **Yes** — `chat-completions` + custom `XIAOMI_BASE_URL` |
+
+### Production retest checklist
+
+| # | Step | Result | Notes |
+|---|------|--------|-------|
+| 1 | Login | **PASS** | `/login` → `/dashboard` |
+| 2 | Board | **PASS** | Reused `Smoke Board ALE-85` |
+| 3 | Add content | **PASS** | Existing text item |
+| 4 | AI Breakdown | **PASS** | Hook/Angle/Structure/CTA + `xiaomi:mimo-v2.5` |
+| 5 | Remix | **PASS** (caveat) | 5 biến thể Facebook → `Không parse được JSON từ Xiaomi MiMo`; **3 biến thể TikTok PASS** |
+| 6 | Voice Profile | **PASS** | `Voice ALE-86` saved, tone summary hiển thị |
+| 7 | Add to Calendar | **PASS** | `ALE-86 Calendar Smoke` từ remix output |
+| 8 | Refresh Calendar | **PASS** | Hard reload — `Sắp tới (1)` còn item |
+
+### Beta readiness (ALE-86)
+
+| Scope | Verdict |
+|-------|---------|
+| P0 RLS | **Cleared** |
+| Workspace → board → content | **Beta-ready** |
+| AI Breakdown (Xiaomi) | **Beta-ready** |
+| Remix (Xiaomi) | **Mostly ready** — flaky JSON khi 5 biến thể / một số format |
+| Voice (Xiaomi) | **Beta-ready** |
+| Calendar | **Beta-ready** |
+
+**Overall:** Full MVP E2E **PASS** với caveat remix 5-variant.
+
+### Follow-up
+
+- Retest remix 5 biến thể sau khi harden JSON parse (Linear follow-up, không block beta core).
+
+---
+
 ## ALE-85 — RLS confirmed + full MVP production retest (2026-05-31)
 
 | Field | Value |
