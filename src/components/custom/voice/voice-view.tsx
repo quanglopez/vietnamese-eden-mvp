@@ -84,9 +84,23 @@ export function VoiceView({ profiles: initialProfiles, fetchError }: VoiceViewPr
               </div>
               <p className="font-display font-bold text-lg">Chưa có voice profile</p>
               <p className="text-sm text-muted-foreground mt-2 max-w-md mx-auto">
-                Tạo profile đầu tiên bằng cách dán các bài viết cũ — AI sẽ phân tích tone, từ vựng
-                và quy tắc viết để dùng khi remix.
+                Tạo voice profile đầu tiên — AI sẽ học cách bạn viết để remix đúng giọng hơn.
+                Nhấn &quot;Tạo Voice Profile mới&quot; bên cạnh để bắt đầu.
               </p>
+              <ol className="mt-6 text-sm text-muted-foreground text-left max-w-xs mx-auto space-y-2">
+                <li className="flex gap-2">
+                  <span className="font-semibold text-brand shrink-0">1.</span>
+                  <span>Dán bài viết cũ (caption, post, bài dài)</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="font-semibold text-brand shrink-0">2.</span>
+                  <span>AI phân tích tone, từ vựng và quy tắc viết</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="font-semibold text-brand shrink-0">3.</span>
+                  <span>Dùng profile khi tạo Remix</span>
+                </li>
+              </ol>
             </div>
           )}
         </div>

@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 
 import { analyzeVoiceProfile } from "@/lib/ai/client";
-import { AiProviderError } from "@/lib/ai/errors";
 import type { ActionResult } from "@/lib/boards/actions";
 import { isValidUuid } from "@/lib/boards/utils";
 import {
@@ -11,6 +10,7 @@ import {
   MAX_VOICE_SAMPLE_CHARS,
   MIN_VOICE_SAMPLE_CHARS,
 } from "@/lib/voice/constants";
+import { mapVoiceAnalysisError } from "@/lib/voice/error-messages";
 import { buildStyleNotesPayload } from "@/lib/voice/style-notes";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/workspaces/queries";
@@ -66,13 +66,7 @@ export async function createVoiceProfileAction(input: {
       description: description || null,
     });
   } catch (error) {
-    if (error instanceof AiProviderError) {
-      return { success: false, error: error.message };
-    }
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Phân tích giọng viết thất bại.",
-    };
+    return { success: false, error: mapVoiceAnalysisError(error) };
   }
 
   const { count: existingCount } = await supabase
