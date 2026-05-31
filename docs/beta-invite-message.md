@@ -17,7 +17,12 @@ Mình mời bạn thử bản beta Vietnamese Eden — workspace AI giúp lưu b
 
 🔗 https://vietnamese-eden-mvp.vercel.app/signup
 
+⚠️ Đăng ký: chỉ dùng email + password. Google login chưa bật.
+📋 Workspace: đặt tên "Cá nhân" hoặc "Content của [Tên bạn]" — chỉ cần 1 workspace.
+
 Bạn dành ~20 phút làm theo checklist trong link hướng dẫn (mình gửi kèm sau khi bạn OK).
+
+💡 Nhớ: muốn AI phân tích sâu thì dùng **Paste text** (dán caption/script vào). URL chỉ lưu link, chưa scrape nội dung.
 
 Sau khi test, nhắn mình 3 ý: (1) bước dễ nhất (2) bước khó/chậm nhất (3) 1 điều cần cải thiện.
 
@@ -25,7 +30,7 @@ Cảm ơn bạn 🙏
 ```
 
 **Link hướng dẫn (gửi ngay sau tin trên):**  
-Gửi file hoặc link repo doc `beta-onboarding.md` — hoặc tóm tắt 8 bước từ onboarding §3.
+Gửi file hoặc link repo doc `beta-onboarding.md` — hoặc tóm tắt 8 bước từ onboarding §4.
 
 ---
 
@@ -47,9 +52,17 @@ Vietnamese Eden là gì?
 
 Bắt đầu:
 1. Đăng ký: https://vietnamese-eden-mvp.vercel.app/signup
-   (Dùng email không có dấu + trong địa chỉ — vd. ban@gmail.com)
-2. Làm theo checklist ~20 phút: [đính kèm beta-onboarding hoặc link Notion]
-3. Ghi nhận giới hạn beta: [known-limitations — tóm tắt: chưa scrape link, chưa auto-post]
+   ⚠️ Chỉ dùng **email + password** — Google OAuth chưa bật trên production.
+2. Tạo workspace: đặt tên đơn giản như "Cá nhân" — chỉ cần 1 workspace.
+3. Làm theo checklist ~20 phút: [đính kèm beta-onboarding hoặc link Notion]
+4. Paste text vs URL:
+   • Dùng **Paste text** khi có caption/script sẵn → AI phân tích đầy đủ
+   • Dùng **URL** chỉ để lưu link tham khảo → AI chưa scrape/transcript
+5. Thứ tự đề xuất:
+   • Remix baseline trước (chưa voice) → tạo Voice Profile → remix lại để so sánh
+6. Ghi nhận giới hạn beta: [known-limitations — tóm tắt: chưa scrape link, chưa auto-post]
+
+⏳ AI chậm 1–2 phút là bình thường — đừng refresh trang khi đang chạy.
 
 Feedback:
 Sau khi test (trong 7 ngày), vui lòng điền form: https://docs.google.com/forms/d/1JkPFQji46AIJISC4oKNY92QgovarNzafUgqVzQ1hMe4/
@@ -84,7 +97,9 @@ Chào [Tên], thấy bạn đã vào app — cảm ơn!
 
 Bước quan trọng nhất: mở board → thêm caption (paste text) → bấm Phân tích AI → Tạo remix.
 
-Nếu AI chậm 1–2 phút là bình thường. Gặp lỗi đỏ thì chụp màn hình gửi mình.
+💡 Dùng **Paste text** để AI phân tích sâu. URL chỉ lưu link, chưa scrape.
+⏳ AI chậm 1–2 phút là bình thường. Không refresh trang khi đang chạy.
+🔧 Gặp lỗi đỏ thì chụp màn hình gửi mình.
 ```
 
 ---
@@ -105,12 +120,10 @@ Chúc bạn làm content vui!
 
 ## 5. Ghi chú gửi tin
 
-
 | Kênh            | Gợi ý                                            |
 | --------------- | ------------------------------------------------ |
 | Telegram / Zalo | Tin ngắn + link signup + onboarding paste        |
 | Email           | Bản dài + form feedback                          |
 | Facebook group  | Xin phép admin; không spam; 1 post + comment FAQ |
-
 
 **Không hứa:** giá cụ thể, ngày launch trả phí, feature chưa có (auto-post, scrape URL).

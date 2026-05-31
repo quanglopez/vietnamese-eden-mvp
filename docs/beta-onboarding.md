@@ -10,7 +10,7 @@ Hướng dẫn cho **10–20 beta users** đầu tiên. Không cần cài đặt
 
 - Dùng **Chrome / Edge** phiên bản mới (desktop hoặc mobile).
 - Chuẩn bị **email không có dấu `+`** (vd. `ban@gmail.com`) cho đăng ký / quên mật khẩu.
-- AI chạy trên server (**Xiaomi MiMo V2.5**) — cần mạng ổn định; mỗi lần phân tích/remix có thể mất **30 giây – 2 phút**.
+- **AI chạy trên server** — cần mạng ổn định; mỗi lần phân tích/remix có thể mất **30 giây – 2 phút**.
 
 ---
 
@@ -21,11 +21,22 @@ Hướng dẫn cho **10–20 beta users** đầu tiên. Không cần cài đặt
 3. Nếu project bật xác nhận email → mở link trong hộp thư → vào app.  
 4. Lần đầu vào **Bảng cảm hứng** có thể thấy **Tạo workspace** — bấm một lần.
 
+**⚠️ Đăng nhập:** Chỉ dùng **email + password**. Google OAuth hiện chưa bật trên production — đừng nhấn "Đăng nhập Google" nếu thấy nút đó.
+
 **Chưa có quyền beta?** Gửi form waitlist trên landing: https://vietnamese-eden-mvp.vercel.app/#waitlist
 
 ---
 
-## 3. Flow test đề xuất (15–25 phút)
+## 3. Workspace là gì?
+
+- Workspace = **không gian làm việc / folder lớn** của bạn.  
+- Solo creator có thể đặt tên **"Cá nhân"** hoặc **"Content của [Tên bạn]"**.  
+- Chỉ cần tạo **một workspace duy nhất** — tất cả board sẽ nằm trong đó.  
+- Không cần thay đổi workspace sau khi tạo.
+
+---
+
+## 4. Flow test đề xuất (15–25 phút)
 
 | Bước | Việc làm | Kỳ vọng |
 |------|----------|---------|
@@ -38,9 +49,26 @@ Hướng dẫn cho **10–20 beta users** đầu tiên. Không cần cài đặt
 | 7 | Một output → **Đưa vào lịch** | Toast OK |
 | 8 | **Lịch nội dung** → refresh trang | Item còn trên lịch |
 
+**⚠️ Thứ tự quan trọng:**  
+- Nếu chưa có Voice Profile: làm **remix baseline trước** → tạo Voice Profile → **remix lại để so sánh** sự khác biệt.
+- Nếu đã có Voice Profile: chọn voice khi tạo remix ngay từ đầu.
+
+**⏳ AI chậm là bình thường:** Breakdown 30–90s, Remix 30–120s, Voice Profile 60–120s. **Không refresh trang** khi đang chạy — AI vẫn đang xử lý phía sau.
+
 ---
 
-## 4. Data mẫu (paste text)
+## 5. Paste text vs URL — cái nào khi nào?
+
+| Cách thêm | Khi nào dùng | AI phân tích được? |
+|-----------|--------------|-------------------|
+| **Paste text** ✅ | Bạn có nội dung sẵn (caption, script, bài đăng) | **Có** — Breakdown, Remix, Voice đều hoạt động |
+| **URL** 🔗 | Bạn muốn lưu link để tham khảo sau | **Chưa** — URL-only chỉ lưu link, chưa scrape/transcript. Muốn AI phân tích sâu thì phải dùng **Paste text** và dán nội dung vào. |
+
+**💡 Mẹo:** Khi thấy content viral trên TikTok/YouTube, copy caption/script và dán qua **Paste text** để AI phân tích đầy đủ.
+
+---
+
+## 6. Data mẫu (paste text)
 
 **Tiêu đề:** `Hook skincare viral test`
 
@@ -54,7 +82,7 @@ Hướng dẫn cho **10–20 beta users** đầu tiên. Không cần cài đặt
 
 ---
 
-## 5. Báo bug
+## 7. Báo bug
 
 Gửi cho team (Linear / email / group chat nội bộ):
 
@@ -64,9 +92,11 @@ Gửi cho team (Linear / email / group chat nội bộ):
 4. **Thời gian** (giờ VN) + trình duyệt (Chrome mobile/desktop)  
 5. **Email tài khoản** (không gửi mật khẩu)
 
+**🔧 Bị kẹt ở đâu?** Chụp màn hình gửi owner ngay — đừng cố refresh nhiều lần.
+
 ---
 
-## 6. Không nên kỳ vọng ở bản beta
+## 8. Không nên kỳ vọng ở bản beta
 
 - Tự đăng lên TikTok / Facebook / Instagram  
 - Tự tải transcript từ link TikTok/YouTube (URL-only = lưu link, chưa scrape)  
@@ -79,12 +109,13 @@ Chi tiết: [known-limitations.md](./known-limitations.md)
 
 ---
 
-## 7. Tài liệu liên quan
+## 9. Tài liệu liên quan
 
 | Doc | Mục đích |
 |-----|----------|
 | [known-limitations.md](./known-limitations.md) | Giới hạn sản phẩm |
 | [production-smoke-test.md](./production-smoke-test.md) | Kết quả test nội bộ |
 | [project-status.md](./project-status.md) | Snapshot trạng thái dự án |
+| [beta-feedback-round-1.md](./beta-feedback-round-1.md) | Tổng hợp feedback đợt 1 |
 
 *(Tài liệu nội bộ team: [frontend-workflow.md](./frontend-workflow.md) — Lovable prototype vs production; không cần cho beta users.)*
