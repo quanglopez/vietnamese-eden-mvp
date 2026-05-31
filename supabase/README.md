@@ -11,6 +11,7 @@ Migrations (apply in order):
 1. `20260530120000_health_check.sql`
 2. `20260530130000_initial_schema.sql`
 3. `20260531120000_beta_waitlist.sql`
+4. `20260531140000_workspace_owner_select.sql` (ALE-83 — workspace bootstrap RLS)
 
 Deploy Vercel + Cloud: [`docs/deploy-checklist.md`](../docs/deploy-checklist.md)
 
