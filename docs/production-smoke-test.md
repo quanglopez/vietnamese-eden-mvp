@@ -10,6 +10,49 @@ Chạy sau khi hoàn tất [supabase-cloud-setup.md](./supabase-cloud-setup.md) 
 
 ---
 
+## ALE-81 — Hotfix form validation (2026-05-31)
+
+**Deploy tested:** https://vietnamese-eden-mvp.vercel.app/ (commits `b045245`, `5f3f603` on `main`)
+
+**Phương pháp:** `curl` health + Playwright (fill form fields, submit)
+
+### Tóm tắt
+
+| Hạng mục | Kết quả |
+|----------|---------|
+| Health `/api/health/supabase` | **PASS** |
+| Signup `/signup` | **PASS** — zod messages tiếng Việt; submit → `/dashboard` (email confirm tắt trên Supabase dev) |
+| Login `/login` | **PASS** — đăng nhập user vừa tạo → `/dashboard` |
+| Waitlist client validation | **PASS** — không còn "Invalid input" trên mọi field |
+| Waitlist server insert | **BLOCKED** — `Bảng waitlist chưa được migrate` (cần apply `20260531120000_beta_waitlist.sql` trên Supabase Cloud) |
+| Forgot-password form | **NOT RUN** (cùng `auth.ts` + `Input` forwardRef — kỳ vọng PASS) |
+| MVP flow đầy đủ | **NOT RUN** |
+
+### Fix đã deploy
+
+| Thay đổi | File |
+|----------|------|
+| `import { z } from "zod/v4"` cho RHF forms | `src/lib/validations/auth.ts`, `waitlist.ts` |
+| `React.forwardRef` cho input binding | `src/components/ui/input.tsx`, `textarea.tsx` |
+| Gitignore Playwright artifacts | `.gitignore` → `.playwright-mcp/` |
+
+**Commits:** `fix: resolve production form validation` · `fix: add forwardRef to Textarea for waitlist form`
+
+### Beta readiness (sau ALE-81)
+
+| Verdict | Lý do |
+|---------|--------|
+| **Sẵn sàng beta hạn chế (auth)** | Signup/login hoạt động trên production |
+| **Chưa đủ cho waitlist landing** | Migration `beta_waitlist` chưa apply trên Supabase Cloud |
+
+### Follow-up
+
+1. Owner: `supabase db push` / apply migration ALE-77 trên Cloud → retest waitlist success toast
+2. **ALE-82**: E2E Playwright production (optional)
+3. Dọn repo: `.playwright-mcp/` đã gitignore; có thể xóa artifacts khỏi history commit `b045245` (non-blocking)
+
+---
+
 ## ALE-80 — Kết quả chạy thực tế (2026-05-31)
 
 **Deploy tested:** https://vietnamese-eden-mvp.vercel.app/ (Vercel Production, Supabase Cloud env đã cấu hình)
