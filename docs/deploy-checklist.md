@@ -153,18 +153,20 @@ Xem chi tiết: [docs/production-env.md](./production-env.md)
 - [ ] `NEXT_PUBLIC_SUPABASE_URL`
 - [ ] `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - [ ] `NEXT_PUBLIC_SITE_URL` = URL production (vd. `https://vietnamese-eden.vercel.app`)
-- [ ] `OPENAI_API_KEY`
+- [ ] `AI_PROVIDER` = `xiaomi` (hoặc `openai` rollback)
 - [ ] `AI_USE_MOCK` = `false`
-- [ ] `OPENAI_MODEL` = `gpt-4o-mini` (optional)
+- [ ] `AI_MODEL` = `mimo-v2.5`
+- [ ] `XIAOMI_API_KEY` + `XIAOMI_BASE_URL` (khi dùng xiaomi)
+- [ ] `OPENAI_API_KEY` (chỉ khi `AI_PROVIDER=openai`)
 
 **Preview (Vercel Preview):**
 
 - [ ] Cùng Supabase dev project **hoặc** project preview riêng (team quyết định)
 - [ ] `NEXT_PUBLIC_SITE_URL` = **URL preview cố định** hoặc set per-deployment trong Vercel (xem production-env.md)
-- [ ] `OPENAI_API_KEY` (bắt buộc — xem mục AI bên dưới)
+- [ ] `AI_PROVIDER` + Xiaomi hoặc OpenAI keys (xem mục AI bên dưới)
 - [ ] Không set `AI_USE_MOCK=true` expecting mock trên Vercel
 
-> **Quan trọng:** Trên Vercel, `NODE_ENV=production` kể cả Preview → `AI_USE_MOCK=true` **không** bật mock. Phải có `OPENAI_API_KEY` để Breakdown/Remix/Voice chạy.
+> **Quan trọng:** Trên Vercel, `NODE_ENV=production` kể cả Preview → `AI_USE_MOCK=true` **không** bật mock. Phải cấu hình provider thật (`xiaomi` hoặc `openai`).
 
 ### C.4 Deploy
 
@@ -190,13 +192,14 @@ Chi tiết demo app: [docs/demo-script.md](./demo-script.md)
 
 ## D. AI production readiness
 
-| Env | `AI_USE_MOCK` | `OPENAI_API_KEY` | Hành vi |
-|-----|---------------|------------------|---------|
-| Local dev | `true` | optional | Mock provider |
-| Local dev | `false` | required | OpenAI thật |
-| Vercel (Preview/Prod) | `false` | **required** | OpenAI; thiếu key → UI báo lỗi, không crash |
+| Env | `AI_USE_MOCK` | `AI_PROVIDER` | Hành vi |
+|-----|---------------|---------------|---------|
+| Local dev | `true` | any | Mock provider |
+| Local dev | `false` | `xiaomi` | Xiaomi (cần `XIAOMI_*`) |
+| Local dev | `false` | `openai` | OpenAI (cần `OPENAI_API_KEY`) |
+| Vercel (Preview/Prod) | `false` | `xiaomi` / `openai` | Provider thật; thiếu config → message tiếng Việt, không crash |
 
-Code: `src/lib/ai/client.ts` — mock chỉ khi `AI_USE_MOCK=true` **và** `NODE_ENV !== "production"`.
+Code: `src/lib/ai/provider.ts` — mock chỉ khi `AI_USE_MOCK=true` **và** `NODE_ENV !== "production"`.
 
 ---
 
@@ -216,7 +219,8 @@ Code: `src/lib/ai/client.ts` — mock chỉ khi `AI_USE_MOCK=true` **và** `NODE
 | Auth redirect mismatch | Thêm đúng `/auth/callback` URL trên Supabase |
 | `Invalid login credentials` | User chưa confirm email / sai project Supabase |
 | Waitlist lỗi bảng | `supabase db push` migration waitlist |
-| AI luôn lỗi trên Vercel | Thêm `OPENAI_API_KEY`; không rely `AI_USE_MOCK` |
+| AI luôn lỗi trên Vercel | Kiểm tra `AI_PROVIDER`, `XIAOMI_*` hoặc `OPENAI_API_KEY`; không rely `AI_USE_MOCK` |
+| Rollback AI | `AI_PROVIDER=openai` + `OPENAI_API_KEY` trên Vercel |
 | Build fail trên Vercel | Chạy `npm run build` local; xem log env thiếu |
 
 ---
@@ -229,6 +233,6 @@ Cần bạn (project owner) cung cấp / thực hiện:
 2. **Supabase Cloud** project dev + chạy migrations
 3. Paste env vars vào Vercel (không gửi key qua chat công khai)
 4. Cấu hình auth redirect URLs cho domain Vercel
-5. (Tuỳ chọn) `OPENAI_API_KEY` với billing enabled
+5. Xiaomi MiMo: `XIAOMI_API_KEY`, `XIAOMI_BASE_URL`, `AI_PROVIDER=xiaomi` (hoặc OpenAI rollback)
 
 Agent **không** tự deploy khi chưa có credentials / xác nhận.

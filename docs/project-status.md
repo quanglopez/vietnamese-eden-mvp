@@ -1,9 +1,9 @@
 # Project status — Vietnamese Eden MVP
 
 **Mục đích:** Snapshot ngắn để ChatGPT / agent mới nắm tình hình nhanh.  
-**Cập nhật lần cuối:** 2026-05-31 (ALE-84)  
+**Cập nhật lần cuối:** 2026-05-31 (ALE-85 production retest)  
 **Repo:** `C:\Users\ADMIN\vietnamese-eden-mvp`  
-**Cách cập nhật:** Sau mỗi issue, copy [status-update-template.md](./status-update-template.md) → điền → merge vào các mục dưới.
+**Cách cập nhật:** [status-update-template.md](./status-update-template.md)
 
 ---
 
@@ -13,31 +13,18 @@
 |-------|--------|
 | **Production URL** | https://vietnamese-eden-mvp.vercel.app/ |
 | **GitHub** | https://github.com/quanglopez/vietnamese-eden-mvp |
-| **Stack** | Next.js 14, TypeScript, Tailwind, shadcn/ui, Supabase, OpenAI |
-| **Linear** | Source of truth cho tasks (team Alexgpt) |
+| **Stack** | Next.js 14, TypeScript, Tailwind, shadcn/ui, Supabase, AI (OpenAI on prod today) |
+| **Linear** | Source of truth (team Alexgpt) |
 
 ---
 
-## Latest completed issue
+## Latest completed verification
 
 | | |
 |--|--|
-| **Issue** | **ALE-84** — Workspace RLS migration + MVP production retest |
-| **Outcome** | Migration **reviewed** + **on `main`** (`3153bd3`). Cloud apply **pending** (agent không apply được). Production probe: workspace vẫn **FAIL RLS**. MVP flow 8–19 **NOT RUN**. |
-| **Docs** | [production-smoke-test.md](./production-smoke-test.md) — section ALE-84 (SQL Editor steps) |
-
-**Issue trước:** **ALE-83** — E2E smoke documented P0 workspace blocker.
-
----
-
-## Latest commit
-
-| | |
-|--|--|
-| **SHA** | `3153bd3` |
-| **Message** | `docs: add project status and workspace RLS migration` |
-| **Branch** | `main` (= `origin/main`) |
-| **Includes** | `supabase/migrations/20260531140000_workspace_owner_select.sql`, `docs/project-status.md`, `docs/status-update-template.md` |
+| **Issue** | **ALE-85** — Production retest (RLS policies confirmed + full MVP flow) |
+| **Outcome** | **P0 RLS cleared** on production (workspace → board → content). **AI FAIL** — OpenAI 500 on breakdown + voice. Remix/calendar **NOT RUN**. |
+| **Docs** | [production-smoke-test.md](./production-smoke-test.md) — § ALE-85 |
 
 ---
 
@@ -45,12 +32,12 @@
 
 | Scope | Status |
 |-------|--------|
-| Landing + pricing + waitlist | **Ready** |
-| Signup / login (production) | **Ready** |
-| Form validation (zod/v4 + forwardRef) | **Deployed** |
-| Full MVP (board → AI → calendar) on production | **Not ready** — migration #4 chưa apply Cloud |
+| Landing + waitlist + auth | **Ready** |
+| Workspace → board → add content | **Ready** (ALE-85 retest PASS) |
+| **P0 RLS** (`profiles_insert_own`, `workspaces_select_owner`) | **Cleared** — policies exist on Cloud; retest không lỗi RLS |
+| AI breakdown / remix / voice / calendar E2E | **Not ready** — OpenAI `internal_error` (500) on production |
 
-**Verdict:** Beta **marketing + auth** OK. Beta **full MVP** sau owner apply SQL migration #4 + retest PASS.
+**Verdict:** Beta **marketing + auth + data entry (workspace/board/content)** OK. Beta **full AI MVP** **not ready** until AI provider works on Vercel (Xiaomi deploy hoặc OpenAI fix).
 
 ---
 
@@ -58,43 +45,46 @@
 
 | Priority | Blocker | Action |
 |----------|---------|--------|
-| **P0** | Migration `20260531140000_workspace_owner_select.sql` **chưa apply** Supabase Cloud | Owner: SQL Editor — chi tiết [production-smoke-test.md § ALE-84](./production-smoke-test.md) |
-| **P1** | MVP E2E 8–19 chưa retest | Sau P0: signup → workspace → board → AI → calendar |
-| **P1** | OpenAI E2E trên Vercel chưa verify | Sau có content item |
-| P2 | Forgot-password + email addressing | Email test không dùng `+` |
-
-**P0 còn?** **Có** — xác nhận bằng production test 2026-05-31.
+| ~~**P0**~~ | ~~Workspace RLS~~ | **Cleared** (ALE-84 migration + ALE-85 retest) |
+| **P1** | OpenAI 500 on breakdown + voice | Deploy Xiaomi provider **hoặc** fix `OPENAI_API_KEY` / quota / model trên Vercel |
+| **P1** | Remix / calendar E2E | Retest sau AI OK |
+| P2 | Forgot-password với email `+` | Dùng email không `+` |
 
 ---
 
-## Supabase Cloud migrations (apply order)
+## In progress (code, not yet on production)
 
-1. `20260530120000_health_check.sql` — applied
-2. `20260530130000_initial_schema.sql` — applied
-3. `20260531120000_beta_waitlist.sql` — applied (ALE-82)
-4. `20260531140000_workspace_owner_select.sql` — **PENDING** ← **owner action**
+| | |
+|--|--|
+| **ALE-85/86** | AI provider abstraction (`mock` \| `openai` \| `xiaomi`) — local repo; **chưa verify** trên production URL |
 
 ---
 
-## Next recommended issue
+## Supabase Cloud migrations
 
-**ALE-85** — Sau owner apply migration #4 trên Cloud:
+1. `20260530120000_health_check.sql` — applied  
+2. `20260530130000_initial_schema.sql` — applied  
+3. `20260531120000_beta_waitlist.sql` — applied  
+4. `20260531140000_workspace_owner_select.sql` — applied; policies **confirmed** on Cloud (ALE-85)
 
-1. Production retest full MVP (board → breakdown → remix → voice → calendar).
-2. Cập nhật checklist ALE-84 trong `production-smoke-test.md`.
-3. Cập nhật file này: P0 cleared, beta readiness full MVP.
+---
+
+## Next recommended steps
+
+1. **Owner:** Vercel — deploy latest `main` + set `AI_PROVIDER=xiaomi`, `XIAOMI_API_KEY`, `XIAOMI_BASE_URL`, `AI_MODEL=mimo-v2.5`, `AI_USE_MOCK=false` (hoặc fix OpenAI).
+2. Retest production steps 6–10: breakdown → remix → calendar → voice.
+3. Cập nhật smoke doc khi AI PASS.
+
+**Rollback AI:** `AI_PROVIDER=openai` + valid `OPENAI_API_KEY`.
 
 ---
 
 ## Last verify commands
 
-| Command | Result (2026-05-31, ALE-84) |
-|---------|------------------------------|
-| `npm run lint` | **Skipped** — docs only |
-| `npm run type-check` | **Skipped** — docs only |
-| `npm run build` | **Skipped** — docs only |
-
-**Production probe (Playwright):** workspace create → **FAIL** (RLS) — confirms migration not on Cloud yet.
+| Command | Result (2026-05-31) |
+|---------|---------------------|
+| Production Playwright retest | See ALE-85 in production-smoke-test.md |
+| `curl …/api/health/supabase` | **ok** |
 
 ```bash
 curl -s https://vietnamese-eden-mvp.vercel.app/api/health/supabase
@@ -107,10 +97,8 @@ curl -s https://vietnamese-eden-mvp.vercel.app/api/health/supabase
 | Doc | Dùng khi |
 |-----|----------|
 | [project-status.md](./project-status.md) | **Đọc đầu tiên** |
-| [status-update-template.md](./status-update-template.md) | Sau mỗi issue |
-| [production-smoke-test.md](./production-smoke-test.md) | Smoke / ALE-84 SQL steps |
-| [supabase-cloud-setup.md](./supabase-cloud-setup.md) | Cloud setup |
-| [demo-script.md](./demo-script.md) | Demo flow |
+| [production-smoke-test.md](./production-smoke-test.md) | Chi tiết smoke / ALE-xx |
+| [production-env.md](./production-env.md) | Vercel env (Xiaomi / OpenAI) |
 
 ---
 
@@ -118,5 +106,6 @@ curl -s https://vietnamese-eden-mvp.vercel.app/api/health/supabase
 
 | Date | Issue | Summary |
 |------|-------|---------|
-| 2026-05-31 | ALE-84 | Migration on main; Cloud apply pending; SQL Editor guide; MVP retest blocked |
-| 2026-05-31 | — | Khởi tạo `project-status.md` + template (post ALE-83) |
+| 2026-05-31 | ALE-85 | Prod retest: RLS PASS; AI OpenAI 500; full MVP not ready |
+| 2026-05-31 | ALE-84 | Migration applied; workspace/board PASS |
+| 2026-05-31 | — | Khởi tạo project-status |

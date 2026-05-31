@@ -1,74 +1,11 @@
-import { AiProviderError } from "@/lib/ai/errors";
-import { MockContentAnalysisProvider } from "@/lib/ai/providers/mock";
-import { MockRemixGeneratorProvider } from "@/lib/ai/providers/mock-remix";
-import { MockVoiceAnalysisProvider } from "@/lib/ai/providers/mock-voice";
-import { OpenAiContentAnalysisProvider } from "@/lib/ai/providers/openai";
-import { OpenAiRemixGeneratorProvider } from "@/lib/ai/providers/openai-remix";
-import { OpenAiVoiceAnalysisProvider } from "@/lib/ai/providers/openai-voice";
-import type {
-  ContentAnalysisProvider,
-  RemixGeneratorProvider,
-  VoiceAnalysisProvider,
-} from "@/lib/ai/types";
+import {
+  getContentAnalysisProvider,
+  getRemixGeneratorProvider,
+  getVoiceAnalysisProvider,
+} from "@/lib/ai/provider";
+import type { RemixGeneratorProvider } from "@/lib/ai/types";
 
-function resolveAiConfig() {
-  const apiKey = process.env.OPENAI_API_KEY?.trim();
-  const useMock = process.env.AI_USE_MOCK === "true";
-  const isProduction = process.env.NODE_ENV === "production";
-  const model = process.env.OPENAI_MODEL?.trim() || "gpt-4o-mini";
-  return { apiKey, useMock, isProduction, model };
-}
-
-export function getContentAnalysisProvider(): ContentAnalysisProvider {
-  const { apiKey, useMock, isProduction, model } = resolveAiConfig();
-
-  if (useMock && !isProduction) {
-    return new MockContentAnalysisProvider();
-  }
-
-  if (!apiKey) {
-    throw new AiProviderError(
-      "Thiếu OPENAI_API_KEY. Thêm key vào .env.local hoặc bật AI_USE_MOCK=true (chỉ dev).",
-      "missing_api_key",
-    );
-  }
-
-  return new OpenAiContentAnalysisProvider(apiKey, model);
-}
-
-export function getVoiceAnalysisProvider(): VoiceAnalysisProvider {
-  const { apiKey, useMock, isProduction, model } = resolveAiConfig();
-
-  if (useMock && !isProduction) {
-    return new MockVoiceAnalysisProvider();
-  }
-
-  if (!apiKey) {
-    throw new AiProviderError(
-      "Thiếu OPENAI_API_KEY. Thêm key vào .env.local hoặc bật AI_USE_MOCK=true (chỉ dev).",
-      "missing_api_key",
-    );
-  }
-
-  return new OpenAiVoiceAnalysisProvider(apiKey, model);
-}
-
-export function getRemixGeneratorProvider(): RemixGeneratorProvider {
-  const { apiKey, useMock, isProduction, model } = resolveAiConfig();
-
-  if (useMock && !isProduction) {
-    return new MockRemixGeneratorProvider();
-  }
-
-  if (!apiKey) {
-    throw new AiProviderError(
-      "Thiếu OPENAI_API_KEY. Thêm key vào .env.local hoặc bật AI_USE_MOCK=true (chỉ dev).",
-      "missing_api_key",
-    );
-  }
-
-  return new OpenAiRemixGeneratorProvider(apiKey, model);
-}
+export { getActiveAiModelLabel } from "@/lib/ai/provider";
 
 export async function analyzeContentText(input: {
   title: string;
@@ -88,7 +25,9 @@ export async function generateRemixVariants(
 }
 
 export async function analyzeVoiceProfile(
-  input: Parameters<VoiceAnalysisProvider["analyzeVoice"]>[0],
+  input: Parameters<
+    ReturnType<typeof getVoiceAnalysisProvider>["analyzeVoice"]
+  >[0],
 ) {
   const provider = getVoiceAnalysisProvider();
   return provider.analyzeVoice(input);

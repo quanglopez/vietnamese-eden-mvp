@@ -1,38 +1,58 @@
-import { openAiJsonCompletion } from "@/lib/ai/openai-chat";
-import { AiProviderError } from "@/lib/ai/errors";
 import {
-  breakdownAnalysisSchema,
-  buildBreakdownUserPrompt,
-  BREAKDOWN_SYSTEM_PROMPT,
-  type BreakdownAnalysisResult,
-} from "@/lib/ai/prompts/breakdown";
-import type { AnalysisProviderInput, ContentAnalysisProvider } from "@/lib/ai/types";
+  normalizeChatApiBaseUrl,
+  type ChatCompletionConfig,
+} from "@/lib/ai/chat-completions";
+import { resolveAiModel, resolveOpenAiCredentials } from "@/lib/ai/config";
+import {
+  OpenAiCompatibleContentAnalysisProvider,
+  OpenAiCompatibleRemixGeneratorProvider,
+  OpenAiCompatibleVoiceAnalysisProvider,
+} from "@/lib/ai/providers/openai-compatible";
 
-export class OpenAiContentAnalysisProvider implements ContentAnalysisProvider {
-  readonly name: string;
-  private readonly apiKey: string;
-  private readonly model: string;
+export {
+  OpenAiCompatibleContentAnalysisProvider,
+  OpenAiCompatibleRemixGeneratorProvider,
+  OpenAiCompatibleVoiceAnalysisProvider,
+};
+import type {
+  ContentAnalysisProvider,
+  RemixGeneratorProvider,
+  VoiceAnalysisProvider,
+} from "@/lib/ai/types";
 
+export function createOpenAiChatConfig(): ChatCompletionConfig {
+  const { apiKey, baseUrl } = resolveOpenAiCredentials();
+
+  return {
+    apiKey,
+    baseUrl: normalizeChatApiBaseUrl(baseUrl),
+    model: resolveAiModel("openai"),
+    providerName: "OpenAI",
+  };
+}
+
+export function createOpenAiContentAnalysisProvider(): ContentAnalysisProvider {
+  return new OpenAiCompatibleContentAnalysisProvider(createOpenAiChatConfig());
+}
+
+export function createOpenAiRemixGeneratorProvider(): RemixGeneratorProvider {
+  return new OpenAiCompatibleRemixGeneratorProvider(createOpenAiChatConfig());
+}
+
+export function createOpenAiVoiceAnalysisProvider(): VoiceAnalysisProvider {
+  return new OpenAiCompatibleVoiceAnalysisProvider(createOpenAiChatConfig());
+}
+
+/** @deprecated Use createOpenAiContentAnalysisProvider */
+export class OpenAiContentAnalysisProvider extends OpenAiCompatibleContentAnalysisProvider {
   constructor(apiKey: string, model: string) {
-    this.apiKey = apiKey;
-    this.model = model;
-    this.name = model;
-  }
-
-  async analyzeContent(input: AnalysisProviderInput): Promise<BreakdownAnalysisResult> {
-    const parsed = await openAiJsonCompletion({
-      apiKey: this.apiKey,
-      model: this.model,
-      systemPrompt: BREAKDOWN_SYSTEM_PROMPT,
-      userPrompt: buildBreakdownUserPrompt(input),
-      temperature: 0.4,
+    super({
+      apiKey,
+      baseUrl: normalizeChatApiBaseUrl(
+        process.env.OPENAI_BASE_URL?.trim() || "https://api.openai.com/v1",
+      ),
+      model,
+      providerName: "OpenAI",
     });
-
-    const validated = breakdownAnalysisSchema.safeParse(parsed);
-    if (!validated.success) {
-      throw new AiProviderError("JSON breakdown không đúng schema.", "invalid_response");
-    }
-
-    return validated.data;
   }
 }

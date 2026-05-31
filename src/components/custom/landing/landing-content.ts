@@ -59,7 +59,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: "Có cần OpenAI API key không?",
-    a: "Beta có thể dùng chế độ mock (AI_USE_MOCK=true). Khi bật AI thật, bạn cấu hình OPENAI_API_KEY trên server.",
+    a: "Beta có thể dùng chế độ mock (AI_USE_MOCK=true, chỉ dev). Production cấu hình AI provider trên server (Xiaomi MiMo hoặc OpenAI fallback).",
   },
   {
     q: "URL TikTok/Facebook có tự lấy nội dung không?",

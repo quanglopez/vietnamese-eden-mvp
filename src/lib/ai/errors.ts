@@ -1,5 +1,9 @@
 export class AiProviderError extends Error {
-  readonly code: "missing_api_key" | "provider_error" | "invalid_response";
+  readonly code:
+    | "missing_api_key"
+    | "missing_config"
+    | "provider_error"
+    | "invalid_response";
 
   constructor(
     message: string,

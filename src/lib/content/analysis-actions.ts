@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { analyzeContentText } from "@/lib/ai/client";
+import { analyzeContentText, getActiveAiModelLabel } from "@/lib/ai/client";
 import { AiProviderError } from "@/lib/ai/errors";
 import type { ActionResult } from "@/lib/boards/actions";
 import {
@@ -58,10 +58,7 @@ export async function runContentAnalysisAction(
       sourceUrl: item.sourceUrl,
     });
     analysisResult = providerResult;
-    aiModel =
-      process.env.AI_USE_MOCK === "true" && process.env.NODE_ENV !== "production"
-        ? "mock-dev"
-        : process.env.OPENAI_MODEL?.trim() || "gpt-4o-mini";
+    aiModel = getActiveAiModelLabel();
   } catch (error) {
     if (error instanceof AiProviderError) {
       return { success: false, error: error.message };

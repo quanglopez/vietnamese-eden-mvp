@@ -10,14 +10,83 @@ Chạy sau khi hoàn tất [supabase-cloud-setup.md](./supabase-cloud-setup.md) 
 
 ---
 
+## ALE-85 — RLS confirmed + full MVP production retest (2026-05-31)
+
+| Field | Value |
+|-------|--------|
+| **Test date** | 2026-05-31 |
+| **Environment** | Production — https://vietnamese-eden-mvp.vercel.app/ |
+| **Method** | Playwright MCP (automated) |
+| **Tester** | Agent — ALE-85 production retest |
+| **Account** | New signup `ale85prodretest20260531@example.com` (no email confirm gate) |
+
+### RLS / migration context (owner)
+
+| Policy | Table | Status (owner) |
+|--------|-------|----------------|
+| `profiles_insert_own` | `profiles` | **Already exists** on Supabase Cloud |
+| `workspaces_select_owner` | `workspaces` | **Already exists** on Supabase Cloud |
+
+Không apply lại migration #4 trong lần test này — xác nhận policy đã có trước khi retest.
+
+### Production retest checklist
+
+| # | Step | Result | Notes |
+|---|------|--------|-------|
+| 1 | Login | **PASS** | Signup → `/dashboard` (tương đương login; confirm email không bật) |
+| 2 | Dashboard | **PASS** | Shell MVP, CTA boards/voice/calendar |
+| 3 | Create workspace | **PASS** | **Tạo workspace** → header `Workspace của ALE-85` — không lỗi RLS |
+| 4 | Create board | **PASS** | `Smoke Board ALE-85` → `/boards/4e2e3376-3b8b-4bd8-bbc9-e9307d3d69c9` |
+| 5 | Add content (text) | **PASS** | Paste text → toast + card `Hook beauty ALE-85` |
+| 6 | AI Breakdown | **FAIL** | UI: `OpenAI API lỗi (500): internal_error` |
+| 7 | Remix | **NOT RUN** | Blocked — chưa có breakdown |
+| 8 | Voice Profile | **FAIL** | `/voice` → `Phân tích & lưu profile` → cùng OpenAI 500 |
+| 9 | Add to Calendar | **NOT RUN** | Không có remix output |
+| 10 | Refresh Calendar | **NOT RUN** | — |
+
+### Network / routes (failures)
+
+| Route | Method | Status | Response / error |
+|-------|--------|--------|------------------|
+| `/breakdown/[contentItemId]` | POST (server action) | **200** (HTTP) | Server action trả `{ success: false, error: "OpenAI API lỗi (500): … internal_error" }` — không phải RLS |
+| `/voice` | POST (server action) | **200** (HTTP) | Cùng OpenAI 500 |
+
+**Supabase auth:** `GET …/auth/v1/user` → **200** trong session.
+
+**RLS tables exercised (PASS):** `workspaces` (insert/select owner), `boards`, `content_items` — không thấy policy violation.
+
+### AI provider on production (observed)
+
+| Signal | Finding |
+|--------|---------|
+| Error message prefix | **`OpenAI API lỗi`** — production deploy **chưa** dùng Xiaomi MiMo (ALE-85/86 code chưa deploy hoặc Vercel vẫn `AI_PROVIDER=openai`) |
+| Missing key | **No** — gọi được API, trả 500 `internal_error` |
+| Xiaomi env | **NOT VERIFIED** on live app |
+
+### Beta readiness (ALE-85 retest)
+
+| Scope | Verdict |
+|-------|---------|
+| Marketing + waitlist + auth | **Beta-ready** |
+| Workspace → board → content | **Beta-ready** |
+| **P0 RLS** | **Cleared** — workspace/board/content không lỗi policy |
+| Full MVP (AI → remix → calendar) | **Not beta-ready** — OpenAI 500 |
+
+### Follow-up
+
+1. Deploy ALE-85/86 AI provider + set Vercel `AI_PROVIDER=xiaomi`, `XIAOMI_*`, hoặc fix OpenAI key/quota.
+2. Retest steps 6–10 sau deploy.
+
+---
+
 ## ALE-84 — Workspace RLS migration + MVP retest (2026-05-31)
 
 | Field | Value |
 |-------|--------|
 | **Test date** | 2026-05-31 |
 | **Environment** | Production — https://vietnamese-eden-mvp.vercel.app/ |
-| **GitHub `main`** | Migration committed in `3153bd3` (`docs: add project status and workspace RLS migration`) |
-| **Supabase MCP** | Chỉ **local** (`127.0.0.1:54321`) — agent **không** apply lên Cloud |
+| **GitHub `main`** | `3dcc31f` (`fix: add workspace owner RLS migration`) + `3153bd3` (migration file + project status docs) |
+| **Method** | Playwright MCP production |
 
 ### Migration review (`20260531140000_workspace_owner_select.sql`)
 
@@ -26,110 +95,65 @@ Chạy sau khi hoàn tất [supabase-cloud-setup.md](./supabase-cloud-setup.md) 
 | Chỉ RLS policies | **Yes** — 2× `CREATE POLICY` |
 | DROP / DELETE / TRUNCATE data | **No** |
 | ALTER schema / bảng khác | **No** |
-| An toàn production | **Yes** — additive policies only |
+| An toàn production | **Yes** |
 
-**Policies thêm:**
-
-1. `workspaces_select_owner` — `SELECT` cho owner (`owner_id = auth.uid()`)
-2. `profiles_insert_own` — `INSERT` profile của chính user (`id = auth.uid()`)
-
-### Migration apply status trên Supabase Cloud
+### Migration apply status (Supabase Cloud)
 
 | Status | Evidence |
 |--------|----------|
-| **NOT APPLIED** (lúc agent test) | Production: signup → **Tạo workspace** → vẫn `new row violates row-level security policy for table "workspaces"` |
+| **APPLIED** | Production retest: signup → workspace UI hiện (`Workspace của …`, **Tạo bảng mới**) — không còn lỗi RLS `workspaces` |
 
-Agent **không có quyền** apply Cloud qua MCP. Owner cần chạy SQL Editor (bên dưới), rồi báo lại để retest steps 8–19.
+### Production retest MVP (sau migration apply)
 
-### Owner: Supabase SQL Editor (bắt buộc trước retest MVP)
+| Step | Result | Notes |
+|------|--------|-------|
+| Login / signup | **PASS** | Signup → `/dashboard` |
+| Dashboard | **PASS** | Demo MVP shell |
+| Create workspace | **PASS** | Auto hoặc **Tạo workspace** — không lỗi RLS |
+| Create board | **PASS** | Board list + open `/boards/[id]` |
+| Board detail | **PASS** | Grid load sau "Đang tải bảng…" |
+| Add content (text) | **PASS** | Modal **Thêm content** → Paste text → **Lưu vào bảng** |
+| Add content (URL) | **NOT RUN** | — |
+| AI breakdown | **FAIL** | `OpenAI API lỗi (500): internal_error` — key có vẻ set nhưng API trả 500 |
+| Remix + copy/export | **NOT RUN** | Blocked bởi breakdown |
+| Voice profile | **NOT RUN** / inconclusive | Session test riêng; cần retest khi AI OK |
+| Calendar + refresh | **NOT RUN** | Lịch trống (chưa có output từ remix) |
 
-**Dashboard** → project Cloud (cùng project Vercel env) → **SQL** → **New query**.
+### AI feature result (ALE-84)
 
-**Bước A — Kiểm tra trước (chạy riêng):**
-
-```sql
-select policyname, cmd
-from pg_policies
-where schemaname = 'public'
-  and tablename in ('workspaces', 'profiles')
-  and policyname in ('workspaces_select_owner', 'profiles_insert_own')
-order by tablename, policyname;
-```
-
-Kỳ vọng trước apply: **0 rows** (hoặc thiếu một trong hai policy).
-
-**Bước B — Apply migration (copy nguyên file repo):**
-
-`supabase/migrations/20260531140000_workspace_owner_select.sql`
-
-```sql
--- ALE-83: Fix workspace bootstrap on Supabase Cloud
-create policy "workspaces_select_owner"
-  on public.workspaces for select to authenticated
-  using (owner_id = auth.uid());
-
-create policy "profiles_insert_own"
-  on public.profiles for insert to authenticated
-  with check (id = auth.uid());
-```
-
-**Run.** Nếu báo policy đã tồn tại → đã apply; chuyển bước C.
-
-**Bước C — Xác nhận sau apply:**
-
-```sql
-select policyname, cmd, roles
-from pg_policies
-where schemaname = 'public'
-  and policyname in ('workspaces_select_owner', 'profiles_insert_own');
-```
-
-Kỳ vọng: **2 rows**.
-
-**Bước D — Smoke nhanh trên production (manual):**
-
-1. https://vietnamese-eden-mvp.vercel.app/signup — user mới
-2. `/boards` → **Tạo workspace** → không còn lỗi RLS
-3. **Tạo bảng mới** → mở board → thêm content text
-
-### Production retest MVP (agent — trước khi owner apply)
-
-| Step | Result |
+| Test | Result |
 |------|--------|
-| Login / signup | **PASS** (signup → dashboard) |
-| Dashboard | **PASS** |
-| Create workspace | **FAIL** — RLS (migration chưa trên Cloud) |
-| Create board | **NOT RUN** |
-| Board detail / add text / URL | **NOT RUN** |
-| AI breakdown | **NOT RUN** |
+| Breakdown gọi OpenAI | **FAIL** — HTTP 500 `internal_error` từ OpenAI |
 | Remix | **NOT RUN** |
-| Voice profile | **NOT RUN** |
-| Calendar + refresh | **NOT RUN** |
+| `OPENAI_API_KEY` trên Vercel | **Likely set** (app gọi API, không báo thiếu key) — **quota/model/config issue** |
 
-### Production retest MVP (sau owner apply) — checklist
+### Calendar result
 
-Điền sau khi owner xác nhận bước B–D:
+**NOT RUN** — không có remix output để đưa vào lịch.
 
-| Step | Pass? | Notes |
-|------|-------|-------|
-| Tạo workspace | ☐ | |
-| Tạo board | ☐ | |
-| Add content (text) | ☐ | |
-| AI breakdown (text) | ☐ | Cần `OPENAI_API_KEY` trên Vercel |
-| Remix + copy/export | ☐ | |
-| Voice profile | ☐ | |
-| Add to calendar + F5 | ☐ | |
+### Bugs found
+
+| ID | Severity | Mô tả |
+|----|----------|--------|
+| — | **Resolved** | P0 workspace RLS — migration #4 applied |
+| **P1** | Blocker AI | OpenAI 500 trên production breakdown |
+| P2 | — | Forgot-password `+` email (từ ALE-83) |
 
 ### Beta readiness (ALE-84)
 
 | Scope | Verdict |
 |-------|---------|
-| Marketing + auth | **Beta-ready** (unchanged) |
-| Full MVP production | **Not beta-ready** until migration **applied** + retest **PASS** |
+| Marketing + waitlist + auth | **Beta-ready** |
+| App shell (workspace → board → content) | **Beta-ready** |
+| Full MVP (AI → remix → calendar) | **Not beta-ready** — OpenAI production 500 |
+
+### Owner SQL (reference — đã apply)
+
+File: `supabase/migrations/20260531140000_workspace_owner_select.sql`
 
 ### Follow-up
 
-- **ALE-85** (đề xuất): Agent/owner retest full MVP trên production **sau** khi SQL Editor apply xong (điền bảng checklist trên).
+- **ALE-85** (đề xuất): Fix/verify OpenAI trên Vercel → retest breakdown → remix → voice → calendar.
 
 ---
 
