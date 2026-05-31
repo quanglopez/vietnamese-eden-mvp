@@ -1,9 +1,10 @@
 # UI Port Plan — s-ng-t-o-vi-t → vietnamese-eden-mvp
 
 > **Audit date:** 2026-05-30  
-> **Prototype:** `C:\Users\ADMIN\s-ng-t-o-vi-t` (TanStack Start + Vite + Lovable)  
-> **Production:** `C:\Users\ADMIN\vietnamese-eden-mvp` (Next.js 14 App Router + Supabase)  
-> **Phạm vi doc:** Chỉ lập kế hoạch port UI — **không** đổi auth, Supabase, schema, không copy TanStack framework.
+> **Prototype:** `C:\Users\ADMIN\s-ng-t-o-vi-t` (TanStack Start + Vite + **Lovable** — UI source)  
+> **Production:** `C:\Users\ADMIN\vietnamese-eden-mvp` (Next.js 14 — port + backend trong **Cursor**)  
+> **Workflow hiện tại:** [frontend-workflow.md](./frontend-workflow.md) · Trạng thái port: [ui-port-audit.md](./ui-port-audit.md)  
+> **Phạm vi doc:** Kế hoạch port UI lịch sử (M1–M7) — **không** đổi auth, Supabase, schema.
 
 ---
 

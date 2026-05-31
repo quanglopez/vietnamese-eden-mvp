@@ -1,26 +1,44 @@
 # UI Port Audit: s-ng-t-o-vi-t → vietnamese-eden-mvp
 
-> **Issue:** ALE-65  
-> **Ngày audit:** 2026-05-31 (cập nhật sau ALE-140)  
-> **Prototype:** `C:\Users\ADMIN\s-ng-t-o-vi-t` (TanStack Start + Vite 7 + Tailwind v4 + Lovable)  
-> **Production:** `C:\Users\ADMIN\vietnamese-eden-mvp` (Next.js 14 App Router + Tailwind v3 + Supabase)  
-> **Tài liệu liên quan:** `docs/ui-port-plan.md` (kế hoạch port chi tiết hơn)
+> **Issue:** ALE-65 (audit gốc) · **Cập nhật vai trò Lovable:** 2026-05-31  
+> **Prototype (Lovable):** `C:\Users\ADMIN\s-ng-t-o-vi-t` — TanStack Start + Vite 7 + Tailwind v4, UI do **Lovable** generate/iterate  
+> **Production (Cursor):** `C:\Users\ADMIN\vietnamese-eden-mvp` — Next.js 14 App Router + Tailwind v3 + Supabase + AI  
+> **Workflow:** [frontend-workflow.md](./frontend-workflow.md)
 
-**Mục đích:** Xác định page/component nào port từ UI prototype sang production, thứ tự ưu tiên, và checklist cho ALE-66 trở đi.
+**Vai trò Lovable:** Nguồn **frontend prototype** (layout, component structure, design tokens, mock flows). **Không** deploy production. Cursor port UI → nối Supabase/auth/AI → Vercel.
+
+**Mục đích:** Inventory page/component từ prototype; trạng thái port trên production; trang còn tham khảo Lovable khi polish.
 
 ---
 
-## Trạng thái hiện tại (sau ALE-140)
+## Trạng thái production (2026-05-31)
 
 | Hạng mục | Trạng thái |
 |----------|------------|
-| AppShell + AppSidebar | ✅ Đã port → `src/components/custom/app/` |
-| Dashboard UI | ✅ Đã port (mock data) → `(app)/dashboard` |
-| Design tokens (brand, gradient, surface) | ✅ Đã thêm vào `globals.css` + `tailwind.config.ts` |
-| AddContentModal | ✅ UI port; logic AI/breakdown **chưa** wire |
-| Middleware protected routes | ✅ `/dashboard`, `/boards`, `/breakdown`, `/voice`, `/remix`, `/calendar` |
-| Boards / Breakdown / Voice / Remix / Calendar | ⏳ Placeholder `ComingSoonPage` |
-| Board CRUD + Supabase query | ❌ Chưa (ALE-67+) |
+| **Lovable prototype** | `s-ng-t-o-vi-t` — reference UI, mock data |
+| AppShell + AppSidebar | ✅ Port + production |
+| Design tokens (brand, gradient, surface) | ✅ `globals.css` + `tailwind.config.ts` |
+| AddContentModal | ✅ Port + wire Supabase (paste text / link) |
+| Landing `/` | ✅ Port **adapted** → `components/custom/landing/*` (Vietnamese Eden copy, waitlist) |
+| Dashboard | ✅ Port + app shell |
+| Boards list + board detail | ✅ Port + Supabase CRUD |
+| Breakdown | ✅ Port + Xiaomi AI |
+| Remix | ✅ Port + AI + outputs DB |
+| Voice profile | ✅ Port + AI |
+| Calendar | ✅ Port + schedule DB |
+| Pricing | ⚠️ Partial — `(app)/pricing` + section trên landing |
+| Auth (`/login`, `/signup`, …) | ✅ **Production-only** (không có trong Lovable) |
+
+*Ghi chú:* Bảng trên thay thế snapshot ALE-140 (placeholder). Beta-ready flow: [project-status.md](./project-status.md).
+
+---
+
+## Trạng thái lịch sử (ALE-140 — tham khảo)
+
+| Hạng mục | Trạng thái (cũ) |
+|----------|------------------|
+| Boards / Breakdown / Voice / Remix / Calendar | ⏳ đã là `ComingSoonPage` — **đã supersede** |
+| Board CRUD + Supabase | ❌ lúc audit — **đã có** trên production |
 
 ---
 
@@ -31,15 +49,15 @@
 | # | File | URL TanStack | Nội dung chính | Quyết định | Milestone |
 |---|------|--------------|----------------|------------|-----------|
 | 1 | `__root.tsx` | — | QueryClient, error boundary, meta | **DROP** | — |
-| 2 | `index.tsx` | `/` | Landing: hero, features, boards showcase, pricing teaser, footer | **DEFER** | M7 |
-| 3 | `dashboard.tsx` | `/dashboard` | Stats cards, trending posts, recent boards, AI suggestion, streak | **PORT** | M1 |
-| 4 | `boards.tsx` | `/boards` | Search, filter tabs, board card grid, nút tạo board | **PORT** | M1 |
-| 5 | `boards.$boardId.tsx` | `/boards/$boardId` | Gradient header, platform filter, content grid (4:5 cards) | **PORT** | M2 |
-| 6 | `breakdown.$postId.tsx` | `/breakdown/$postId` | Hook / Angle / Structure / CTA / Why viral sections | **DEFER** | M3 |
-| 7 | `voice.tsx` | `/voice` | Textarea profile, sliders trait, upload, preview | **DEFER** | M4 |
-| 8 | `remix.tsx` | `/remix` | Source picker, variant captions, copy/regenerate | **DEFER** | M5 |
-| 9 | `calendar.tsx` | `/calendar` | 30-day grid, type badges, export CSV, AI generate | **DEFER** | M6 |
-| 10 | `pricing.tsx` | `/pricing` | 3 gói giá, standalone (không AppShell) | **DEFER** | M7 |
+| 2 | `index.tsx` | `/` | Landing: hero, features, boards showcase, pricing teaser, footer | **PORT** ✅ adapted | M7 |
+| 3 | `dashboard.tsx` | `/dashboard` | Stats cards, trending posts, recent boards, AI suggestion, streak | **PORT** ✅ | M1 |
+| 4 | `boards.tsx` | `/boards` | Search, filter tabs, board card grid, nút tạo board | **PORT** ✅ | M1 |
+| 5 | `boards.$boardId.tsx` | `/boards/$boardId` | Gradient header, platform filter, content grid (4:5 cards) | **PORT** ✅ | M2 |
+| 6 | `breakdown.$postId.tsx` | `/breakdown/$postId` | Hook / Angle / Structure / CTA / Why viral sections | **PORT** ✅ | M3 |
+| 7 | `voice.tsx` | `/voice` | Textarea profile, sliders trait, upload, preview | **PORT** ✅ | M4 |
+| 8 | `remix.tsx` | `/remix` | Source picker, variant captions, copy/regenerate | **PORT** ✅ | M5 |
+| 9 | `calendar.tsx` | `/calendar` | 30-day grid, type badges, export CSV, AI generate | **PORT** ✅ | M6 |
+| 10 | `pricing.tsx` | `/pricing` | 3 gói giá, standalone (không AppShell) | **PARTIAL** ⚠️ | M7 |
 
 ### Giải thích PORT / DEFER / DROP
 
@@ -106,16 +124,16 @@
 
 | TanStack route | URL công khai | Next.js App Router | Trạng thái |
 |----------------|---------------|-------------------|------------|
-| `/dashboard` | `/dashboard` | `src/app/(app)/dashboard/page.tsx` | ✅ UI port |
-| `/boards` | `/boards` | `src/app/(app)/boards/page.tsx` | ⏳ placeholder |
-| `/boards/$boardId` | `/boards/[boardId]` | `src/app/(app)/boards/[boardId]/page.tsx` | ⏳ placeholder |
-| `/breakdown/$postId` | `/breakdown/[postId]` | `src/app/(app)/breakdown/[postId]/page.tsx` | ⏳ placeholder |
-| `/breakdown` (index) | `/breakdown` | `src/app/(app)/breakdown/page.tsx` | ⏳ placeholder |
-| `/voice` | `/voice` | `src/app/(app)/voice/page.tsx` | ⏳ placeholder |
-| `/remix` | `/remix` | `src/app/(app)/remix/page.tsx` | ⏳ placeholder |
-| `/calendar` | `/calendar` | `src/app/(app)/calendar/page.tsx` | ⏳ placeholder |
-| `/pricing` | `/pricing` | `src/app/pricing/page.tsx` *(public, chưa tạo)* | M7 |
-| `/` landing | `/` | `src/app/page.tsx` | ⏳ placeholder mỏng |
+| `/dashboard` | `/dashboard` | `src/app/(app)/dashboard/page.tsx` | ✅ |
+| `/boards` | `/boards` | `src/app/(app)/boards/page.tsx` | ✅ |
+| `/boards/$boardId` | `/boards/[boardId]` | `src/app/(app)/boards/[boardId]/page.tsx` | ✅ |
+| `/breakdown/$postId` | `/breakdown/[contentItemId]` | `src/app/(app)/breakdown/[contentItemId]/page.tsx` | ✅ |
+| `/breakdown` (index) | `/breakdown` | `src/app/(app)/breakdown/page.tsx` | ✅ hub |
+| `/voice` | `/voice` | `src/app/(app)/voice/page.tsx` | ✅ |
+| `/remix` | `/remix` | `src/app/(app)/remix/page.tsx` + `[contentItemId]` | ✅ |
+| `/calendar` | `/calendar` | `src/app/(app)/calendar/page.tsx` | ✅ |
+| `/pricing` | `/pricing` | `src/app/(app)/pricing/page.tsx` | ⚠️ partial |
+| `/` landing | `/` | `src/app/page.tsx` + `landing/*` | ✅ adapted |
 | — | — | `src/app/(app)/layout.tsx` | ✅ auth guard + session |
 
 ### Pattern chuyển đổi
@@ -153,15 +171,16 @@ useRouterState → pathname
 | **CSS utilities** | `bg-gradient-brand`, `shadow-glow`, `font-display`, `bg-surface-elev` — đã port |
 | **Platform gradient map** | Thumbnail cards TikTok/IG/YT — copy className từ `mock-data.ts` |
 
-### DEFER (milestone sau, không bỏ hẳn)
+### Còn tham khảo Lovable (polish / chưa parity 100%)
 
-| Item | Lý do defer |
-|------|-------------|
-| Breakdown 5-section layout | Cần `content_analyses` + AI Edge Function (M3) |
-| Voice sliders + upload | Cần `voice_profiles` API (M4) |
-| Remix variant generator | Cần `generated_outputs` (M5) |
-| Calendar 30-day grid | Cần `content_calendar_items` (M6) |
-| Landing + Pricing | Marketing/billing — sau MVP core (M7) |
+| Item | Ghi chú |
+|------|---------|
+| Dashboard charts / streak UI | Prototype có chart mock — production đơn giản hơn |
+| Calendar 30-day grid density | So sánh layout prototype vs production list/tabs |
+| Pricing standalone page | Prototype `pricing.tsx` đầy đủ 3 cột — production chủ yếu landing `#pricing` |
+| Voice upload / sliders | Prototype có control phụ — production dùng textarea + AI summary |
+| shadcn components chưa add | `chart`, `calendar` UI primitive — thêm qua CLI khi cần |
+| Brand copy **Vinrl** → **Vietnamese Eden** | Đã rebrand trên production; không sync ngược prototype |
 
 ### DROP (không port)
 

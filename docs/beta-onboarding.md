@@ -86,3 +86,5 @@ Chi tiết: [known-limitations.md](./known-limitations.md)
 | [known-limitations.md](./known-limitations.md) | Giới hạn sản phẩm |
 | [production-smoke-test.md](./production-smoke-test.md) | Kết quả test nội bộ |
 | [project-status.md](./project-status.md) | Snapshot trạng thái dự án |
+
+*(Tài liệu nội bộ team: [frontend-workflow.md](./frontend-workflow.md) — Lovable prototype vs production; không cần cho beta users.)*
