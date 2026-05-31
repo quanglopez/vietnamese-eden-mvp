@@ -20,14 +20,45 @@ export const remixVariantsSchema = z.object({
 
 export type RemixVariantsResult = z.infer<typeof remixVariantsSchema>;
 
+export const REMIX_FORMAT_GUIDANCE: Record<RemixFormat, string> = {
+  tiktok_script:
+    "Format: TikTok script ngắn, nói được, 15-60 giây. Mỗi variant phải khác hook và flow. Tránh văn viết dài.",
+  youtube_shorts_script:
+    "Format: YouTube Shorts script, 30-90 giây. Hook mạnh trong 3 giây đầu. CTA rõ ràng ở cuối.",
+  facebook_post:
+    "Format: Facebook post, xuống dòng dễ đọc, emoji tự nhiên, không wall-of-text. Hook ở dòng đầu.",
+  linkedin_post:
+    "Format: LinkedIn post, professional nhưng không khô khan. Storytelling hoặc insight. Xuống dòng mỗi 1-2 câu.",
+  email:
+    "Format: Email, có subject line, greeting ngắn, body scannable, CTA rõ. Professional but warm.",
+};
+
 export const REMIX_SYSTEM_PROMPT = `Bạn là copywriter chuyên tạo biến thể nội dung tiếng Việt cho creator.
 Nhiệm vụ: tạo nhiều biến thể remix dựa trên nội dung gốc và breakdown (nếu có).
+
+QUY TẮC DIVERSITY (bắt buộc):
+- Mỗi biến thể phải khác nhau ở ít nhất 2 trong 4 yếu tố: Angle/góc tiếp cận, Opening/hook mở bài, CTA/kêu gọi hành động, Structure/cấu trúc.
+- Mỗi biến thể phải có angle khác nhau rõ rệt. KHÔNG được lặp lại cùng một góc nhìn.
+  Ví dụ angle: storytelling, listicle tips, controversial opinion, before/after, myth-busting, personal confession, data-driven insight.
+- Mỗi biến thể phải có hook/opening khác nhau. KHÔNG được dùng cùng một câu mở đầu.
+  Ví dụ opening: câu hỏi, fact shocking, story opener, quote, direct address ("Mình từng…"), pattern interrupt.
+- Mỗi biến thể phải có CTA khác nhau. KHÔNG được lặp "comment ngay" hoặc cùng một lời kêu gọi ở mọi variant.
+  Ví dụ CTA: comment, share, click link, save, tag friend, reply với keyword, follow, DM.
+- Mỗi biến thể phải có cấu trúc khác nhau: ngắn gọn (1-2 câu) vs chi tiết (3-5 câu có xuống dòng) vs list vs story có intro-body-cta.
+- Các title phải phản ánh angle riêng, không generic như "Biến thể 1", "Bản 2", "Variant A".
+
+QUY TẮC TIẾNG VIỆT TỰ NHIÊN (bắt buộc):
+- Viết như người Việt nói chuyện hàng ngày — không sáo rỗng, không dùng từ hoa mỹ quá mức.
+- Tránh cụm từ "dịch máy" như: "hãy để tôi nói cho bạn biết", "trong thời đại ngày nay", "điều quan trọng là" ở mọi variant.
+- Dùng từ lóng, emoji, dấu chấm than một cách tự nhiên nếu phù hợp tone — không gượng ép.
+- Nếu format là TikTok script: viết ngắn, nói được, dùng từ đời thường. Tránh văn viết dài dòng.
+- Nếu format là Facebook/LinkedIn: giữ xuống dòng dễ đọc, mỗi đoạn 1-2 câu, dùng bullet hoặc number nếu phù hợp.
+- Nếu có Voice Profile: bám sát giọng nhưng KHÔNG copy-paste y nguyên từ sample. Học style rồi viết mới.
 
 Quy tắc nội dung:
 - Viết hoàn toàn bằng tiếng Việt tự nhiên, phù hợp format và tone được yêu cầu.
 - Nếu có Voice Profile, bắt buộc bám sát giọng viết đó (từ vựng, nhịp câu, CTA, quy tắc).
-- Mỗi biến thể phải khác nhau rõ rệt (góc mở, CTA, cấu trúc).
-- title: tiêu đề ngắn gọn cho biến thể (không trùng nhau).
+- title: tiêu đề ngắn gọn mô tả angle (không trùng nhau).
 - content: nội dung đầy đủ sẵn sàng đăng (caption/script/email body).
 - Đúng số lượng variants được yêu cầu.
 
@@ -63,6 +94,7 @@ export function buildRemixUserPrompt(input: {
 }): string {
   const formatLabel = getRemixFormatLabel(input.format);
   const toneLabel = getRemixToneLabel(input.tone);
+  const formatHint = REMIX_FORMAT_GUIDANCE[input.format];
 
   const breakdownBlock = input.analysis
     ? [
@@ -89,9 +121,12 @@ export function buildRemixUserPrompt(input: {
   return [
     `Tạo đúng ${input.variantCount} biến thể remix.`,
     `Format: ${formatLabel}`,
+    formatHint ? `📐 ${formatHint}` : null,
     `Tone remix (preset): ${toneLabel}`,
     `Tiêu đề gốc: ${input.title}`,
     `Nền tảng: ${input.platform}`,
+    "",
+    "Yêu cầu diversity: mỗi variant khác angle, hook mở bài, CTA và cấu trúc. Title mô tả angle, không generic.",
     voiceBlock ? ["", voiceBlock].join("\n") : null,
     "",
     "Nội dung gốc:",
@@ -101,3 +136,27 @@ export function buildRemixUserPrompt(input: {
     .filter((line) => line !== null)
     .join("\n");
 }
+
+/**
+ * Manual test checklist (ALE-144) — run on production or local with real AI keys:
+ *
+ * Setup: paste text content (≥50 chars) → AI Breakdown → Remix page
+ *
+ * 5 variants:
+ * - [ ] All 5 titles different and descriptive (not "Biến thể 1")
+ * - [ ] All 5 have different openings/hooks
+ * - [ ] All 5 have different CTAs
+ * - [ ] At least 2 different structures visible
+ * - [ ] Vietnamese sounds natural (no "dịch máy" tone)
+ *
+ * 10 variants:
+ * - [ ] Same diversity criteria as above
+ * - [ ] No repeated hooks across variants
+ * - [ ] No identical CTA (e.g. "comment ngay") in all 10
+ * - [ ] Format matches selected (TikTok short, FB readable, etc.)
+ *
+ * With Voice Profile:
+ * - [ ] Variants reflect voice tone but are not copy-paste from samples
+ *
+ * Regression: JSON parser (src/lib/ai/json.ts) unchanged — verify remix still saves outputs.
+ */
