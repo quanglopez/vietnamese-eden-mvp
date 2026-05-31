@@ -4,7 +4,14 @@ import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/types/database";
 
 const AUTH_ROUTES = ["/login", "/signup", "/forgot-password"];
-const PROTECTED_PREFIXES = ["/dashboard"];
+const PROTECTED_PREFIXES = [
+  "/dashboard",
+  "/boards",
+  "/breakdown",
+  "/voice",
+  "/remix",
+  "/calendar",
+];
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });

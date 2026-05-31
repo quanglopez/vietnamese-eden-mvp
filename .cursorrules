@@ -1,0 +1,57 @@
+# Vietnamese Eden MVP — Cursor AI Instructions
+
+## Project Context
+
+- **Repo**: vietnamese-eden-mvp (Next.js 14 App Router + TypeScript strict + Tailwind + shadcn/ui + Supabase)
+- **Prototype UI repo**: s-ng-t-o-vi-t (TanStack Start + Vite 7 + React 19 + Tailwind 4 + shadcn/ui)
+- **Decision**: Không phát triển song song 2 repo. Dùng prototype làm nguồn tham khảo UI, port từng page/component sang production repo. Không port framework TanStack.
+
+## Stack
+
+- Next.js 14 App Router
+- TypeScript (strict)
+- Tailwind CSS v3
+- shadcn/ui (đã cài đầy đủ primitives)
+- Supabase (auth + database)
+- Lucide React icons
+
+## Database Schema (10 bảng)
+
+- `workspaces`, `boards`, `content_items`, `board_content_items` (many-to-many), `content_analyses`, `voice_profiles`, `generated_outputs`, `content_calendar_items`, `subscriptions`, `users` (via Supabase Auth)
+
+## Auth
+
+- Supabase Auth với middleware.ts bảo vệ route `/dashboard/*`
+- Protected routes tự động redirect nếu chưa login
+
+## Port Strategy
+
+1. Foundation: `AppShell` + `AppSidebar` layout
+2. Pages: `dashboard` → `boards` → `board detail`
+3. Features: `AddContentModal` (text + URL)
+4. Milestones sau: Breakdown (M3), Voice (M4), Remix (M5), Calendar (M6), Landing (M7)
+
+## CSS Tokens cần dùng
+
+```css
+/* Tailwind extensions */
+--brand: #8B5CF6;
+--brand-2: #A78BFA;
+--brand-3: #C4B5FD;
+--brand-4: #DDD6FE;
+
+/* Classes custom */
+bg-gradient-brand: linear-gradient(135deg, #8B5CF6, #A78BFA);
+shadow-glow: 0 4px 20px rgba(139, 92, 246, 0.3);
+shadow-card: 0 8px 30px rgba(0,0,0,0.08);
+font-display: Inter or system display font;
+```
+
+## Quy tắc code
+
+- TypeScript strict: không dùng `any`
+- Server Components mặc định, chỉ dùng `"use client"` khi cần interactivity
+- Supabase queries qua Server Actions hoặc `supabase/ssr` helpers
+- shadcn/ui primitives đã có — dùng `npx shadcn add <component>` nếu thiếu
+- Tiếng Việt cho toàn bộ UI copy
+- `npm run lint && npm run type-check && npm run build` phải pass trước khi commit
