@@ -10,6 +10,41 @@ Chạy sau khi hoàn tất [supabase-cloud-setup.md](./supabase-cloud-setup.md) 
 
 ---
 
+## ALE-82 — Waitlist migration + production retest (2026-05-31)
+
+**Deploy tested:** https://vietnamese-eden-mvp.vercel.app/
+
+**Infra:** Migration `20260531120000_beta_waitlist.sql` đã apply trên Supabase Cloud (SQL Editor).
+
+**Phương pháp:** Playwright — fill form + submit (signup/login/waitlist).
+
+### Tóm tắt
+
+| Hạng mục | Kết quả |
+|----------|---------|
+| Health `/api/health/supabase` | **PASS** — `status: ok`, `supabase.ok: true` |
+| Waitlist `/#waitlist` | **PASS** — toast **"Đã ghi nhận — cảm ơn bạn!"**, không còn lỗi migrate |
+| Signup `/signup` | **PASS** — submit → `/dashboard` (email confirm tắt trên project dev) |
+| Login `/login` | **PASS** — user vừa signup → `/dashboard` |
+| Form validation | **PASS** — không có "Invalid input" |
+| Forgot-password | **NOT RUN** |
+| MVP flow (board → calendar) | **NOT RUN** |
+
+### Beta readiness (sau ALE-82)
+
+| Verdict | Lý do |
+|---------|--------|
+| **Sẵn sàng beta công khai (landing + auth)** | Waitlist insert + signup/login OK trên production URL |
+| **Chưa verify** | AI breakdown/remix, calendar E2E, mobile 375px, forgot-password |
+
+### Ghi chú tester
+
+- Email waitlist test mẫu: `ale82wl+<timestamp>@example.com`
+- Xác nhận row: Supabase Table Editor → `public.beta_waitlist`
+- Trùng email: kỳ vọng message tiếng Việt "Email đã tồn tại" (unique index)
+
+---
+
 ## ALE-81 — Hotfix form validation (2026-05-31)
 
 **Deploy tested:** https://vietnamese-eden-mvp.vercel.app/ (commits `b045245`, `5f3f603` on `main`)
@@ -24,7 +59,7 @@ Chạy sau khi hoàn tất [supabase-cloud-setup.md](./supabase-cloud-setup.md) 
 | Signup `/signup` | **PASS** — zod messages tiếng Việt; submit → `/dashboard` (email confirm tắt trên Supabase dev) |
 | Login `/login` | **PASS** — đăng nhập user vừa tạo → `/dashboard` |
 | Waitlist client validation | **PASS** — không còn "Invalid input" trên mọi field |
-| Waitlist server insert | **BLOCKED** — `Bảng waitlist chưa được migrate` (cần apply `20260531120000_beta_waitlist.sql` trên Supabase Cloud) |
+| Waitlist server insert | **BLOCKED** tại thời điểm ALE-81 — đã **PASS** sau ALE-82 (migration Cloud) |
 | Forgot-password form | **NOT RUN** (cùng `auth.ts` + `Input` forwardRef — kỳ vọng PASS) |
 | MVP flow đầy đủ | **NOT RUN** |
 
@@ -130,7 +165,7 @@ curl -s https://vietnamese-eden-mvp.vercel.app/api/health/supabase
 | 1.2 | Scroll các section | Problem, How it works, Features, Use cases, Pricing, FAQ | ☑ |
 | 1.3 | Header **Đăng nhập** | → `/login` | ☑ |
 | 1.4 | **Tham gia beta** / scroll `#waitlist` | Form name / email / use case hiện | ☑ |
-| 1.5 | Submit waitlist (email test mới) | Success hoặc lỗi email trùng (tiếng Việt) | ✗ Invalid input (deploy hiện tại) |
+| 1.5 | Submit waitlist (email test mới) | Success hoặc lỗi email trùng (tiếng Việt) | ☑ ALE-82 |
 | 1.6 | DevTools Console | Không lỗi JS đỏ blocking | ☑ |
 | 1.7 | Mobile ~375px | Layout đọc được, nút bấm được | ☐ |
 
@@ -148,9 +183,9 @@ Xác nhận DB (optional): Supabase Table Editor → `beta_waitlist` có 1 row.
 
 | # | Hành động | Kỳ vọng | Pass? |
 |---|-----------|---------|-------|
-| 2.1 | `/signup` — đăng ký user mới | Form OK, không crash | ✗ validation "Invalid input" |
-| 2.2 | Email confirmation (nếu bật) | Link mở → `/auth/callback` → `/dashboard` | ☐ blocked |
-| 2.3 | `/login` — đăng nhập | Vào `/dashboard` | ☐ blocked |
+| 2.1 | `/signup` — đăng ký user mới | Form OK, không crash | ☑ ALE-82 |
+| 2.2 | Email confirmation (nếu bật) | Link mở → `/auth/callback` → `/dashboard` | ☐ (confirm tắt trên dev — signup → dashboard trực tiếp) |
+| 2.3 | `/login` — đăng nhập | Vào `/dashboard` | ☑ ALE-82 |
 | 2.4 | Mở `/dashboard` khi chưa login | Redirect `/login?next=...` | ☑ (middleware SSR) |
 | 2.5 | Google OAuth (nếu đã cấu hình) | Login thành công | ☐ / N/A |
 
@@ -248,6 +283,7 @@ Nếu không tạo được board: kiểm tra `handle_new_user` / `workspace_mem
 | Môi trường | Ngày | Tester | Kết quả |
 |------------|------|--------|---------|
 | Production (Vercel) | 2026-05-31 | Agent ALE-80 | **Fail** — forms broken; infra OK |
+| Production (Vercel) | 2026-05-31 | Agent ALE-82 | **Pass** — waitlist + signup + login |
 | Local prod build :3020 (sau fix) | 2026-05-31 | Agent ALE-80 | Signup → email confirm screen **Pass** |
 
 **Blocking issues (ghi ID Linear nếu có):**
