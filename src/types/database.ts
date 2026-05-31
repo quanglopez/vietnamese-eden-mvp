@@ -183,12 +183,61 @@ export type Database = {
         };
         Relationships: [];
       };
+      content_analyses: {
+        Row: {
+          id: string;
+          content_item_id: string;
+          workspace_id: string;
+          hook: string | null;
+          angle: string | null;
+          structure: string | null;
+          cta: string | null;
+          summary: string | null;
+          ai_model: string | null;
+          status: "pending" | "completed" | "failed";
+          analyzed_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          content_item_id: string;
+          workspace_id: string;
+          hook?: string | null;
+          angle?: string | null;
+          structure?: string | null;
+          cta?: string | null;
+          summary?: string | null;
+          ai_model?: string | null;
+          status?: "pending" | "completed" | "failed";
+          analyzed_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          content_item_id?: string;
+          workspace_id?: string;
+          hook?: string | null;
+          angle?: string | null;
+          structure?: string | null;
+          cta?: string | null;
+          summary?: string | null;
+          ai_model?: string | null;
+          status?: "pending" | "completed" | "failed";
+          analyzed_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
     Enums: {
       workspace_role: "owner" | "admin" | "member" | "viewer";
       platform_type: "tiktok" | "facebook" | "instagram" | "youtube" | "other";
+      analysis_status: "pending" | "completed" | "failed";
     };
     CompositeTypes: Record<string, never>;
   };
