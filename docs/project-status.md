@@ -1,62 +1,73 @@
 # Project status — Vietnamese Eden MVP
 
-**Cập nhật:** 2026-05-31 (ALE-87 remix JSON hardening)  
+**Cập nhật:** 2026-05-31 (ALE-88 beta readiness)  
 **Production:** https://vietnamese-eden-mvp.vercel.app/  
-**Commit:** `0bfe448` on `main`
+**Commit:** `8dfae12` on `main`
 
 ---
 
-## Latest completed
-
-| | |
-|--|--|
-| **Issue** | **ALE-87** — Harden JSON parsing for Xiaomi remix |
-| **Outcome** | Remix **5 biến thể Facebook** PASS on production after deploy |
-| **Docs** | [production-smoke-test.md](./production-smoke-test.md) — § ALE-87 |
-
----
-
-## Beta readiness
+## Beta readiness — GO for 10–20 users
 
 | Scope | Status |
 |-------|--------|
+| Landing + waitlist | **Ready** |
+| Auth (signup/login) | **Ready** |
+| Workspace → board → content | **Ready** |
 | P0 RLS | **Cleared** |
-| Auth + waitlist + workspace/board/content | **Ready** |
-| AI Breakdown (Xiaomi `mimo-v2.5`) | **Ready** |
-| Remix 5-variant (Xiaomi) | **Ready** (ALE-87) |
-| Voice Profile | **Ready** |
-| Calendar | **Ready** |
-
-**Verdict:** Beta **full MVP core flow** **ready** for external testers.
+| AI Breakdown (Xiaomi) | **Ready** |
+| Remix 5–10 variants | **Ready** (10 slower; see limitations) |
+| Voice + Calendar | **Ready** |
+| Beta docs | **Ready** — [beta-onboarding.md](./beta-onboarding.md), [known-limitations.md](./known-limitations.md) |
 
 ---
 
-## AI provider (production)
+## Latest issue
 
-`AI_PROVIDER=xiaomi`, `AI_MODEL=mimo-v2.5`, `XIAOMI_*` on Vercel. OpenAI fallback in code.
-
----
-
-## Open blockers
-
-| Priority | Item |
-|----------|------|
-| P2 | Forgot-password email with `+` |
-| — | Local `npm run build` OOM on agent machine; Vercel build OK |
+| | |
+|--|--|
+| **ALE-88** | Beta readiness hardening — prod smoke + mobile 375 + latency notes + onboarding docs |
+| **Outcome** | No code change; docs + verification |
 
 ---
 
-## Next recommended
+## AI (production)
 
-- **ALE-88** (optional): Playwright production smoke script in CI; mobile 375px pass.
-- Monitor Xiaomi remix latency/cost at 10 variants.
+`AI_PROVIDER=xiaomi`, `AI_MODEL=mimo-v2.5`, `XIAOMI_*` on Vercel.
 
 ---
 
-## Verify (ALE-87)
+## Known P2 (non-blocking beta)
+
+| Item | Doc |
+|------|-----|
+| Forgot-password email with `+` | [known-limitations.md](./known-limitations.md) |
+| Google OAuth not enabled on Cloud | same |
+| Remix/calendar minor H-scroll @ 375px | ALE-88 smoke |
+| Local build OOM on low-RAM agents | Vercel OK; `NODE_OPTIONS=--max-old-space-size=8192` works |
+
+---
+
+## Verify (ALE-88)
 
 | Command | Result |
 |---------|--------|
 | `npm run lint` | **PASS** |
 | `npm run type-check` | **PASS** |
-| `npm run build` (local) | **FAIL** OOM static gen; compile + types OK |
+| `npm run build` | **PASS** (8GB heap) |
+
+---
+
+## Next recommended
+
+- **ALE-89**: Invite beta cohort + feedback template; optional Playwright smoke in CI.
+- Monitor Xiaomi cost at 10 variants/user/day.
+
+---
+
+## Changelog
+
+| Date | Issue | Summary |
+|------|-------|---------|
+| 2026-05-31 | ALE-88 | Beta GO; onboarding + limitations docs |
+| 2026-05-31 | ALE-87 | Remix JSON hardening |
+| 2026-05-31 | ALE-86 | Xiaomi prod verified |

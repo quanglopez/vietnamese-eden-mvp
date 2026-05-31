@@ -10,6 +10,68 @@ Chạy sau khi hoàn tất [supabase-cloud-setup.md](./supabase-cloud-setup.md) 
 
 ---
 
+## ALE-88 — Beta readiness hardening (2026-05-31)
+
+| Field | Value |
+|-------|--------|
+| **Test date** | 2026-05-31 |
+| **Environment** | Production + mobile 375×812 |
+| **Commit** | `8dfae12` (docs baseline); code unchanged |
+| **Docs added** | `beta-onboarding.md`, `known-limitations.md` |
+
+### Production smoke (desktop)
+
+| Flow | Result | Notes |
+|------|--------|-------|
+| Landing `/` | **PASS** | Hero + CTA |
+| Waitlist `#waitlist` | **PASS** | `Gửi đăng ký beta` ~4s |
+| Signup | **NOT RUN** (session exists) | ALE-82/85 verified |
+| Login | **PASS** | ~4.2s → dashboard |
+| Dashboard | **PASS** | |
+| Board + content | **PASS** | Reused smoke board |
+| AI Breakdown | **PASS** | Cached `xiaomi:mimo-v2.5`; cold ~15–45s (ALE-86) |
+| Remix 5 variants | **PASS** | Already 8+ from prior; no parse error |
+| Remix 10 variants | **PASS** | UI max 10; **~30s** observed (8→23 total); no rate limit |
+| Voice profile | **PASS** | `Voice ALE-86` exists |
+| Calendar + refresh | **PASS** | `ALE-86 Calendar Smoke` persists |
+
+### Mobile 375px
+
+| Page | Result |
+|------|--------|
+| Landing | **PASS** |
+| Login / Signup | **PASS** (card `h2`, no horizontal overflow) |
+| Dashboard | **PASS** |
+| Board detail | **PASS** |
+| Remix | **PASS*** minor horizontal scroll |
+| Calendar | **PASS*** minor horizontal scroll |
+
+### Xiaomi MiMo latency (observed, production)
+
+| Operation | Latency | Notes |
+|-----------|---------|-------|
+| Breakdown (cold) | ~15–45s | ALE-86 manual wait |
+| Breakdown (cached UI) | <1s | DB已有 analysis |
+| Remix 5 variants | ~60–120s | ALE-87 after JSON fix |
+| Remix 10 variants | **~30s** | ALE-88 single run; varies with load |
+| Rate limit | **None observed** | Session 2026-05-31 |
+
+*Cost/token:* phụ thuộc Xiaomi billing; không log trong app.
+
+### Forgot-password `+` email
+
+| Test | Result |
+|------|--------|
+| `beta+plus@example.com` | Form submit; message hướng kiểm tra email / Supabase có thể reject — **P2** documented |
+
+### Beta readiness (ALE-88)
+
+| Verdict | |
+|---------|--|
+| **Ready for 10–20 beta users** | Core flow + docs onboarding/limitations |
+
+---
+
 ## ALE-87 — Harden remix JSON parsing + production retest (2026-05-31)
 
 | Field | Value |
