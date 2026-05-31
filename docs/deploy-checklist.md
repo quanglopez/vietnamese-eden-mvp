@@ -4,6 +4,10 @@ Repo: https://github.com/quanglopez/vietnamese-eden-mvp
 
 Mục tiêu: bản **beta/dev** trên Vercel, database **Supabase Cloud** (project dev riêng — không dùng production data thật).
 
+**Production URL:** https://vietnamese-eden-mvp.vercel.app/
+
+**Chi tiết Supabase + smoke test:** [supabase-cloud-setup.md](./supabase-cloud-setup.md) · [production-smoke-test.md](./production-smoke-test.md)
+
 > **Lưu ý:** Checklist này không chứa secret. Mọi key chỉ nhập trong Supabase Dashboard / Vercel Environment Variables.
 
 ---

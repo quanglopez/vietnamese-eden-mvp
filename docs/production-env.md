@@ -1,6 +1,10 @@
 # Production & Vercel environment variables
 
+**App URL:** https://vietnamese-eden-mvp.vercel.app/
+
 Tham chiếu đầy đủ cho deploy beta. Copy tên biến vào Vercel → **Settings** → **Environment Variables**. **Không** commit giá trị thật.
+
+Setup Supabase Cloud: [supabase-cloud-setup.md](./supabase-cloud-setup.md)
 
 ---
 
