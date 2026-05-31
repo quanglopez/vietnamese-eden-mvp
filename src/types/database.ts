@@ -9,6 +9,33 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      beta_waitlist: {
+        Row: {
+          id: string;
+          full_name: string;
+          email: string;
+          use_case: string | null;
+          source: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          full_name: string;
+          email: string;
+          use_case?: string | null;
+          source?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          full_name?: string;
+          email?: string;
+          use_case?: string | null;
+          source?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
       health_check: {
         Row: {
           id: number;

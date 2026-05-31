@@ -13,12 +13,17 @@ export default function PricingPage() {
     <AppShell title="Gói cước" subtitle="Beta — chưa mở bán trong MVP">
       <div className="rounded-2xl border border-border/60 bg-surface-elev p-8 max-w-xl">
         <p className="text-muted-foreground leading-relaxed">
-          Phiên bản beta hiện tập trung vào board → breakdown → remix → calendar. Billing và giới
-          hạn usage sẽ có ở sprint sau.
+          Phiên bản beta hiện tập trung vào board → breakdown → remix → calendar. Xem bảng giá đầy
+          đủ trên trang chủ — billing Stripe sẽ bật sau beta.
         </p>
-        <Button asChild variant="outline" className="mt-6">
-          <Link href="/dashboard">Quay lại tổng quan</Link>
-        </Button>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Button asChild variant="outline">
+            <Link href="/#pricing">Xem gói trên landing</Link>
+          </Button>
+          <Button asChild variant="ghost">
+            <Link href="/dashboard">Quay lại tổng quan</Link>
+          </Button>
+        </div>
       </div>
     </AppShell>
   );

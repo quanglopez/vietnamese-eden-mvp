@@ -34,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi">
+    <html lang="vi" className="scroll-smooth">
       <body
         className={`${inter.variable} ${outfit.variable} ${figtree.variable} min-h-screen font-sans antialiased`}
         style={{ ["--font-display" as string]: "var(--font-outfit)" }}
