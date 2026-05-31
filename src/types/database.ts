@@ -270,6 +270,51 @@ export type Database = {
         };
         Relationships: [];
       };
+      content_calendar_items: {
+        Row: {
+          id: string;
+          workspace_id: string;
+          generated_output_id: string | null;
+          content_item_id: string | null;
+          title: string;
+          platform: "tiktok" | "facebook" | "instagram" | "youtube" | "other";
+          scheduled_at: string;
+          status: "scheduled" | "published" | "skipped" | "failed";
+          notes: string | null;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          workspace_id: string;
+          generated_output_id?: string | null;
+          content_item_id?: string | null;
+          title: string;
+          platform?: "tiktok" | "facebook" | "instagram" | "youtube" | "other";
+          scheduled_at: string;
+          status?: "scheduled" | "published" | "skipped" | "failed";
+          notes?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          workspace_id?: string;
+          generated_output_id?: string | null;
+          content_item_id?: string | null;
+          title?: string;
+          platform?: "tiktok" | "facebook" | "instagram" | "youtube" | "other";
+          scheduled_at?: string;
+          status?: "scheduled" | "published" | "skipped" | "failed";
+          notes?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       generated_outputs: {
         Row: {
           id: string;
@@ -317,6 +362,7 @@ export type Database = {
       platform_type: "tiktok" | "facebook" | "instagram" | "youtube" | "other";
       analysis_status: "pending" | "completed" | "failed";
       output_status: "draft" | "ready" | "published" | "archived";
+      calendar_status: "scheduled" | "published" | "skipped" | "failed";
     };
     CompositeTypes: Record<string, never>;
   };

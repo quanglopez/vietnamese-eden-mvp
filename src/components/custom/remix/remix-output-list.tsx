@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { Copy, Download, FileText, Sparkles } from "lucide-react";
+import { CalendarPlus, Copy, Download, FileText, Sparkles } from "lucide-react";
 
+import { AddToCalendarDialog } from "@/components/custom/calendar/add-to-calendar-dialog";
 import { Button } from "@/components/ui/button";
 import {
   formatOutputCreatedAt,
@@ -36,6 +38,9 @@ export function RemixOutputList({
   onToast,
   onCreateFirstRemix,
 }: RemixOutputListProps) {
+  const [calendarOutput, setCalendarOutput] = useState<GeneratedOutputView | null>(null);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+
   const handleCopy = async (output: GeneratedOutputView) => {
     try {
       await copyTextToClipboard(output.content);
@@ -100,7 +105,16 @@ export function RemixOutputList({
   }
 
   return (
-    <div className="space-y-4">
+    <>
+      <AddToCalendarDialog
+        output={calendarOutput}
+        contentItemId={sourceItemId}
+        open={calendarOpen}
+        onOpenChange={setCalendarOpen}
+        onSuccess={() => onToast({ type: "success", message: "Đã thêm vào lịch nội dung." })}
+      />
+
+      <div className="space-y-4">
       <p className="text-xs text-muted-foreground">
         Nguồn:{" "}
         <Link href={`/breakdown/${sourceItemId}`} className="text-brand hover:underline">
@@ -170,6 +184,19 @@ export function RemixOutputList({
                   <FileText className="h-3.5 w-3.5" />
                   .md
                 </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5 border-brand/40 text-brand"
+                  onClick={() => {
+                    setCalendarOutput(output);
+                    setCalendarOpen(true);
+                  }}
+                >
+                  <CalendarPlus className="h-3.5 w-3.5" />
+                  Đưa vào lịch
+                </Button>
               </div>
             </div>
 
@@ -180,5 +207,6 @@ export function RemixOutputList({
         );
       })}
     </div>
+    </>
   );
 }
