@@ -1,6 +1,9 @@
 import type { CalendarChannel, CalendarStatus } from "@/types/calendar";
 import type { PlatformType } from "@/types/content";
 
+export const CALENDAR_NO_AUTO_POST_NOTICE =
+  "Calendar chỉ lên lịch và nhắc nhở. Không tự động đăng nội dung lên bất kỳ nền tảng nào.";
+
 export const CALENDAR_CHANNEL_OPTIONS: { value: CalendarChannel; label: string }[] = [
   { value: "facebook", label: "Facebook" },
   { value: "linkedin", label: "LinkedIn" },

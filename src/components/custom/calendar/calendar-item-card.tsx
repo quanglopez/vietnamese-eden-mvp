@@ -120,6 +120,11 @@ export function CalendarItemCard({ item, onUpdated }: CalendarItemCardProps) {
       {item.userNotes ? (
         <p className="text-xs text-muted-foreground mt-3 italic">Ghi chú: {item.userNotes}</p>
       ) : null}
+
+      <div className="mt-3 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+        <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-400" />
+        Nhắc lịch — không tự động đăng
+      </div>
     </article>
   );
 }

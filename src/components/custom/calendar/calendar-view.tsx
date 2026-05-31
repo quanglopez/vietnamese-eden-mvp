@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { CalendarDays, LayoutGrid, List } from "lucide-react";
+import { CalendarDays, Info, LayoutGrid, List } from "lucide-react";
 
 import { AppShell } from "@/components/custom/app/app-shell";
 import { CalendarItemCard } from "@/components/custom/calendar/calendar-item-card";
@@ -13,6 +13,7 @@ import {
 } from "@/components/custom/calendar/calendar-weekly-view";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CALENDAR_NO_AUTO_POST_NOTICE } from "@/lib/calendar/constants";
 import { getWeekStartMonday, splitUpcomingAndPast } from "@/lib/calendar/queries";
 import type { CalendarItemView } from "@/types/calendar";
 
@@ -34,7 +35,10 @@ export function CalendarView({ items, fetchError }: CalendarViewProps) {
   const { upcoming, past } = useMemo(() => splitUpcomingAndPast(items), [items]);
 
   return (
-    <AppShell title="Lịch nội dung" subtitle="Lên lịch đăng từ remix output">
+    <AppShell
+      title="Lịch nội dung"
+      subtitle="Lên lịch đăng nội dung — bạn vẫn tự đăng thủ công trên MXH"
+    >
       {fetchError ? (
         <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
           {fetchError}
@@ -46,7 +50,8 @@ export function CalendarView({ items, fetchError }: CalendarViewProps) {
           <CalendarDays className="h-12 w-12 text-brand mx-auto mb-4" />
           <p className="font-display font-bold text-lg">Chưa có nội dung nào trong lịch</p>
           <p className="text-sm text-muted-foreground mt-2 max-w-md mx-auto">
-            Tạo remix từ board, rồi bấm &quot;Đưa vào lịch&quot; trên từng output.
+            Tạo remix từ board, rồi bấm &quot;Đưa vào lịch&quot; để lên kế hoạch đăng.
+            Bạn vẫn phải tự đăng thủ công trên từng nền tảng — Calendar chỉ là công cụ nhắc lịch.
           </p>
           <div className="flex flex-wrap justify-center gap-3 mt-6">
             <Button asChild variant="default">
@@ -55,6 +60,10 @@ export function CalendarView({ items, fetchError }: CalendarViewProps) {
             <Button asChild variant="outline">
               <Link href="/dashboard">Dashboard</Link>
             </Button>
+          </div>
+          <div className="mt-4 inline-flex items-center gap-2 rounded-lg bg-brand/10 px-3 py-2 text-xs text-brand">
+            <Info className="h-4 w-4 shrink-0" />
+            <span>{CALENDAR_NO_AUTO_POST_NOTICE}</span>
           </div>
         </div>
       ) : (

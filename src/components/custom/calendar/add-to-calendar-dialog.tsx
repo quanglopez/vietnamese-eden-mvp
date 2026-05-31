@@ -101,7 +101,8 @@ export function AddToCalendarDialog({
             Đưa vào lịch
           </DialogTitle>
           <DialogDescription>
-            Lên lịch đăng nội dung remix. Không tự động đăng lên mạng xã hội.
+            Lên lịch đăng nội dung remix. Calendar là công cụ nhắc lịch — bạn vẫn phải tự đăng
+            thủ công trên Facebook, TikTok, LinkedIn, v.v.
           </DialogDescription>
         </DialogHeader>
 
@@ -193,6 +194,11 @@ export function AddToCalendarDialog({
               {error}
             </p>
           ) : null}
+
+          <div className="rounded-lg bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
+            💡 Sau khi lên lịch, bạn sẽ nhận nhắc nhở (hoặc tự kiểm tra) để copy-paste nội dung và
+            đăng thủ công.
+          </div>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

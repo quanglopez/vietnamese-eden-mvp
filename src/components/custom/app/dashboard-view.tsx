@@ -39,6 +39,7 @@ const quickLinks = [
     href: "/calendar",
     label: "Lịch nội dung",
     desc: "Lên lịch đăng remix",
+    footnote: "Chỉ nhắc lịch — không auto-post",
     icon: CalendarDays,
   },
 ] as const;
@@ -68,7 +69,7 @@ export function DashboardView({ title, subtitle, boards }: DashboardViewProps) {
           { label: "Bước 1", value: "Board", hint: "Tạo & quản lý content", icon: FolderHeart },
           { label: "Bước 2", value: "Breakdown", hint: "Phân tích AI", icon: Sparkles },
           { label: "Bước 3", value: "Remix", hint: "Biến thể nội dung", icon: Wand2 },
-          { label: "Bước 4", value: "Calendar", hint: "Lên lịch đăng", icon: CalendarDays },
+          { label: "Bước 4", value: "Calendar", hint: "Lên lịch (không auto-post)", icon: CalendarDays },
         ].map(({ label, value, hint, icon: Icon }) => (
           <div key={label} className="rounded-2xl border border-border/60 bg-surface-elev p-5">
             <div className="h-10 w-10 rounded-xl bg-gradient-brand grid place-items-center shadow-glow">
@@ -85,7 +86,7 @@ export function DashboardView({ title, subtitle, boards }: DashboardViewProps) {
         <div className="lg:col-span-2 space-y-4">
           <h2 className="font-display text-xl font-bold">Truy cập nhanh</h2>
           <div className="grid sm:grid-cols-3 gap-4">
-            {quickLinks.map(({ href, label, desc, icon: Icon }) => (
+            {quickLinks.map(({ href, label, desc, icon: Icon, ...rest }) => (
               <Link
                 key={href}
                 href={href}
@@ -94,6 +95,11 @@ export function DashboardView({ title, subtitle, boards }: DashboardViewProps) {
                 <Icon className="h-6 w-6 text-brand mb-3" />
                 <div className="font-semibold">{label}</div>
                 <div className="text-xs text-muted-foreground mt-1">{desc}</div>
+                {"footnote" in rest && rest.footnote ? (
+                  <span className="text-xs text-muted-foreground mt-1 block">
+                    ({rest.footnote})
+                  </span>
+                ) : null}
                 <span className="text-xs text-brand mt-3 inline-flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
                   Mở <ArrowUpRight className="h-3 w-3" />
                 </span>

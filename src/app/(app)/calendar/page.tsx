@@ -7,7 +7,8 @@ import { getCurrentWorkspace } from "@/lib/workspaces/queries";
 
 export const metadata: Metadata = {
   title: "Lịch nội dung · Vietnamese Eden",
-  description: "Content Calendar — lên lịch đăng nội dung",
+  description:
+    "Content Calendar — lên lịch đăng nội dung (nhắc lịch thủ công, không tự động đăng lên MXH)",
 };
 
 export default async function CalendarPage() {
