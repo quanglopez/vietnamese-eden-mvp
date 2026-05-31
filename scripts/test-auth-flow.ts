@@ -3,13 +3,22 @@ import { resolve } from "node:path";
 
 config({ path: resolve(process.cwd(), ".env.local") });
 
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!url || !anonKey) {
-  console.error("❌ Missing Supabase env vars");
-  process.exit(1);
+function requireEnv(value: string | undefined, label: string): string {
+  if (!value) {
+    console.error(`❌ Missing ${label}`);
+    process.exit(1);
+  }
+  return value;
 }
+
+const url = requireEnv(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  "NEXT_PUBLIC_SUPABASE_URL",
+);
+const anonKey = requireEnv(
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+);
 
 const testEmail = `test-${Date.now()}@vietnamese-eden.local`;
 
