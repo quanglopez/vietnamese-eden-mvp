@@ -10,6 +10,129 @@ Chạy sau khi hoàn tất [supabase-cloud-setup.md](./supabase-cloud-setup.md) 
 
 ---
 
+## ALE-84 — Workspace RLS migration + MVP retest (2026-05-31)
+
+| Field | Value |
+|-------|--------|
+| **Test date** | 2026-05-31 |
+| **Environment** | Production — https://vietnamese-eden-mvp.vercel.app/ |
+| **GitHub `main`** | Migration committed in `3153bd3` (`docs: add project status and workspace RLS migration`) |
+| **Supabase MCP** | Chỉ **local** (`127.0.0.1:54321`) — agent **không** apply lên Cloud |
+
+### Migration review (`20260531140000_workspace_owner_select.sql`)
+
+| Check | Result |
+|-------|--------|
+| Chỉ RLS policies | **Yes** — 2× `CREATE POLICY` |
+| DROP / DELETE / TRUNCATE data | **No** |
+| ALTER schema / bảng khác | **No** |
+| An toàn production | **Yes** — additive policies only |
+
+**Policies thêm:**
+
+1. `workspaces_select_owner` — `SELECT` cho owner (`owner_id = auth.uid()`)
+2. `profiles_insert_own` — `INSERT` profile của chính user (`id = auth.uid()`)
+
+### Migration apply status trên Supabase Cloud
+
+| Status | Evidence |
+|--------|----------|
+| **NOT APPLIED** (lúc agent test) | Production: signup → **Tạo workspace** → vẫn `new row violates row-level security policy for table "workspaces"` |
+
+Agent **không có quyền** apply Cloud qua MCP. Owner cần chạy SQL Editor (bên dưới), rồi báo lại để retest steps 8–19.
+
+### Owner: Supabase SQL Editor (bắt buộc trước retest MVP)
+
+**Dashboard** → project Cloud (cùng project Vercel env) → **SQL** → **New query**.
+
+**Bước A — Kiểm tra trước (chạy riêng):**
+
+```sql
+select policyname, cmd
+from pg_policies
+where schemaname = 'public'
+  and tablename in ('workspaces', 'profiles')
+  and policyname in ('workspaces_select_owner', 'profiles_insert_own')
+order by tablename, policyname;
+```
+
+Kỳ vọng trước apply: **0 rows** (hoặc thiếu một trong hai policy).
+
+**Bước B — Apply migration (copy nguyên file repo):**
+
+`supabase/migrations/20260531140000_workspace_owner_select.sql`
+
+```sql
+-- ALE-83: Fix workspace bootstrap on Supabase Cloud
+create policy "workspaces_select_owner"
+  on public.workspaces for select to authenticated
+  using (owner_id = auth.uid());
+
+create policy "profiles_insert_own"
+  on public.profiles for insert to authenticated
+  with check (id = auth.uid());
+```
+
+**Run.** Nếu báo policy đã tồn tại → đã apply; chuyển bước C.
+
+**Bước C — Xác nhận sau apply:**
+
+```sql
+select policyname, cmd, roles
+from pg_policies
+where schemaname = 'public'
+  and policyname in ('workspaces_select_owner', 'profiles_insert_own');
+```
+
+Kỳ vọng: **2 rows**.
+
+**Bước D — Smoke nhanh trên production (manual):**
+
+1. https://vietnamese-eden-mvp.vercel.app/signup — user mới
+2. `/boards` → **Tạo workspace** → không còn lỗi RLS
+3. **Tạo bảng mới** → mở board → thêm content text
+
+### Production retest MVP (agent — trước khi owner apply)
+
+| Step | Result |
+|------|--------|
+| Login / signup | **PASS** (signup → dashboard) |
+| Dashboard | **PASS** |
+| Create workspace | **FAIL** — RLS (migration chưa trên Cloud) |
+| Create board | **NOT RUN** |
+| Board detail / add text / URL | **NOT RUN** |
+| AI breakdown | **NOT RUN** |
+| Remix | **NOT RUN** |
+| Voice profile | **NOT RUN** |
+| Calendar + refresh | **NOT RUN** |
+
+### Production retest MVP (sau owner apply) — checklist
+
+Điền sau khi owner xác nhận bước B–D:
+
+| Step | Pass? | Notes |
+|------|-------|-------|
+| Tạo workspace | ☐ | |
+| Tạo board | ☐ | |
+| Add content (text) | ☐ | |
+| AI breakdown (text) | ☐ | Cần `OPENAI_API_KEY` trên Vercel |
+| Remix + copy/export | ☐ | |
+| Voice profile | ☐ | |
+| Add to calendar + F5 | ☐ | |
+
+### Beta readiness (ALE-84)
+
+| Scope | Verdict |
+|-------|---------|
+| Marketing + auth | **Beta-ready** (unchanged) |
+| Full MVP production | **Not beta-ready** until migration **applied** + retest **PASS** |
+
+### Follow-up
+
+- **ALE-85** (đề xuất): Agent/owner retest full MVP trên production **sau** khi SQL Editor apply xong (điền bảng checklist trên).
+
+---
+
 ## ALE-83 — Full MVP production E2E smoke (2026-05-31)
 
 

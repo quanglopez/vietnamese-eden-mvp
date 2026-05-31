@@ -1,7 +1,7 @@
 # Project status — Vietnamese Eden MVP
 
 **Mục đích:** Snapshot ngắn để ChatGPT / agent mới nắm tình hình nhanh.  
-**Cập nhật lần cuối:** 2026-05-31  
+**Cập nhật lần cuối:** 2026-05-31 (ALE-84)  
 **Repo:** `C:\Users\ADMIN\vietnamese-eden-mvp`  
 **Cách cập nhật:** Sau mỗi issue, copy [status-update-template.md](./status-update-template.md) → điền → merge vào các mục dưới.
 
@@ -22,11 +22,11 @@
 
 | | |
 |--|--|
-| **Issue** | **ALE-83** — Full MVP production E2E smoke test |
-| **Outcome** | Landing, waitlist, signup, login, dashboard, mobile basic **PASS** trên production. Board → AI → calendar **NOT RUN** (blocked). |
-| **Docs** | [production-smoke-test.md](./production-smoke-test.md) — section ALE-83 |
+| **Issue** | **ALE-84** — Workspace RLS migration + MVP production retest |
+| **Outcome** | Migration **reviewed** + **on `main`** (`3153bd3`). Cloud apply **pending** (agent không apply được). Production probe: workspace vẫn **FAIL RLS**. MVP flow 8–19 **NOT RUN**. |
+| **Docs** | [production-smoke-test.md](./production-smoke-test.md) — section ALE-84 (SQL Editor steps) |
 
-**Issue trước đó (scope ổn định):** **ALE-82** — Waitlist migration apply Cloud + retest waitlist/auth **PASS**.
+**Issue trước:** **ALE-83** — E2E smoke documented P0 workspace blocker.
 
 ---
 
@@ -34,15 +34,10 @@
 
 | | |
 |--|--|
-| **SHA** | `f2ae254` |
-| **Message** | `docs: update production smoke test after waitlist migration` |
-| **Branch** | `main` (synced with `origin/main` at last check) |
-
-**Local chưa commit (nếu agent thấy trong `git status`):**
-
-- `docs/production-smoke-test.md` — bổ sung ALE-83
-- `supabase/migrations/20260531140000_workspace_owner_select.sql` — fix RLS workspace (mới)
-- `supabase/README.md` — migration #4
+| **SHA** | `3153bd3` |
+| **Message** | `docs: add project status and workspace RLS migration` |
+| **Branch** | `main` (= `origin/main`) |
+| **Includes** | `supabase/migrations/20260531140000_workspace_owner_select.sql`, `docs/project-status.md`, `docs/status-update-template.md` |
 
 ---
 
@@ -52,10 +47,10 @@
 |-------|--------|
 | Landing + pricing + waitlist | **Ready** |
 | Signup / login (production) | **Ready** |
-| Form validation (zod/v4 + forwardRef) | **Deployed** (`b045245`, `5f3f603`) |
-| Full MVP (board → breakdown → remix → voice → calendar) | **Not ready** |
+| Form validation (zod/v4 + forwardRef) | **Deployed** |
+| Full MVP (board → AI → calendar) on production | **Not ready** — migration #4 chưa apply Cloud |
 
-**Verdict:** Beta **công khai hạn chế** (marketing + auth). Beta **đầy đủ MVP** sau khi gỡ blocker workspace + retest E2E + AI.
+**Verdict:** Beta **marketing + auth** OK. Beta **full MVP** sau owner apply SQL migration #4 + retest PASS.
 
 ---
 
@@ -63,44 +58,43 @@
 
 | Priority | Blocker | Action |
 |----------|---------|--------|
-| **P0** | Tạo workspace trên production: `new row violates row-level security policy for table "workspaces"` | Apply SQL migration #4: `supabase/migrations/20260531140000_workspace_owner_select.sql` trên Supabase Cloud (SQL Editor) |
-| **P1** | MVP E2E steps 8–19 chưa chạy (phụ thuộc P0) | Retest theo [production-smoke-test.md](./production-smoke-test.md) sau fix |
-| **P1** | `OPENAI_API_KEY` / AI breakdown-remix trên Vercel chưa verify E2E | Retest sau có board + content |
-| P2 | Forgot-password: email có `+` bị Supabase recover reject | Dùng email test không `+`; hoặc cấu hình Auth provider |
+| **P0** | Migration `20260531140000_workspace_owner_select.sql` **chưa apply** Supabase Cloud | Owner: SQL Editor — chi tiết [production-smoke-test.md § ALE-84](./production-smoke-test.md) |
+| **P1** | MVP E2E 8–19 chưa retest | Sau P0: signup → workspace → board → AI → calendar |
+| **P1** | OpenAI E2E trên Vercel chưa verify | Sau có content item |
+| P2 | Forgot-password + email addressing | Email test không dùng `+` |
+
+**P0 còn?** **Có** — xác nhận bằng production test 2026-05-31.
 
 ---
 
 ## Supabase Cloud migrations (apply order)
 
-1. `20260530120000_health_check.sql`
-2. `20260530130000_initial_schema.sql`
-3. `20260531120000_beta_waitlist.sql` — **applied** (ALE-82)
-4. `20260531140000_workspace_owner_select.sql` — **pending** (ALE-83 fix)
-
-Chi tiết: [supabase-cloud-setup.md](./supabase-cloud-setup.md), [supabase/README.md](../supabase/README.md).
+1. `20260530120000_health_check.sql` — applied
+2. `20260530130000_initial_schema.sql` — applied
+3. `20260531120000_beta_waitlist.sql` — applied (ALE-82)
+4. `20260531140000_workspace_owner_select.sql` — **PENDING** ← **owner action**
 
 ---
 
 ## Next recommended issue
 
-**ALE-84** (đề xuất — tạo trên Linear nếu chưa có):
+**ALE-85** — Sau owner apply migration #4 trên Cloud:
 
-1. Apply migration `20260531140000_workspace_owner_select.sql` trên Supabase Cloud.
-2. Production retest: Tạo workspace → board → content → AI breakdown/remix → calendar.
-3. Cập nhật `docs/production-smoke-test.md` + **file này** (`docs/project-status.md`).
+1. Production retest full MVP (board → breakdown → remix → voice → calendar).
+2. Cập nhật checklist ALE-84 trong `production-smoke-test.md`.
+3. Cập nhật file này: P0 cleared, beta readiness full MVP.
 
 ---
 
 ## Last verify commands
 
-| Command | Khi nào chạy | Last result (2026-05-31) |
-|---------|----------------|---------------------------|
-| `npm run lint` | Sau thay đổi code | Pass |
-| `npm run type-check` | Sau thay đổi code | Pass |
-| `npm run build` | Sau thay đổi code | Pass (local: `NODE_OPTIONS=--max-old-space-size=8192` nếu OOM) |
-| — | **Chỉ docs** (lần cập nhật status này) | **Không chạy** — không đổi code |
+| Command | Result (2026-05-31, ALE-84) |
+|---------|------------------------------|
+| `npm run lint` | **Skipped** — docs only |
+| `npm run type-check` | **Skipped** — docs only |
+| `npm run build` | **Skipped** — docs only |
 
-**Production smoke (manual / Playwright):**
+**Production probe (Playwright):** workspace create → **FAIL** (RLS) — confirms migration not on Cloud yet.
 
 ```bash
 curl -s https://vietnamese-eden-mvp.vercel.app/api/health/supabase
@@ -112,12 +106,11 @@ curl -s https://vietnamese-eden-mvp.vercel.app/api/health/supabase
 
 | Doc | Dùng khi |
 |-----|----------|
-| [project-status.md](./project-status.md) | **Đọc đầu tiên** — snapshot hiện tại |
-| [status-update-template.md](./status-update-template.md) | Sau mỗi issue — cập nhật status |
-| [production-smoke-test.md](./production-smoke-test.md) | Chi tiết pass/fail production theo ALE-xx |
-| [deploy-checklist.md](./deploy-checklist.md) | Deploy Vercel / env |
-| [supabase-cloud-setup.md](./supabase-cloud-setup.md) | Supabase Cloud + migrations |
-| [demo-script.md](./demo-script.md) | Demo local / click-by-click |
+| [project-status.md](./project-status.md) | **Đọc đầu tiên** |
+| [status-update-template.md](./status-update-template.md) | Sau mỗi issue |
+| [production-smoke-test.md](./production-smoke-test.md) | Smoke / ALE-84 SQL steps |
+| [supabase-cloud-setup.md](./supabase-cloud-setup.md) | Cloud setup |
+| [demo-script.md](./demo-script.md) | Demo flow |
 
 ---
 
@@ -125,4 +118,5 @@ curl -s https://vietnamese-eden-mvp.vercel.app/api/health/supabase
 
 | Date | Issue | Summary |
 |------|-------|---------|
-| 2026-05-31 | — | Khởi tạo `project-status.md` + `status-update-template.md` (post ALE-83) |
+| 2026-05-31 | ALE-84 | Migration on main; Cloud apply pending; SQL Editor guide; MVP retest blocked |
+| 2026-05-31 | — | Khởi tạo `project-status.md` + template (post ALE-83) |
