@@ -141,11 +141,54 @@ export type Database = {
         };
         Relationships: [];
       };
+      content_items: {
+        Row: {
+          id: string;
+          workspace_id: string;
+          title: string;
+          platform: "tiktok" | "facebook" | "instagram" | "youtube" | "other";
+          source_url: string | null;
+          raw_content: string | null;
+          author_name: string | null;
+          saved_by: string | null;
+          saved_at: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          workspace_id: string;
+          title: string;
+          platform?: "tiktok" | "facebook" | "instagram" | "youtube" | "other";
+          source_url?: string | null;
+          raw_content?: string | null;
+          author_name?: string | null;
+          saved_by?: string | null;
+          saved_at?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          workspace_id?: string;
+          title?: string;
+          platform?: "tiktok" | "facebook" | "instagram" | "youtube" | "other";
+          source_url?: string | null;
+          raw_content?: string | null;
+          author_name?: string | null;
+          saved_by?: string | null;
+          saved_at?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
     Enums: {
       workspace_role: "owner" | "admin" | "member" | "viewer";
+      platform_type: "tiktok" | "facebook" | "instagram" | "youtube" | "other";
     };
     CompositeTypes: Record<string, never>;
   };

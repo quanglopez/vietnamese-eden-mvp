@@ -1,23 +1,72 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
-import { ComingSoonPage } from "@/components/custom/app/coming-soon-page";
+import { AppShell } from "@/components/custom/app/app-shell";
+import { BoardDetailView } from "@/components/custom/boards/board-detail-view";
+import {
+  getBoardById,
+  listBoardContentItems,
+} from "@/lib/boards/queries";
+import { isValidUuid } from "@/lib/boards/utils";
+import { createClient } from "@/lib/supabase/server";
 
 type BoardDetailPageProps = {
   params: { boardId: string };
 };
 
-export function generateMetadata({ params }: BoardDetailPageProps): Metadata {
+export async function generateMetadata({
+  params,
+}: BoardDetailPageProps): Promise<Metadata> {
+  if (!isValidUuid(params.boardId)) {
+    return { title: "Không tìm thấy bảng · Vietnamese Eden" };
+  }
+
+  const supabase = createClient();
+  const { board } = await getBoardById(supabase, params.boardId);
+
   return {
-    title: `Board ${params.boardId} · Vietnamese Eden`,
+    title: board
+      ? `${board.name} · Vietnamese Eden`
+      : "Không tìm thấy bảng · Vietnamese Eden",
   };
 }
 
-export default function BoardDetailPage({ params }: BoardDetailPageProps) {
+export default async function BoardDetailPage({ params }: BoardDetailPageProps) {
+  if (!isValidUuid(params.boardId)) {
+    notFound();
+  }
+
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    notFound();
+  }
+
+  const { board, error: boardError } = await getBoardById(supabase, params.boardId);
+
+  if (boardError) {
+    return (
+      <AppShell title="Bảng cảm hứng" subtitle="Không thể tải bảng">
+        <div className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+          Lỗi khi tải bảng: {boardError}
+        </div>
+      </AppShell>
+    );
+  }
+
+  if (!board) {
+    notFound();
+  }
+
+  const { items, error: itemsError } = await listBoardContentItems(
+    supabase,
+    params.boardId,
+  );
+
   return (
-    <ComingSoonPage
-      title="Bảng cảm hứng"
-      subtitle={`Board: ${params.boardId}`}
-      feature="Chi tiết bảng cảm hứng"
-    />
+    <BoardDetailView board={board} items={items} fetchError={itemsError} />
   );
 }

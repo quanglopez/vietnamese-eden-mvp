@@ -30,3 +30,15 @@ export type BoardListItem = {
 };
 
 export type WorkspaceSummary = Pick<WorkspaceRow, "id" | "name" | "slug">;
+
+export type BoardDetail = {
+  id: string;
+  workspaceId: string;
+  name: string;
+  description: string | null;
+  gradientClass: string;
+  emoji: string;
+  contentCount: number;
+  createdAt: string;
+  updatedAt: string;
+};
