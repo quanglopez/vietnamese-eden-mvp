@@ -16,6 +16,9 @@
 # production
 /build
 
+# playwright mcp artifacts
+.playwright-mcp/
+
 # misc
 .DS_Store
 *.pem
