@@ -6,7 +6,13 @@ ERD + documentation: [`docs/database/ERD.md`](../docs/database/ERD.md)
 
 10 bảng chính: `profiles`, `workspaces`, `workspace_members`, `boards`, `content_items`, `board_content_items`, `content_analyses`, `voice_profiles`, `generated_outputs`, `content_calendar_items`
 
-Migration: `supabase/migrations/20260530130000_initial_schema.sql`
+Migrations (apply in order):
+
+1. `20260530120000_health_check.sql`
+2. `20260530130000_initial_schema.sql`
+3. `20260531120000_beta_waitlist.sql`
+
+Deploy Vercel + Cloud: [`docs/deploy-checklist.md`](../docs/deploy-checklist.md)
 
 ## Local development (Docker)
 
@@ -28,12 +34,13 @@ Local credentials (default) are written to `.env.local` after `supabase start`:
 
 Run `npx supabase status` to view keys anytime.
 
-## Cloud production
+## Cloud (dev / beta)
 
-1. Create a project at [supabase.com/dashboard](https://supabase.com/dashboard)
-2. Copy **Project URL** and **anon key** into `.env.local`
-3. Run migration SQL from `supabase/migrations/` in the SQL Editor (or link CLI: `npx supabase link`)
-4. Verify: `npm run supabase:test` or `GET /api/health/supabase`
+1. Create a **dev** project at [supabase.com/dashboard](https://supabase.com/dashboard) (do not use production data dumps)
+2. Apply all migrations — see [`docs/deploy-checklist.md`](../docs/deploy-checklist.md)
+3. Configure **Auth redirect URLs** for local + Vercel domains
+4. Copy **Project URL** and **anon key** into Vercel env (and `.env.local` for local testing against Cloud)
+5. Verify: `npm run supabase:test` or `GET /api/health/supabase`
 
 ## Environment variables
 
