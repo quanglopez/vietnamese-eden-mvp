@@ -231,6 +231,45 @@ export type Database = {
         };
         Relationships: [];
       };
+      generated_outputs: {
+        Row: {
+          id: string;
+          workspace_id: string;
+          source_content_item_id: string | null;
+          voice_profile_id: string | null;
+          title: string | null;
+          content: string;
+          status: "draft" | "ready" | "published" | "archived";
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          workspace_id: string;
+          source_content_item_id?: string | null;
+          voice_profile_id?: string | null;
+          title?: string | null;
+          content: string;
+          status?: "draft" | "ready" | "published" | "archived";
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          workspace_id?: string;
+          source_content_item_id?: string | null;
+          voice_profile_id?: string | null;
+          title?: string | null;
+          content?: string;
+          status?: "draft" | "ready" | "published" | "archived";
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -238,6 +277,7 @@ export type Database = {
       workspace_role: "owner" | "admin" | "member" | "viewer";
       platform_type: "tiktok" | "facebook" | "instagram" | "youtube" | "other";
       analysis_status: "pending" | "completed" | "failed";
+      output_status: "draft" | "ready" | "published" | "archived";
     };
     CompositeTypes: Record<string, never>;
   };

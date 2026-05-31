@@ -3,7 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Link2, Loader2 } from "lucide-react";
+import { ArrowLeft, Link2, Loader2, Wand2 } from "lucide-react";
 
 import { AppShell } from "@/components/custom/app/app-shell";
 import {
@@ -44,6 +44,8 @@ export function BreakdownView({
   const preview = getContentPreview(item.title, item.rawContent);
   const gradient = getPlatformGradient(item.platform);
   const backHref = item.boardId ? `/boards/${item.boardId}` : "/boards";
+  const remixHref = `/remix/${item.id}`;
+  const canOpenRemix = canAnalyze || Boolean(analysis);
 
   const handleAnalyze = () => {
     setFormError(null);
@@ -133,6 +135,22 @@ export function BreakdownView({
               ) : null}
 
               {analysis && !isPending ? <BreakdownSections analysis={analysis} /> : null}
+
+              {canOpenRemix ? (
+                <div className="pt-2">
+                  <Button asChild variant="outline" className="gap-2 w-full sm:w-auto">
+                    <Link href={remixHref}>
+                      <Wand2 className="h-4 w-4" />
+                      Tạo remix
+                    </Link>
+                  </Button>
+                  {!analysis ? (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      Cần phân tích AI trước khi generate remix.
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
 
               {!analysis && !isPending && !formError ? (
                 <div className="rounded-2xl border border-dashed border-border/80 p-8 text-center text-muted-foreground">
