@@ -22,7 +22,7 @@ import { formatBoardUpdatedAt } from "@/lib/boards/constants";
 import type { BoardDetail } from "@/types/boards";
 import type { BoardContentItem } from "@/types/content";
 
-import { AddContentTextModal } from "./add-content-text-modal";
+import { AddContentModal } from "./add-content-modal";
 import { ContentItemCard } from "./content-item-card";
 
 type BoardDetailViewProps = {
@@ -165,7 +165,7 @@ export function BoardDetailView({ board, items, fetchError }: BoardDetailViewPro
         </div>
       )}
 
-      <AddContentTextModal
+      <AddContentModal
         boardId={board.id}
         boardName={board.name}
         open={addOpen}

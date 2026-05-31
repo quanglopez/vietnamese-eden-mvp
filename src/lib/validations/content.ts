@@ -32,6 +32,30 @@ export const addContentTextSchema = z.object({
 
 export type AddContentTextInput = z.infer<typeof addContentTextSchema>;
 
+export const addContentUrlSchema = z.object({
+  boardId: z.string().uuid("Board không hợp lệ"),
+  sourceUrl: z
+    .string()
+    .trim()
+    .min(1, "URL không được để trống")
+    .refine((value) => {
+      try {
+        const normalized = /^https?:\/\//i.test(value) ? value : `https://${value}`;
+        const parsed = new URL(normalized);
+        return parsed.protocol === "http:" || parsed.protocol === "https:";
+      } catch {
+        return false;
+      }
+    }, { message: "URL không hợp lệ" }),
+  title: z
+    .string()
+    .trim()
+    .max(200, "Tiêu đề quá dài")
+    .optional(),
+});
+
+export type AddContentUrlInput = z.infer<typeof addContentUrlSchema>;
+
 export const PLATFORM_OPTIONS = [
   { value: "other", label: "Khác / chưa xác định" },
   { value: "tiktok", label: "TikTok" },
