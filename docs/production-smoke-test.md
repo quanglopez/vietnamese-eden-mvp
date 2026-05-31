@@ -10,6 +10,49 @@ Chạy sau khi hoàn tất [supabase-cloud-setup.md](./supabase-cloud-setup.md) 
 
 ---
 
+## ALE-87 — Harden remix JSON parsing + production retest (2026-05-31)
+
+| Field | Value |
+|-------|--------|
+| **Test date** | 2026-05-31 |
+| **Commit** | `0bfe448` — `fix: harden AI JSON parsing for Xiaomi remix outputs` |
+| **Environment** | Production — https://vietnamese-eden-mvp.vercel.app/ |
+
+### Root cause (remix 5-variant fail)
+
+| Issue | Detail |
+|-------|--------|
+| Parser cũ | Regex tham lam `\{[\s\S]*\}` — dễ cắt sai JSON lớn (5 variants) |
+| Model output | Đôi khi markdown fence / text thừa / trailing comma |
+
+### Fix shipped
+
+| Item | File |
+|------|------|
+| Balanced-bracket JSON extract + fence strip | `src/lib/ai/json.ts` |
+| Shared parse for all chat completions | `src/lib/ai/chat-completions.ts` |
+| Strict remix prompt + 1× JSON repair retry | `prompts/remix.ts`, `openai-compatible.ts` |
+
+### Production retest — Remix 5 variants
+
+| Step | Result |
+|------|--------|
+| Login | **PASS** |
+| Remix `/remix/[id]` | **PASS** |
+| Format Facebook + Tone Gần gũi + **5 biến thể** | **PASS** — không lỗi parse |
+| Outputs | **5 biến thể mới** (tổng 8 sau session trước: 3 TikTok + 5 Facebook) |
+| Hard refresh | **PASS** — `Biến thể đã tạo (8)` còn |
+| Copy tất cả | **Available** |
+
+### Beta readiness (ALE-87)
+
+| Scope | Verdict |
+|-------|---------|
+| Remix 5-variant (Xiaomi) | **Beta-ready** |
+| Full MVP E2E | **Beta-ready** (core flow) |
+
+---
+
 ## ALE-86 — Xiaomi MiMo V2.5 deploy + production AI retest (2026-05-31)
 
 | Field | Value |
