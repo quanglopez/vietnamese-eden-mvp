@@ -1,23 +1,19 @@
 # Project status — Vietnamese Eden MVP
 
-**Cập nhật:** 2026-05-31 (ALE-88 beta readiness)  
+**Cập nhật:** 2026-05-31 (ALE-89 invite first beta cohort)  
 **Production:** https://vietnamese-eden-mvp.vercel.app/  
-**Commit:** `8dfae12` on `main`
+**Commit:** `68a928b` on `main` (docs); ALE-89 docs pending push
 
 ---
 
-## Beta readiness — GO for 10–20 users
+## Beta readiness
 
-| Scope | Status |
+| Phase | Status |
 |-------|--------|
-| Landing + waitlist | **Ready** |
-| Auth (signup/login) | **Ready** |
-| Workspace → board → content | **Ready** |
-| P0 RLS | **Cleared** |
-| AI Breakdown (Xiaomi) | **Ready** |
-| Remix 5–10 variants | **Ready** (10 slower; see limitations) |
-| Voice + Calendar | **Ready** |
-| Beta docs | **Ready** — [beta-onboarding.md](./beta-onboarding.md), [known-limitations.md](./known-limitations.md) |
+| Core MVP on production | **Ready** (ALE-88) |
+| Onboarding + limitations docs | **Ready** |
+| **Inviting first cohort** | **In progress** (ALE-89) |
+| Feedback triage round 1 | **Next** — ALE-90 |
 
 ---
 
@@ -25,42 +21,31 @@
 
 | | |
 |--|--|
-| **ALE-88** | Beta readiness hardening — prod smoke + mobile 375 + latency notes + onboarding docs |
-| **Outcome** | No code change; docs + verification |
+| **Issue** | **ALE-89** — Invite first beta cohort and collect feedback |
+| **Outcome** | Docs: feedback plan, invite messages, triage guide — **no app code change** |
+| **Docs** | [beta-feedback-plan.md](./beta-feedback-plan.md) · [beta-invite-message.md](./beta-invite-message.md) · [feedback-triage.md](./feedback-triage.md) |
+
+---
+
+## Cohort 1 (owner actions)
+
+| Step | Doc |
+|------|-----|
+| Chọn 10–20 người | [beta-feedback-plan.md](./beta-feedback-plan.md) §3 |
+| Gửi invite | [beta-invite-message.md](./beta-invite-message.md) |
+| Thu feedback + triage | [feedback-triage.md](./feedback-triage.md) |
 
 ---
 
 ## AI (production)
 
-`AI_PROVIDER=xiaomi`, `AI_MODEL=mimo-v2.5`, `XIAOMI_*` on Vercel.
+`AI_PROVIDER=xiaomi`, `AI_MODEL=mimo-v2.5` on Vercel.
 
 ---
 
-## Known P2 (non-blocking beta)
+## Next recommended issue
 
-| Item | Doc |
-|------|-----|
-| Forgot-password email with `+` | [known-limitations.md](./known-limitations.md) |
-| Google OAuth not enabled on Cloud | same |
-| Remix/calendar minor H-scroll @ 375px | ALE-88 smoke |
-| Local build OOM on low-RAM agents | Vercel OK; `NODE_OPTIONS=--max-old-space-size=8192` works |
-
----
-
-## Verify (ALE-88)
-
-| Command | Result |
-|---------|--------|
-| `npm run lint` | **PASS** |
-| `npm run type-check` | **PASS** |
-| `npm run build` | **PASS** (8GB heap) |
-
----
-
-## Next recommended
-
-- **ALE-89**: Invite beta cohort + feedback template; optional Playwright smoke in CI.
-- Monitor Xiaomi cost at 10 variants/user/day.
+**ALE-90** — Triage beta feedback round 1 (sau 7–10 ngày cohort test).
 
 ---
 
@@ -68,6 +53,6 @@
 
 | Date | Issue | Summary |
 |------|-------|---------|
-| 2026-05-31 | ALE-88 | Beta GO; onboarding + limitations docs |
+| 2026-05-31 | ALE-89 | Beta invite + feedback docs |
+| 2026-05-31 | ALE-88 | Beta GO; onboarding + limitations |
 | 2026-05-31 | ALE-87 | Remix JSON hardening |
-| 2026-05-31 | ALE-86 | Xiaomi prod verified |
