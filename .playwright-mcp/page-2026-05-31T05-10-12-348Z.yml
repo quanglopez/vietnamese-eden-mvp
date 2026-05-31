@@ -1,0 +1,248 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "Vietnamese Eden" [ref=e5] [cursor=pointer]:
+          - /url: /
+        - navigation [ref=e6]:
+          - link "Tính năng" [ref=e7] [cursor=pointer]:
+            - /url: "#features"
+          - link "Gói cước" [ref=e8] [cursor=pointer]:
+            - /url: "#pricing"
+        - generic [ref=e9]:
+          - link "Đăng nhập" [ref=e10] [cursor=pointer]:
+            - /url: /login
+          - link "Tham gia beta" [ref=e11] [cursor=pointer]:
+            - /url: "#waitlist"
+    - main [ref=e12]:
+      - generic [ref=e14]:
+        - paragraph [ref=e15]: AI content workspace · Creator & agency Việt Nam
+        - heading "Từ bài viral đến nội dung của bạn — trong một workspace" [level=1] [ref=e16]:
+          - text: Từ bài viral đến nội dung của bạn
+          - text: — trong một workspace
+        - paragraph [ref=e17]: Lưu swipe file, phân tích hook & CTA bằng AI, remix tiếng Việt theo giọng viết cá nhân, rồi đưa thẳng vào lịch đăng — dành cho creator và agency làm content hàng ngày.
+        - generic [ref=e18]:
+          - link "Dùng thử bản beta" [ref=e19] [cursor=pointer]:
+            - /url: "#waitlist"
+            - text: Dùng thử bản beta
+            - img
+          - link "Xem demo" [ref=e20] [cursor=pointer]:
+            - /url: "#how-it-works"
+            - img
+            - text: Xem demo
+        - paragraph [ref=e21]:
+          - text: Đã có tài khoản?
+          - link "Đăng nhập" [ref=e22] [cursor=pointer]:
+            - /url: /login
+          - text: ·
+          - link "Đăng ký" [ref=e23] [cursor=pointer]:
+            - /url: /signup
+      - generic [ref=e25]:
+        - generic [ref=e26]:
+          - heading "Creator Việt đang mất thời gian ở đâu?" [level=2] [ref=e27]
+          - paragraph [ref=e28]: Bạn không thiếu ý tưởng — bạn thiếu hệ thống biến bài viral thành nội dung có giọng riêng và lịch đăng rõ ràng.
+        - list [ref=e29]:
+          - listitem [ref=e30]:
+            - img [ref=e32]
+            - heading "Inspiration rải rác" [level=3] [ref=e36]
+            - paragraph [ref=e37]: Link TikTok, screenshot, note — khó tìm lại khi cần remix.
+          - listitem [ref=e38]:
+            - img [ref=e40]
+            - heading "Remix mất giọng" [level=3] [ref=e46]
+            - paragraph [ref=e47]: Chat AI chung chung, không giữ được tone thương hiệu cá nhân.
+          - listitem [ref=e48]:
+            - img [ref=e50]
+            - heading "Từ ý tưởng đến lịch đăng quá lâu" [level=3] [ref=e53]
+            - paragraph [ref=e54]: Phân tích, viết lại, copy sang sheet — nhiều bước thủ công.
+      - generic [ref=e56]:
+        - heading "Cách hoạt động" [level=2] [ref=e57]
+        - paragraph [ref=e58]: Bốn bước từ lưu bài viral đến output sẵn sàng đăng.
+        - list [ref=e59]:
+          - listitem [ref=e60]:
+            - text: "1"
+            - heading "Lưu inspiration" [level=3] [ref=e61]
+            - paragraph [ref=e62]: Tạo board, thêm text hoặc link bài viral bạn muốn học hỏi.
+          - listitem [ref=e63]:
+            - text: "2"
+            - heading "Phân tích AI" [level=3] [ref=e64]
+            - paragraph [ref=e65]: Chạy Breakdown để thấy hook, angle, structure và CTA.
+          - listitem [ref=e66]:
+            - text: "3"
+            - heading "Remix + giọng văn" [level=3] [ref=e67]
+            - paragraph [ref=e68]: Chọn format, tone, voice profile — sinh biến thể tiếng Việt.
+          - listitem [ref=e69]:
+            - text: "4"
+            - heading "Lên lịch đăng" [level=3] [ref=e70]
+            - paragraph [ref=e71]: Đưa output vào calendar, copy/export và đăng thủ công.
+      - generic [ref=e73]:
+        - heading "Tính năng cốt lõi" [level=2] [ref=e74]
+        - paragraph [ref=e75]: "Toàn bộ luồng MVP: board → breakdown → remix → voice → calendar."
+        - list [ref=e76]:
+          - listitem [ref=e77]:
+            - heading "Swipe Board" [level=3] [ref=e78]
+            - paragraph [ref=e79]: Lưu bài viral, swipe file và ý tưởng từ TikTok, Facebook, Instagram — gom một chỗ cho team.
+          - listitem [ref=e80]:
+            - heading "AI Breakdown" [level=3] [ref=e81]
+            - paragraph [ref=e82]: Phân tích hook, angle, structure, CTA và insight — hiểu vì sao bài chạy tốt.
+          - listitem [ref=e83]:
+            - heading "Remix tiếng Việt" [level=3] [ref=e84]
+            - paragraph [ref=e85]: Sinh 5–10 biến thể caption/script theo format và tone bạn chọn.
+          - listitem [ref=e86]:
+            - heading "Voice Profile" [level=3] [ref=e87]
+            - paragraph [ref=e88]: Học giọng viết từ mẫu của bạn — remix nghe đúng “mình” hơn template chung.
+          - listitem [ref=e89]:
+            - heading "Content Calendar" [level=3] [ref=e90]
+            - paragraph [ref=e91]: Đưa output đã remix vào lịch 30 ngày, theo kênh và trạng thái đăng.
+          - listitem [ref=e92]:
+            - heading "Copy & Export" [level=3] [ref=e93]
+            - paragraph [ref=e94]: Copy nhanh hoặc tải .txt/.md — sẵn sàng dán lên tool đăng bài.
+      - generic [ref=e96]:
+        - heading "Ai đang dùng?" [level=2] [ref=e97]
+        - paragraph [ref=e98]: Use case phổ biến trong beta creator & agency Việt Nam.
+        - list [ref=e99]:
+          - listitem [ref=e100]:
+            - heading "Beauty / lifestyle creator" [level=3] [ref=e101]
+            - paragraph [ref=e102]: Lưu hook viral ngành beauty, breakdown góc “skincare routine”, remix 7 caption cho tuần.
+          - listitem [ref=e103]:
+            - heading "Agency social nhỏ" [level=3] [ref=e104]
+            - paragraph [ref=e105]: Mỗi client một board, voice profile riêng, calendar theo ngày đăng từng kênh.
+          - listitem [ref=e106]:
+            - heading "Educator / coach" [level=3] [ref=e107]
+            - paragraph [ref=e108]: Swipe case study, tách structure bài dạy, remix thành thread và CTA workshop.
+      - generic [ref=e110]:
+        - heading "Gói cước" [level=2] [ref=e111]
+        - paragraph [ref=e112]: Beta miễn phí. Gói trả phí là định hướng — chưa bật Stripe trong MVP.
+        - list [ref=e113]:
+          - listitem [ref=e114]:
+            - generic [ref=e115]: Đang mở beta
+            - heading "Free / Beta" [level=3] [ref=e116]
+            - paragraph [ref=e117]: 0đ
+            - paragraph [ref=e118]: trong giai đoạn beta
+            - paragraph [ref=e119]: Dành cho creator thử luồng MVP đầy đủ.
+            - list [ref=e120]:
+              - listitem [ref=e121]:
+                - img [ref=e122]
+                - generic [ref=e124]: Swipe board không giới hạn
+              - listitem [ref=e125]:
+                - img [ref=e126]
+                - generic [ref=e128]: AI Breakdown + Remix (mock hoặc OpenAI)
+              - listitem [ref=e129]:
+                - img [ref=e130]
+                - generic [ref=e132]: 1 voice profile
+              - listitem [ref=e133]:
+                - img [ref=e134]
+                - generic [ref=e136]: Lịch nội dung 30 ngày
+              - listitem [ref=e137]:
+                - img [ref=e138]
+                - generic [ref=e140]: Copy / export output
+            - link "Tham gia waitlist" [ref=e141] [cursor=pointer]:
+              - /url: "#waitlist"
+          - listitem [ref=e142]:
+            - heading "Creator" [level=3] [ref=e143]
+            - paragraph [ref=e144]: 299.000đ
+            - paragraph [ref=e145]: / tháng (sắp mở)
+            - paragraph [ref=e146]: Cho solo creator làm content hàng ngày.
+            - list [ref=e147]:
+              - listitem [ref=e148]:
+                - img [ref=e149]
+                - generic [ref=e151]: Mọi tính năng Beta
+              - listitem [ref=e152]:
+                - img [ref=e153]
+                - generic [ref=e155]: Nhiều voice profile
+              - listitem [ref=e156]:
+                - img [ref=e157]
+                - generic [ref=e159]: Remix batch lớn hơn
+              - listitem [ref=e160]:
+                - img [ref=e161]
+                - generic [ref=e163]: Ưu tiên queue AI
+              - listitem [ref=e164]:
+                - img [ref=e165]
+                - generic [ref=e167]: Hỗ trợ email
+            - link "Đăng ký sớm" [ref=e168] [cursor=pointer]:
+              - /url: "#waitlist"
+          - listitem [ref=e169]:
+            - heading "Pro / Agency" [level=3] [ref=e170]
+            - paragraph [ref=e171]: Liên hệ
+            - paragraph [ref=e172]: theo workspace
+            - paragraph [ref=e173]: Cho agency quản nhiều brand và thành viên.
+            - list [ref=e174]:
+              - listitem [ref=e175]:
+                - img [ref=e176]
+                - generic [ref=e178]: Workspace đa thành viên
+              - listitem [ref=e179]:
+                - img [ref=e180]
+                - generic [ref=e182]: Board theo client
+              - listitem [ref=e183]:
+                - img [ref=e184]
+                - generic [ref=e186]: Voice profile theo brand
+              - listitem [ref=e187]:
+                - img [ref=e188]
+                - generic [ref=e190]: Calendar team view
+              - listitem [ref=e191]:
+                - img [ref=e192]
+                - generic [ref=e194]: Onboarding riêng
+            - link "Liên hệ beta" [ref=e195] [cursor=pointer]:
+              - /url: "#waitlist"
+        - paragraph [ref=e196]:
+          - text: Đã có tài khoản beta?
+          - link "Đăng nhập app" [ref=e197] [cursor=pointer]:
+            - /url: /login
+      - generic [ref=e199]:
+        - generic [ref=e200]:
+          - heading "Tham gia beta waitlist" [level=2] [ref=e201]
+          - paragraph [ref=e202]: Để lại email — chúng tôi mời từng đợt. Nếu bạn đã có quyền truy cập, đăng ký tài khoản và bắt đầu luôn.
+          - list [ref=e203]:
+            - listitem [ref=e204]: • Không spam — chỉ email về beta và cập nhật sản phẩm.
+            - listitem [ref=e205]: • Dữ liệu lưu an toàn trên Supabase (insert-only, không public read).
+            - listitem [ref=e206]: • Email trùng sẽ được báo để bạn không đăng ký nhầm hai lần.
+        - generic [ref=e208]:
+          - generic [ref=e209]:
+            - generic [ref=e210]: Họ tên
+            - textbox "Họ tên" [ref=e211]:
+              - /placeholder: Nguyễn Văn A
+              - text: ALE-80 Smoke Test
+            - paragraph [ref=e247]: Invalid input
+          - generic [ref=e212]:
+            - generic [ref=e213]: Email
+            - textbox "Email" [ref=e214]:
+              - /placeholder: ban@example.com
+              - text: ale80-smoke-20260531@mailinator.com
+            - paragraph [ref=e248]: Invalid input
+          - generic [ref=e215]:
+            - generic [ref=e216]: Bạn làm content thế nào?
+            - textbox "Bạn làm content thế nào?" [ref=e217]:
+              - /placeholder: "VD: Creator beauty TikTok, 3 video/tuần, cần remix caption tiếng Việt..."
+              - text: Production smoke test ALE-80 — creator beauty TikTok beta flow verification.
+            - paragraph [ref=e249]: Invalid input
+          - button "Gửi đăng ký beta" [ref=e218] [cursor=pointer]
+      - generic [ref=e220]:
+        - heading "Câu hỏi thường gặp" [level=2] [ref=e221]
+        - generic [ref=e222]:
+          - generic [ref=e223]:
+            - term [ref=e224]: Vietnamese Eden khác gì so với lưu link trong Notes?
+            - definition [ref=e225]: Bạn lưu bài viral, phân tích hook/angle/CTA bằng AI, remix theo giọng viết riêng và đưa thẳng vào lịch — một workspace thay vì rời rạc nhiều app.
+          - generic [ref=e226]:
+            - term [ref=e227]: Có cần OpenAI API key không?
+            - definition [ref=e228]: Beta có thể dùng chế độ mock (AI_USE_MOCK=true). Khi bật AI thật, bạn cấu hình OPENAI_API_KEY trên server.
+          - generic [ref=e229]:
+            - term [ref=e230]: URL TikTok/Facebook có tự lấy nội dung không?
+            - definition [ref=e231]: Chưa — MVP lưu link và text thủ công. URL-only sẽ hiện thông báo rõ, không gọi AI cho đến khi có nội dung text.
+          - generic [ref=e232]:
+            - term [ref=e233]: Có auto-post lên mạng xã hội không?
+            - definition [ref=e234]: Chưa. Calendar giúp lên kế hoạch và theo trạng thái; đăng bài vẫn thủ công.
+          - generic [ref=e235]:
+            - term [ref=e236]: Khi nào mở billing?
+            - definition [ref=e237]: Sau beta. Gói Creator và Pro/Agency trên landing là định hướng giá, chưa thanh toán Stripe.
+    - contentinfo [ref=e238]:
+      - generic [ref=e239]:
+        - paragraph [ref=e240]: © 2026 Vietnamese Eden · AI content workspace
+        - navigation [ref=e241]:
+          - link "Tính năng" [ref=e242] [cursor=pointer]:
+            - /url: "#features"
+          - link "Gói cước" [ref=e243] [cursor=pointer]:
+            - /url: "#pricing"
+          - link "Đăng nhập" [ref=e244] [cursor=pointer]:
+            - /url: /login
+          - link "Đăng ký" [ref=e245] [cursor=pointer]:
+            - /url: /signup
+  - alert [ref=e246]

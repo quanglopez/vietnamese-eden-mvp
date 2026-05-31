@@ -1,0 +1,36 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]: Đăng ký
+        - generic [ref=e6]: Tạo tài khoản Vietnamese Eden miễn phí
+      - generic [ref=e7]:
+        - button "Đăng ký với Google" [ref=e9] [cursor=pointer]:
+          - img
+          - text: Đăng ký với Google
+        - generic [ref=e14]: hoặc
+        - generic [ref=e15]:
+          - generic [ref=e16]:
+            - generic [ref=e17]: Họ tên
+            - textbox "Họ tên" [ref=e18]:
+              - /placeholder: Nguyễn Văn A
+              - text: Prod Smoke ALE80
+            - paragraph [ref=e29]: Invalid input
+          - generic [ref=e19]:
+            - generic [ref=e20]: Email
+            - textbox "Email" [ref=e21]:
+              - /placeholder: ban@example.com
+              - text: ale80.prod.smoke.20260531@gmail.com
+            - paragraph [ref=e30]: Invalid input
+          - generic [ref=e22]:
+            - generic [ref=e23]: Mật khẩu
+            - textbox "Mật khẩu" [ref=e24]:
+              - /placeholder: ••••••••
+              - text: SmokeTest123!
+            - paragraph [ref=e31]: Invalid input
+          - button "Tạo tài khoản" [ref=e25] [cursor=pointer]
+        - paragraph [ref=e26]:
+          - text: Đã có tài khoản?
+          - link "Đăng nhập" [ref=e27] [cursor=pointer]:
+            - /url: /login
+  - alert [ref=e28]

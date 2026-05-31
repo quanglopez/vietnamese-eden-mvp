@@ -10,15 +10,63 @@ Chạy sau khi hoàn tất [supabase-cloud-setup.md](./supabase-cloud-setup.md) 
 
 ---
 
+## ALE-80 — Kết quả chạy thực tế (2026-05-31)
+
+**Deploy tested:** https://vietnamese-eden-mvp.vercel.app/ (Vercel Production, Supabase Cloud env đã cấu hình)
+
+**Phương pháp:** `curl` + Playwright MCP (keyboard input trên form)
+
+### Tóm tắt
+
+| Hạng mục | Kết quả |
+|----------|---------|
+| Health `/api/health/supabase` | **PASS** — `{"status":"ok","supabase":{"ok":true,"rowCount":1}}` |
+| Landing `/` | **PASS** — 200, nội dung tiếng Việt đầy đủ |
+| Auth routes HTTP | **PASS** — `/login`, `/signup` → 200 |
+| Protected route | **PASS** — `/dashboard` redirect login (middleware) |
+| Waitlist submit | **FAIL** trên deploy hiện tại — validation "Invalid input" |
+| Signup / Login | **FAIL** trên deploy hiện tại — cùng lỗi form |
+| MVP flow (board → calendar) | **NOT RUN** — blocked bởi auth/forms |
+
+### Blocking bug (production deploy hiện tại)
+
+**Triệu chứng:** Mọi form dùng `zodResolver` (signup, login, waitlist) hiển thị lỗi **"Invalid input"** trên từng field khi submit — không gọi Supabase auth / waitlist insert.
+
+**Nguyên nhân:** Zod v4 schema từ `import { z } from "zod"` không tương thích đúng với `@hookform/resolvers/zod` trong **production bundle** (dev build OK).
+
+**Fix đã verify local (chưa deploy Vercel):**
+
+- `import { z } from "zod/v4"` trong `src/lib/validations/auth.ts`, `waitlist.ts`
+- `Input` component `forwardRef` cho react-hook-form
+
+Sau fix, `npm run build` + signup trên `localhost:3020` → **"Kiểm tra email của bạn"** (Supabase signup OK).
+
+**Khuyến nghị:** Deploy fix lên Vercel → chạy lại mục 2–8 checklist bên dưới.
+
+### Beta readiness
+
+| Verdict | Lý do |
+|---------|--------|
+| **Chưa sẵn sàng beta công khai** | Form auth/waitlist broken trên URL production hiện tại |
+| **Sẵn sàng sau 1 deploy** | Supabase + health OK; fix form đã có trên branch local |
+
+### Follow-up Linear gợi ý
+
+1. **ALE-81** (hoặc hotfix): Deploy zod/v4 + Input forwardRef
+2. **ALE-82**: E2E Playwright production sau hotfix (cần email confirm hoặc tắt confirm tạm trên Supabase dev)
+3. Manual: Owner xác nhận email Supabase + chạy full flow 15 phút
+
+---
+
 ## 0. Pre-flight (bắt buộc)
 
 | # | Kiểm tra | Pass? | Ghi chú |
 |---|----------|-------|---------|
-| 0.1 | `curl -s https://vietnamese-eden-mvp.vercel.app/api/health/supabase` → `"status":"ok"` | ☐ | Nếu error → xem supabase-cloud-setup |
-| 0.2 | Vercel env: `NEXT_PUBLIC_SITE_URL=https://vietnamese-eden-mvp.vercel.app` | ☐ | |
-| 0.3 | Vercel env: `AI_USE_MOCK=false` + `OPENAI_API_KEY` set | ☐ | AI features trên Vercel |
-| 0.4 | Supabase redirect: `https://vietnamese-eden-mvp.vercel.app/auth/callback` | ☐ | |
-| 0.5 | Trình duyệt: Chrome/Edge, cửa sổ ẩn danh (tránh session cũ) | ☐ | |
+| 0.1 | `curl -s https://vietnamese-eden-mvp.vercel.app/api/health/supabase` → `"status":"ok"` | ☑ ALE-80 | `checkedAt` 2026-05-31 |
+| 0.2 | Vercel env: `NEXT_PUBLIC_SITE_URL=https://vietnamese-eden-mvp.vercel.app` | ☑ | Giả định owner đã set (health OK) |
+| 0.3 | Vercel env: `AI_USE_MOCK=false` + `OPENAI_API_KEY` set | ☐ | Chưa verify AI trên prod (blocked auth) |
+| 0.4 | Supabase redirect: `https://vietnamese-eden-mvp.vercel.app/auth/callback` | ☐ | Chưa verify signup E2E |
+| 0.5 | Trình duyệt: Chrome/Edge, cửa sổ ẩn danh (tránh session cũ) | ☑ | Playwright |
 
 **Probe nhanh (không cần login):**
 
@@ -35,12 +83,12 @@ curl -s https://vietnamese-eden-mvp.vercel.app/api/health/supabase
 
 | # | Hành động | Kỳ vọng | Pass? |
 |---|-----------|---------|-------|
-| 1.1 | Mở `/` | Hero tiếng Việt, CTA "Dùng thử bản beta" / "Xem demo" | ☐ |
-| 1.2 | Scroll các section | Problem, How it works, Features, Use cases, Pricing, FAQ | ☐ |
-| 1.3 | Header **Đăng nhập** | → `/login` | ☐ |
-| 1.4 | **Tham gia beta** / scroll `#waitlist` | Form name / email / use case hiện | ☐ |
-| 1.5 | Submit waitlist (email test mới) | Success hoặc lỗi email trùng (tiếng Việt) | ☐ |
-| 1.6 | DevTools Console | Không lỗi JS đỏ blocking | ☐ |
+| 1.1 | Mở `/` | Hero tiếng Việt, CTA "Dùng thử bản beta" / "Xem demo" | ☑ |
+| 1.2 | Scroll các section | Problem, How it works, Features, Use cases, Pricing, FAQ | ☑ |
+| 1.3 | Header **Đăng nhập** | → `/login` | ☑ |
+| 1.4 | **Tham gia beta** / scroll `#waitlist` | Form name / email / use case hiện | ☑ |
+| 1.5 | Submit waitlist (email test mới) | Success hoặc lỗi email trùng (tiếng Việt) | ✗ Invalid input (deploy hiện tại) |
+| 1.6 | DevTools Console | Không lỗi JS đỏ blocking | ☑ |
 | 1.7 | Mobile ~375px | Layout đọc được, nút bấm được | ☐ |
 
 **Data mẫu waitlist:**
@@ -57,10 +105,10 @@ Xác nhận DB (optional): Supabase Table Editor → `beta_waitlist` có 1 row.
 
 | # | Hành động | Kỳ vọng | Pass? |
 |---|-----------|---------|-------|
-| 2.1 | `/signup` — đăng ký user mới | Form OK, không crash | ☐ |
-| 2.2 | Email confirmation (nếu bật) | Link mở → `/auth/callback` → `/dashboard` | ☐ |
-| 2.3 | `/login` — đăng nhập | Vào `/dashboard` | ☐ |
-| 2.4 | Mở `/dashboard` khi chưa login | Redirect `/login?next=...` | ☐ |
+| 2.1 | `/signup` — đăng ký user mới | Form OK, không crash | ✗ validation "Invalid input" |
+| 2.2 | Email confirmation (nếu bật) | Link mở → `/auth/callback` → `/dashboard` | ☐ blocked |
+| 2.3 | `/login` — đăng nhập | Vào `/dashboard` | ☐ blocked |
+| 2.4 | Mở `/dashboard` khi chưa login | Redirect `/login?next=...` | ☑ (middleware SSR) |
 | 2.5 | Google OAuth (nếu đã cấu hình) | Login thành công | ☐ / N/A |
 
 **Lỗi thường gặp:** redirect mismatch → sửa Supabase Redirect URLs.
@@ -156,16 +204,18 @@ Nếu không tạo được board: kiểm tra `handle_new_user` / `workspace_mem
 
 | Môi trường | Ngày | Tester | Kết quả |
 |------------|------|--------|---------|
-| Production | | | ☐ Pass / ☐ Fail |
+| Production (Vercel) | 2026-05-31 | Agent ALE-80 | **Fail** — forms broken; infra OK |
+| Local prod build :3020 (sau fix) | 2026-05-31 | Agent ALE-80 | Signup → email confirm screen **Pass** |
 
 **Blocking issues (ghi ID Linear nếu có):**
 
-1. 
-2. 
+1. **Zod + zodResolver trên production bundle** — signup/login/waitlist → "Invalid input" (fix: `zod/v4` import, chưa deploy)
 
 **Non-blocking / follow-up:**
 
-1. 
+1. Mobile 375px chưa test
+2. AI breakdown/remix/calendar — chờ auth fix + deploy
+3. Tắt email confirm tạm trên Supabase dev để E2E tự động hóa
 
 ---
 
