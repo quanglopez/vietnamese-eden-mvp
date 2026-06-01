@@ -1132,5 +1132,72 @@ Nếu không tạo được board: kiểm tra `handle_new_user` / `workspace_mem
 | Supabase | `127.0.0.1:54321`          | Cloud project                            |
 | Site URL | `http://127.0.0.1:3000`    | `https://vietnamese-eden-mvp.vercel.app` |
 
+---
+
+## ALE-152 — Improve URL-only content thumbnails and metadata enrichment (2026-06-01)
+
+| Field | Value |
+|-------|-------|
+| **Commit tested** | `fa08afe` — `feat: improve URL-only content previews` |
+| **Environment** | Production `https://vietnamese-eden-mvp.vercel.app/` |
+| **Method** | Hermes browser automation (CDP) |
+| **Account** | `ggonevn@gmail.com` |
+| **Linear comment** | `d9765987-72e9-486a-8e26-d3d1f6a97884` (posted, success) |
+| **Verdict** | **PARTIAL PASS** — 7/9 PASS, 3 follow-up issues, **NOT marked Done** |
+
+### Scope
+
+Verify ALE-152 deliverable: URL-only content cards (YouTube, TikTok, etc.) must show thumbnails OR a clean fallback, AI Breakdown must work from metadata when available, and copy must clearly say "metadata, not transcript" so users don't think we have full captions.
+
+### Smoke matrix (7/9 PASS, 2 issues found)
+
+| # | Check | Result | Notes |
+|---|-------|--------|-------|
+| 1 | Open board with URL-only YouTube content | **PASS** | Board `✨ youtube` (`226fef41-ece4-4561-975e-32e771d492df`) with card `https://www.youtube.com/watch?v=3Bfx4osqbfE` |
+| 2 | Refresh card/breakdown to trigger enrich | **PASS** | Card pre-enriched on load; clicking "Phân tích AI" re-runs analysis |
+| 3 | YouTube thumbnail displays | **PASS** | `https://img.youtube.com/vi/3Bfx4osqbfE/hqdefault.jpg` 480x360 loaded successfully; gradient fallback `from-[#ff0000] to-[#ff6b35]` if broken |
+| 4 | Open AI Breakdown for URL-only YouTube | **PASS** | Breakdown `bafcb7dd-8c29-42be-95bd-eeb0e05a2ae5` → Bước 1/4 overlay visible, ~75s to complete |
+| 5 | Metadata enrich + breakdown copy | **PASS** | Card displays "Metadata tự động từ link — không phải transcript/caption đầy đủ. Để phân tích sâu hơn, hãy dán caption/script qua Paste…"; breakdown model label = `xiaomi:mimo-v2.5` |
+| 6 | Fallback message when metadata not enrichable | **PASS** | YouTube Shorts + TikTok: **"Chưa thể phân tích bằng AI. Không lấy được metadata từ link (YouTube/TikTok có thể chặn tự động). Hãy dùng tab Paste text trên bảng và dán caption/script để phân tích sâu hơn."** + "Quay lại bảng để thêm text" CTA |
+| 7 | TikTok oEmbed / fallback | **PARTIAL PASS** | oEmbed blocked server-side → no thumbnail, but fallback renders: "TikTok" badge + URL + clear paste-text message. No trắng trống. |
+| 8 | Paste text flow | **PASS** | Card "Khác — Văn bản demo" → breakdown renders full 7 sections (Hook / Angle / Cấu trúc / CTA / Cảm xúc / Đối tượng mục tiêu / Vì sao hiệu quả) + Gợi ý Remix (5 items) + "Phân tích lại" + "Tạo remix" buttons |
+| 9 | No transcript/caption claim | **PASS** | All copy uses "metadata", "caption/script" (with paste reminder). No claim of full transcript extraction anywhere on card or breakdown. |
+
+### Follow-up issues (block Done)
+
+1. **YouTube Shorts not enrichable** (MEDIUM)
+   - `https://youtube.com/shorts/UZSEmfaNRqg?si=…` shows same fallback as TikTok
+   - Likely: oEmbed parser handles only `youtube.com/watch?v=…`, not `/shorts/`
+   - Suggested fix: detect `/shorts/` pattern and rewrite to `watch?v=` before oEmbed call, or add dedicated Shorts handler. **Shorts are common → not negligible.**
+
+2. **TikTok oEmbed completely blocked** (LOW — acceptable per spec)
+   - `https://vt.tiktok.com/ZSx7CSdfS/` returns no metadata
+   - Fallback message is clean and guides user to paste text
+   - Suggested: try `https://www.tiktok.com/oembed?url=…` as alternative; document TikTok limitation in onboarding if still blocked
+
+3. **Non-Vietnamese glyph leak in breakdown body** (MEDIUM)
+   - Breakdown of `3Bfx4osqbfE` "Vì sao hiệu quả" section contains `pontos` (Portuguese token)
+   - Same class of leak as ALE-147 (CJK) but for Romance language tokens
+   - Suggested fix: extend `containsNonVietnameseChars` validator in `src/lib/ai/json.ts` to reject CJK **and** non-ASCII Latin (Portuguese/Spanish accented chars) when not in Vietnamese. Add to `assertRemixVariantsNoCjk` style assertion for breakdown too.
+
+### Latency observed
+
+| Operation | Latency | Notes |
+|-----------|---------|-------|
+| YouTube watch?v=… breakdown (xiaomi:mimo-v2.5) | ~75s | ALE-141 overlay visible entire wait, Bước 1/4 → 100% |
+| Card load (already enriched) | <1s | DB read |
+| Fallback breakdown page (no analysis) | <1s | Static "Chưa thể phân tích" message |
+
+### Decision
+
+- [ ] **ALL PASS** → mark ALE-152 Done
+- [x] **PARTIAL PASS** (2 follow-ups block Done) → leave as In Progress, file follow-up issues
+
+### Re-test guidance after fixes
+
+1. Apply YouTube Shorts URL rewrite → re-test `/shorts/UZSEmfaNRqg` card → expect metadata label appears + thumbnail loads
+2. Extend `containsNonVietnameseChars` to also catch non-ASCII Latin → re-run breakdown on `3Bfx4osqbfE` → expect `pontos` either removed or replaced with Vietnamese
+3. (Optional) Add TikTok oEmbed fallback → re-test `vt.tiktok.com/ZSx7CSdfS` → if still blocked, document in `known-limitations.md`
+
 
 Script demo ngắn local: [demo-script.md](./demo-script.md)
