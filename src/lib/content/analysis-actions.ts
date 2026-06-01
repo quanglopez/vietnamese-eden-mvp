@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { analyzeContentText, getActiveAiModelLabel } from "@/lib/ai/client";
-import { AiProviderError } from "@/lib/ai/errors";
+import { AiProviderError, BreakdownContentError } from "@/lib/ai/errors";
 import type { ActionResult } from "@/lib/boards/actions";
 import {
   buildSummaryPayload,
@@ -60,6 +60,9 @@ export async function runContentAnalysisAction(
     analysisResult = providerResult;
     aiModel = getActiveAiModelLabel();
   } catch (error) {
+    if (error instanceof BreakdownContentError) {
+      return { success: false, error: error.message };
+    }
     if (error instanceof AiProviderError) {
       return { success: false, error: error.message };
     }

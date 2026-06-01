@@ -1,4 +1,6 @@
-import { AiProviderError, RemixContentError } from "@/lib/ai/errors";
+import { AiProviderError, BreakdownContentError, RemixContentError } from "@/lib/ai/errors";
+import type { BreakdownAnalysisResult } from "@/lib/ai/prompts/breakdown";
+import { containsNonVietnameseTokens } from "@/lib/ai/quality/language-leak";
 
 export type ParseAiJsonResult =
   | { ok: true; data: unknown }
@@ -181,5 +183,28 @@ export function assertRemixVariantsNoCjk(
     throw new RemixContentError(
       "Phát hiện ký tự không phải tiếng Việt (Trung/Nhật/Hàn) trong nội dung remix. Vui lòng thử tạo lại.",
     );
+  }
+}
+
+/** Kiểm tra breakdown JSON không rò rỉ token nước ngoài (ALE-153). */
+export function assertBreakdownNoNonVietnamese(result: BreakdownAnalysisResult): void {
+  const fields: string[] = [
+    result.hook,
+    result.angle,
+    result.structure,
+    result.cta,
+    result.emotion,
+    result.target_audience,
+    result.why_it_works,
+    ...result.remix_suggestions,
+  ];
+
+  for (const text of fields) {
+    const check = containsNonVietnameseTokens(text);
+    if (!check.ok) {
+      throw new BreakdownContentError(
+        "Phát hiện từ/ký tự không phải tiếng Việt trong phân tích. Vui lòng thử lại.",
+      );
+    }
   }
 }

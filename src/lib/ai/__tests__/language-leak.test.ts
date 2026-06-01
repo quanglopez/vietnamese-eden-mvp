@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
+import { assertBreakdownNoNonVietnamese } from "@/lib/ai/json";
+import { BreakdownContentError } from "@/lib/ai/errors";
 import { containsNonVietnameseTokens } from "@/lib/ai/quality/language-leak";
+import type { BreakdownAnalysisResult } from "@/lib/ai/prompts/breakdown";
 
 describe("containsNonVietnameseTokens", () => {
   it("từ chối token tiếng Bồ Đào Nha pontos", () => {
@@ -51,5 +54,33 @@ describe("containsNonVietnameseTokens", () => {
   it("chấp nhận chuỗi rỗng", () => {
     const result = containsNonVietnameseTokens("");
     assert.equal(result.ok, true);
+  });
+});
+
+describe("assertBreakdownNoNonVietnamese", () => {
+  const validBreakdown: BreakdownAnalysisResult = {
+    hook: "Hook tiếng Việt dùng AI marketing",
+    angle: "Góc chia sẻ thực chiến",
+    structure: "1. Mở đầu\n2. Nội dung\n3. CTA",
+    cta: "Comment để nhận checklist",
+    emotion: "Tò mò",
+    target_audience: "Creator Việt Nam",
+    why_it_works: "Công thức quen thuộc trên video ngắn",
+    remix_suggestions: ["Đổi hook sang số liệu", "Thêm proof social"],
+  };
+
+  it("chấp nhận breakdown tiếng Việt hợp lệ", () => {
+    assert.doesNotThrow(() => assertBreakdownNoNonVietnamese(validBreakdown));
+  });
+
+  it("từ chối breakdown có pontos trong why_it_works", () => {
+    assert.throws(
+      () =>
+        assertBreakdownNoNonVietnamese({
+          ...validBreakdown,
+          why_it_works: "Video hay vì tích lũy pontos uy tín",
+        }),
+      BreakdownContentError,
+    );
   });
 });

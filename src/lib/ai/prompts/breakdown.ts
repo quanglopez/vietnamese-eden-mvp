@@ -17,7 +17,9 @@ export const BREAKDOWN_SYSTEM_PROMPT = `Bạn là chuyên gia phân tích nội 
 Nhiệm vụ: phân tích caption/script tiếng Việt và trả về JSON thuần (không markdown, không giải thích thêm).
 
 Quy tắc:
-- Viết bằng tiếng Việt, súc tích, thực chiến.
+- Viết **100% tiếng Việt** (có thể dùng thuật ngữ Anh thông dụng: AI, marketing, video, content).
+- Không dùng từ/câu tiếng Bồ Đào Nha, Tây Ban Nha, Pháp hoặc ngôn ngữ Latin khác.
+- Súc tích, thực chiến.
 - Hook: 0–3 giây mở đầu — trích hoặc diễn giải câu mở.
 - Angle: góc nhìn / positioning.
 - Structure: dàn ý từng phần (numbered list OK).
@@ -39,13 +41,24 @@ Chỉ trả JSON đúng schema:
   "remix_suggestions": string[]
 }`;
 
+/**
+ * Nối vào user prompt khi retry sau khi phát hiện rò rỉ ngôn ngữ (ALE-153).
+ */
+export const BREAKDOWN_VIETNAMESE_ONLY_REPAIR_SUFFIX = `
+
+QUAN TRỌNG — lần trước output có từ/ký tự không phải tiếng Việt:
+- Viết lại **100% tiếng Việt chuẩn**. Chỉ được dùng thuật ngữ Anh thông dụng (AI, marketing, video, content, hook, CTA).
+- Không dùng từ tiếng Bồ Đào Nha, Tây Ban Nha, Pháp hoặc ngôn ngữ Latin khác (vd. pontos, porque, muy, cette).
+- Nếu không chắc cách diễn đạt, chọn cụm tiếng Việt khác — không trộn ngôn ngữ nước ngoài.`;
+
 export function buildBreakdownUserPrompt(input: {
   title: string;
   platform: string;
   rawContent: string;
   sourceUrl?: string | null;
+  vietnameseOnlyRepair?: boolean;
 }): string {
-  return [
+  const base = [
     `Tiêu đề: ${input.title}`,
     `Nền tảng: ${input.platform}`,
     input.sourceUrl ? `Link nguồn: ${input.sourceUrl}` : null,
@@ -55,4 +68,8 @@ export function buildBreakdownUserPrompt(input: {
   ]
     .filter((line) => line !== null)
     .join("\n");
+
+  return input.vietnameseOnlyRepair
+    ? `${base}${BREAKDOWN_VIETNAMESE_ONLY_REPAIR_SUFFIX}`
+    : base;
 }

@@ -22,3 +22,11 @@ export class RemixContentError extends AiProviderError {
     this.name = "RemixContentError";
   }
 }
+
+/** Thrown when breakdown output leaks non-Vietnamese tokens (ALE-153). */
+export class BreakdownContentError extends AiProviderError {
+  constructor(message: string) {
+    super(message, "invalid_response");
+    this.name = "BreakdownContentError";
+  }
+}
