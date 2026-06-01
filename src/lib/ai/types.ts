@@ -10,6 +10,8 @@ export type AnalysisProviderInput = {
   platform: string;
   rawContent: string;
   sourceUrl?: string | null;
+  /** Retry với prompt siết tiếng Việt sau khi guard ALE-153 phát hiện rò rỉ. */
+  vietnameseOnlyRepair?: boolean;
 };
 
 export interface ContentAnalysisProvider {

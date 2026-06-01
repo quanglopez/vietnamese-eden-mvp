@@ -1217,5 +1217,34 @@ Verify ALE-152 deliverable: URL-only content cards (YouTube, TikTok, etc.) must 
 2. Extend `containsNonVietnameseChars` to also catch non-ASCII Latin → re-run breakdown on `3Bfx4osqbfE` → expect `pontos` either removed or replaced with Vietnamese
 3. (Optional) Add TikTok oEmbed fallback → re-test `vt.tiktok.com/ZSx7CSdfS` → if still blocked, document in `known-limitations.md`
 
+---
+
+## ALE-153 — Breakdown non-Vietnamese language guard (2026-06-01)
+
+| Field | Value |
+|-------|-------|
+| **Commits** | `f2c822a` (detector) + `d837024` (guard + retry) — branch `fix/ale-153-non-vietnamese-leakage` |
+| **Issue** | Production breakdown leaked Portuguese token `pontos` in `why_it_works` (YouTube metadata-only `watch?v=3Bfx4osqbfE`) |
+| **Guard** | `containsNonVietnameseTokens` + `assertBreakdownNoNonVietnamese`; retry 1× with `BREAKDOWN_VIETNAMESE_ONLY_REPAIR_SUFFIX` |
+| **Out of scope** | Transcript/caption scrape; Remix CJK guard unchanged |
+
+### Manual smoke (human — after deploy)
+
+| # | Test | Steps | Expected |
+|---|------|-------|----------|
+| 1 | YouTube watch regression | Login → board ✨ youtube → card "I built a complete business…" → `/breakdown/bafcb7dd-8c29-42be-95bd-eeb0e05a2ae5` → **Phân tích AI** (re-run) | `Vì sao hiệu quả` **không** chứa `pontos` hay từ Bồ Đào Nha/Tây Ban Nha/Pháp |
+| 2 | YouTube Shorts | `/breakdown/09d7176c-4d8d-4c4c-b864-c5b3db6416e2` → re-analyze | Same check — 100% Vietnamese fields |
+| 3 | Paste text (regression) | `/breakdown/279580a2-1347-4836-8cb0-8bb39ffd6f5e` (Khác — Văn bản demo) | Breakdown vẫn chạy bình thường |
+| 4 | Remix CJK guard | Remix Facebook 5 variants trên content đã breakdown | CJK guard ALE-148 vẫn pass (không regression) |
+
+**Unit tests (local):** `npx tsx --test src/lib/ai/__tests__/language-leak.test.ts` — 10/10 pass.
+
+**Note:** Nếu lần 1 vẫn leak, retry tự động (~thêm 60–90s). Nếu sau retry vẫn lỗi → UI hiện: *"Phát hiện từ/ký tự không phải tiếng Việt trong phân tích. Vui lòng thử lại."*
+
+### Verdict
+
+- [ ] **PASS** — mark ALE-153 Done (fill after manual smoke)
+- [x] **Shipped** — guard merged to feature branch; production smoke pending
+
 
 Script demo ngắn local: [demo-script.md](./demo-script.md)
