@@ -40,7 +40,9 @@ Feedback source of truth:
 | ALE-149 (generic titles) | ✅ Done (commit `01d5de3`) |
 | ALE-150 (hide Google OAuth) | ✅ Done (commit `4417d3d`) |
 | ALE-151 (final mini smoke) | ✅ Done (production smoke PASS) |
-| Inviting next cohort | **Cohort 2: GO** |
+| Inviting next cohort | **Cohort 2: inviting** 📨 |
+| Cohort 2 feedback tracking | [beta-feedback-round-2.md](./beta-feedback-round-2.md) |
+| **Next decision point** | **After 5 completed tests OR 7–10 days** (whichever first) |
 
 
 ---
@@ -104,6 +106,7 @@ Feedback source of truth:
 
 | Date | Summary |
 |------|---------|
+| 2026-06-01 | **Cohort 2 inviting** — `beta-feedback-round-2.md` tracker ready, decision gate set (5 completed tests OR 7–10 days). |
 | 2026-06-01 | **ALE-151** — Final mini smoke PASS (13/13). Cohort 2 GO. |
 | 2026-06-01 | **ALE-150** — Hide Google OAuth (`4417d3d`) + production smoke PASS. |
 | 2026-06-01 | **ALE-149** — Generic remix titles (`01d5de3`) + production smoke PASS. |
