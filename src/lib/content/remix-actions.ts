@@ -152,7 +152,12 @@ export async function generateRemixAction(input: {
     workspace_id: item.workspaceId,
     source_content_item_id: contentItemId,
     voice_profile_id: voiceProfile?.id ?? null,
-    title: buildOutputTitle({ format, tone, variantIndex: index + 1 }),
+    title: buildOutputTitle({
+      format,
+      tone,
+      variantIndex: index + 1,
+      aiTitle: variant.title,
+    }),
     content: variant.content,
     status: "draft" as const,
     created_by: user.id,

@@ -4,6 +4,24 @@ import { getRemixFormatLabel, getRemixToneLabel } from "./constants";
 
 const TITLE_META_PREFIX = "⟦remix:";
 
+export const ANGLE_NAMES = [
+  "Story",
+  "List/Tips",
+  "Before/After",
+  "Myth-Busting",
+  "Data/Stat",
+  "Hook/Opener",
+  "Controversial",
+  "How-To",
+  "Confession",
+  "Behind-Scenes",
+  "Question",
+  "Comparison",
+  "Quote/Reframe",
+  "FOMO/Urgency",
+  "Benefit-first",
+] as const;
+
 type TitleMeta = {
   format: RemixFormat;
   tone: RemixTone;
@@ -28,15 +46,65 @@ function isRemixTone(value: string): value is RemixTone {
   return TONE_VALUES.has(value);
 }
 
+export function getAngleNameForIndex(index: number): string {
+  return ANGLE_NAMES[index % ANGLE_NAMES.length] ?? "Remix";
+}
+
+export function isGenericTitle(title: string): boolean {
+  const t = title.trim().toLowerCase();
+  if (t.length < 5) {
+    return true;
+  }
+
+  const genericPatterns = [
+    /^biến thể \d+/,
+    /^bản \d+/,
+    /^variant[\s\w]*\d+/i,
+    /^remix[\s\w]*\d+/i,
+    /^facebook[\s·]+gần gũi/i,
+    /^tiktok[\s·]+chuyên gia/i,
+    /·\s*biến thể \d+\s*$/,
+  ];
+
+  return genericPatterns.some((pattern) => pattern.test(t));
+}
+
+export function getAngleLabelFromDisplayTitle(
+  displayTitle: string,
+  variantIndex: number,
+): string {
+  const colonPrefix = displayTitle.match(/^([^:]{2,24}):/)?.[1]?.trim();
+  if (colonPrefix && !isGenericTitle(colonPrefix)) {
+    return colonPrefix;
+  }
+
+  const dotPrefix = displayTitle.match(/^([^·]{2,24})\s·/)?.[1]?.trim();
+  if (dotPrefix && !isGenericTitle(dotPrefix)) {
+    return dotPrefix;
+  }
+
+  return getAngleNameForIndex(variantIndex);
+}
+
 export function buildOutputTitle(input: {
   format: RemixFormat;
   tone: RemixTone;
   variantIndex: number;
+  aiTitle?: string;
+  angle?: string;
 }): string {
   const formatLabel = getRemixFormatLabel(input.format);
   const toneLabel = getRemixToneLabel(input.tone);
   const meta = `format=${input.format}|tone=${input.tone}|v=${input.variantIndex}`;
-  const display = `${formatLabel} · ${toneLabel} · Biến thể ${input.variantIndex}`;
+
+  const angleName = input.angle ?? getAngleNameForIndex(input.variantIndex);
+  const fallbackDisplay = `${angleName} · ${formatLabel} · ${toneLabel}`;
+
+  const display =
+    input.aiTitle && !isGenericTitle(input.aiTitle)
+      ? input.aiTitle.trim()
+      : fallbackDisplay;
+
   return `${TITLE_META_PREFIX}${meta}⟧ ${display}`;
 }
 

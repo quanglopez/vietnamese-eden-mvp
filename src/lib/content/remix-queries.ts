@@ -4,7 +4,7 @@ import {
   getRemixFormatLabel,
   getRemixToneLabel,
 } from "@/lib/remix/constants";
-import { getDisplayTitle, parseOutputTitle } from "@/lib/remix/metadata";
+import { getDisplayTitle, getAngleLabelFromDisplayTitle, parseOutputTitle } from "@/lib/remix/metadata";
 import type { GeneratedOutputView, RemixPageContext } from "@/types/remix";
 import type { Database } from "@/types/database";
 
@@ -24,31 +24,36 @@ function mapOutputRow(row: {
 
   const meta = parseOutputTitle(row.title);
   if (!meta) {
+    const displayTitle = getDisplayTitle(row.title);
     return {
       id: row.id,
       contentItemId: row.source_content_item_id,
-      title: getDisplayTitle(row.title),
+      title: displayTitle,
       content: row.content,
       format: "facebook_post",
       formatLabel: "Remix",
       tone: "friendly",
       toneLabel: "—",
       variantIndex: 0,
+      angleLabel: getAngleLabelFromDisplayTitle(displayTitle, 0),
       status: row.status,
       createdAt: row.created_at,
     };
   }
 
+  const displayTitle = getDisplayTitle(row.title);
+
   return {
     id: row.id,
     contentItemId: row.source_content_item_id,
-    title: getDisplayTitle(row.title),
+    title: displayTitle,
     content: row.content,
     format: meta.format,
     formatLabel: getRemixFormatLabel(meta.format),
     tone: meta.tone,
     toneLabel: getRemixToneLabel(meta.tone),
     variantIndex: meta.variantIndex,
+    angleLabel: getAngleLabelFromDisplayTitle(displayTitle, meta.variantIndex),
     status: row.status,
     createdAt: row.created_at,
   };

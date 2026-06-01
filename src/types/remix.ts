@@ -22,6 +22,7 @@ export type GeneratedOutputView = {
   tone: RemixTone;
   toneLabel: string;
   variantIndex: number;
+  angleLabel: string;
   status: "draft" | "ready" | "published" | "archived";
   createdAt: string;
 };

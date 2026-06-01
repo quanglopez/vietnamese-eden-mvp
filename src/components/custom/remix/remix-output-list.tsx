@@ -21,6 +21,21 @@ import {
 } from "@/lib/remix/output-export";
 import type { GeneratedOutputView } from "@/types/remix";
 
+const ANGLE_COLORS = [
+  "bg-rose-100 text-rose-700",
+  "bg-orange-100 text-orange-700",
+  "bg-amber-100 text-amber-700",
+  "bg-emerald-100 text-emerald-700",
+  "bg-cyan-100 text-cyan-700",
+  "bg-sky-100 text-sky-700",
+  "bg-violet-100 text-violet-700",
+  "bg-fuchsia-100 text-fuchsia-700",
+];
+
+function getAngleTagColor(index: number): string {
+  return ANGLE_COLORS[index % ANGLE_COLORS.length] ?? "bg-muted text-muted-foreground";
+}
+
 type RemixOutputListProps = {
   outputs: GeneratedOutputView[];
   sourceTitle: string;
@@ -122,9 +137,10 @@ export function RemixOutputList({
         </Link>
       </p>
 
-      {outputs.map((output) => {
+      {outputs.map((output, index) => {
         const displayTitle = getOutputDisplayTitle(output);
         const statusLabel = getOutputStatusLabel(output.status);
+        const angleLabel = output.angleLabel || `Variant ${index + 1}`;
 
         return (
           <article
@@ -133,7 +149,14 @@ export function RemixOutputList({
           >
             <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
               <div className="min-w-0 flex-1">
-                <h3 className="font-display font-bold text-base">{displayTitle}</h3>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="font-display font-bold text-base">{displayTitle}</h3>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${getAngleTagColor(index)}`}
+                  >
+                    {angleLabel}
+                  </span>
+                </div>
                 <div className="flex flex-wrap gap-2 mt-2 text-xs">
                   <span className="bg-brand/10 text-brand px-2 py-0.5 rounded-full font-medium">
                     {output.formatLabel}

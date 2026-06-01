@@ -45,7 +45,13 @@ QUY TẮC DIVERSITY (bắt buộc):
 - Mỗi biến thể phải có CTA khác nhau. KHÔNG được lặp "comment ngay" hoặc cùng một lời kêu gọi ở mọi variant.
   Ví dụ CTA: comment, share, click link, save, tag friend, reply với keyword, follow, DM.
 - Mỗi biến thể phải có cấu trúc khác nhau: ngắn gọn (1-2 câu) vs chi tiết (3-5 câu có xuống dòng) vs list vs story có intro-body-cta.
-- Các title phải phản ánh angle riêng, không generic như "Biến thể 1", "Bản 2", "Variant A".
+
+QUY TẮC TIÊU ĐỀ (bắt buộc):
+- Mỗi title phải là **tiêu đề thật** mô tả angle/góc tiếp cận cụ thể — không phải label.
+- KHÔNG dùng: "Biến thể 1", "Bản 2", "Variant A", "Remix Facebook", "TikTok 1".
+- Ví dụ title tốt: "Story: Mình từng bỏ lỡ 3 cơ hội vì không biết hook", "Before/After: Caption cũ vs mới", "Data: 73% người xem dừng lại ở 3 giây đầu", "Myth-busting: Bạn không cần 10K followers", "List: 5 hook beauty viral tháng 6".
+- Title phải ngắn gọn (≤12 từ), đầy đủ nghĩa, phản ánh opening hoặc angle chính.
+- Nếu không nghĩ ra title hay, hãy viết lại opening ngắn gọn để làm title.
 
 QUY TẮC TIẾNG VIỆT TỰ NHIÊN (bắt buộc):
 - Viết như người Việt nói chuyện hàng ngày — không sáo rỗng, không dùng từ hoa mỹ quá mức.
@@ -137,7 +143,7 @@ export function buildRemixUserPrompt(input: {
     `Tiêu đề gốc: ${input.title}`,
     `Nền tảng: ${input.platform}`,
     "",
-    "Yêu cầu diversity: mỗi variant khác angle, hook mở bài, CTA và cấu trúc. Title mô tả angle, không generic.",
+    "Yêu cầu diversity: mỗi variant khác angle, hook mở bài, CTA và cấu trúc. Title ngắn gọn mô tả angle chính xác, không generic.",
     "Nhắc lại quy tắc: output 100% tiếng Việt, không ký tự Trung Quốc/Nhật/Hàn.",
     voiceBlock ? ["", voiceBlock].join("\n") : null,
     "",
@@ -176,4 +182,9 @@ export function buildRemixUserPrompt(input: {
  * - [ ] 5 variants: no Chinese/Japanese/Korean glyphs in title or content
  * - [ ] 10 variants: same check across all variants
  * - [ ] If model leaks CJK once, retry succeeds or user sees clear error (not silent)
+ *
+ * ALE-149 — descriptive titles:
+ * - [ ] Card titles not "Biến thể N" or "Format · Tone · Biến thể N"
+ * - [ ] AI titles used when descriptive; angle fallback otherwise
+ * - [ ] Colored angle tags visible on each card
  */
