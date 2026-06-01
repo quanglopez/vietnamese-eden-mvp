@@ -19,9 +19,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
-import { loginSchema, type LoginFormValues } from "@/lib/validations/auth";
+import {
+  isGoogleOAuthEnabled,
+  loginSchema,
+  type LoginFormValues,
+} from "@/lib/validations/auth";
 
 export function LoginForm() {
+  const googleOAuthEnabled = isGoogleOAuthEnabled();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [formError, setFormError] = useState<string | null>(
@@ -69,8 +74,12 @@ export function LoginForm() {
         <CardDescription>Truy cập workspace AI content của bạn</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <GoogleAuthButton />
-        <AuthDivider />
+        {googleOAuthEnabled ? (
+          <>
+            <GoogleAuthButton />
+            <AuthDivider />
+          </>
+        ) : null}
 
         <form className="space-y-4" onSubmit={(event) => void onSubmit(event)}>
           <div className="space-y-2">

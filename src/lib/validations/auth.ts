@@ -46,3 +46,16 @@ export function getSiteUrl(): string {
 export function getAuthCallbackUrl(next = "/dashboard"): string {
   return `${getSiteUrl()}/auth/callback?next=${encodeURIComponent(next)}`;
 }
+
+/**
+ * Feature flag: Google OAuth availability.
+ *
+ * Returns true only when one of the env flags is explicitly "true".
+ * Default is false for production beta safety.
+ */
+export function isGoogleOAuthEnabled(): boolean {
+  return (
+    process.env.GOOGLE_OAUTH_ENABLED === "true" ||
+    process.env.NEXT_PUBLIC_GOOGLE_OAUTH_ENABLED === "true"
+  );
+}

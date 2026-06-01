@@ -8,15 +8,23 @@ import { getAuthCallbackUrl } from "@/lib/validations/auth";
 
 type GoogleAuthButtonProps = {
   label?: string;
+  disabled?: boolean;
+  helperText?: string;
 };
 
 export function GoogleAuthButton({
   label = "Tiếp tục với Google",
+  disabled = false,
+  helperText,
 }: GoogleAuthButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleGoogleSignIn = async () => {
+    if (disabled) {
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
@@ -45,12 +53,15 @@ export function GoogleAuthButton({
         type="button"
         variant="outline"
         className="w-full"
-        disabled={isLoading}
+        disabled={isLoading || disabled}
         onClick={() => void handleGoogleSignIn()}
       >
         <GoogleIcon />
         {isLoading ? "Đang chuyển hướng..." : label}
       </Button>
+      {disabled && helperText ? (
+        <p className="text-center text-xs text-muted-foreground">{helperText}</p>
+      ) : null}
       {error ? (
         <p className="text-center text-sm text-destructive">{error}</p>
       ) : null}

@@ -898,6 +898,7 @@ Xác nhận DB (optional): Supabase Table Editor → `beta_waitlist` có 1 row.
 | 2.1 | `/signup` — đăng ký user mới   | Form OK, không crash                      | ☑ ALE-82                                                |
 | 2.2 | Email confirmation (nếu bật)   | Link mở → `/auth/callback` → `/dashboard` | ☐ (confirm tắt trên dev — signup → dashboard trực tiếp) |
 | 2.3 | `/login` — đăng nhập           | Vào `/dashboard`                          | ☑ ALE-82                                                |
+| 2.3b | Google OAuth button (beta)   | **Ẩn** khi `GOOGLE_OAUTH_ENABLED=false`   | ☐                                                       |
 | 2.4 | Mở `/dashboard` khi chưa login | Redirect `/login?next=...`                | ☑ (middleware SSR)                                      |
 | 2.5 | Google OAuth (nếu đã cấu hình) | Login thành công                          | ☐ / N/A                                                 |
 

@@ -20,11 +20,13 @@ import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
 import {
   getAuthCallbackUrl,
+  isGoogleOAuthEnabled,
   signupSchema,
   type SignupFormValues,
 } from "@/lib/validations/auth";
 
 export function SignupForm() {
+  const googleOAuthEnabled = isGoogleOAuthEnabled();
   const [formError, setFormError] = useState<string | null>(null);
   const [confirmationSent, setConfirmationSent] = useState(false);
   const [submittedEmail, setSubmittedEmail] = useState("");
@@ -106,8 +108,12 @@ export function SignupForm() {
         <CardDescription>Tạo tài khoản Vietnamese Eden miễn phí</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <GoogleAuthButton label="Đăng ký với Google" />
-        <AuthDivider />
+        {googleOAuthEnabled ? (
+          <>
+            <GoogleAuthButton label="Đăng ký với Google" />
+            <AuthDivider />
+          </>
+        ) : null}
 
         <form className="space-y-4" onSubmit={(event) => void onSubmit(event)}>
           <div className="space-y-2">

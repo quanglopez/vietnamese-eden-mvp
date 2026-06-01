@@ -21,7 +21,7 @@ Hướng dẫn cho **10–20 beta users** đầu tiên. Không cần cài đặt
 3. Nếu project bật xác nhận email → mở link trong hộp thư → vào app.  
 4. Lần đầu vào **Bảng cảm hứng** có thể thấy **Tạo workspace** — bấm một lần.
 
-**⚠️ Đăng nhập:** Chỉ dùng **email + password**. Google OAuth hiện chưa bật trên production — đừng nhấn "Đăng nhập Google" nếu thấy nút đó.
+**✅ Đăng nhập:** Chỉ dùng **email + password**. Google OAuth sẽ được bật sau khi cấu hình production xong.
 
 **Chưa có quyền beta?** Gửi form waitlist trên landing: https://vietnamese-eden-mvp.vercel.app/#waitlist
 
