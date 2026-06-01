@@ -1138,12 +1138,12 @@ Nếu không tạo được board: kiểm tra `handle_new_user` / `workspace_mem
 
 | Field | Value |
 |-------|-------|
-| **Commit tested** | `fa08afe` — `feat: improve URL-only content previews` |
+| **Commit tested** | `fa08afe` — `feat: improve URL-only content previews` (initial) + `18ae8e6` — `fix: normalize YouTube URLs to canonical watch?v= for oEmbed` (re-smoke) |
 | **Environment** | Production `https://vietnamese-eden-mvp.vercel.app/` |
 | **Method** | Hermes browser automation (CDP) |
 | **Account** | `ggonevn@gmail.com` |
-| **Linear comment** | `d9765987-72e9-486a-8e26-d3d1f6a97884` (posted, success) |
-| **Verdict** | **PARTIAL PASS** — 7/9 PASS, 3 follow-up issues, **NOT marked Done** |
+| **Linear comments** | `d9765987-…` (initial PARTIAL PASS), `b4638210-…` (re-smoke ALL PASS) |
+| **Verdict** | ✅ **DONE** — 9/9 PASS after YouTube URL normalization fix |
 
 ### Scope
 
@@ -1190,8 +1190,26 @@ Verify ALE-152 deliverable: URL-only content cards (YouTube, TikTok, etc.) must 
 
 ### Decision
 
-- [ ] **ALL PASS** → mark ALE-152 Done
-- [x] **PARTIAL PASS** (2 follow-ups block Done) → leave as In Progress, file follow-up issues
+- [x] **ALL PASS** → mark ALE-152 Done (2026-06-01, commit `18ae8e6`)
+- [x] **PARTIAL PASS** (initial smoke 2026-06-01 commit `fa08afe`) → filed follow-ups: YouTube Shorts parser fix, ALE-153 (P1 non-Vietnamese leakage), TikTok known-limitation doc
+
+### Re-smoke matrix after fix (`18ae8e6`)
+
+| # | Test | Result | Notes |
+|---|------|--------|-------|
+| 1 | YouTube `watch?v=…` card | **PASS** | Pre-enriched, no regression |
+| 2 | YouTube `watch?v=…` breakdown | **PASS** | 7 sections, title "I built a complete business operating system" |
+| 3 | YouTube `shorts/UZSEmfaNRqg` card enrich | **PASS** | Title "The BILLION DOLLAR Agent", metadata label, thumbnail `img.youtube.com/vi/UZSEmfaNRqg/hqdefault.jpg` 480x360 |
+| 4 | YouTube `shorts/UZSEmfaNRqg` breakdown | **PASS** | 7 sections, 100% Vietnamese, no foreign leakage |
+| 5 | TikTok `vt.tiktok.com/ZSx7CSdfS` card enrich | **PASS** | Title "Ăn xong trái ổi xỉa răng nửa tiếng🥲" |
+| 6 | TikTok breakdown | **PASS** | 7 sections, 100% Vietnamese, AI analysis complete |
+| 7 | TikTok fallback path (known-limitation) | **PASS** | Documented in `known-limitations.md`, not a blocker |
+| 8 | Paste text flow | **PASS** | No regression, 7 sections render |
+| 9 | No transcript/caption claim | **PASS** | All copy uses "metadata" + "dán caption/script" reminder |
+
+### Fix shipped
+
+`src/lib/content/url-metadata.ts` — added `normalizeYouTubeUrlForOEmbed()` that rewrites `/shorts/ID`, `/embed/ID`, and `?si=…` query strings to canonical `https://www.youtube.com/watch?v=ID` before calling oEmbed. Reuses existing `extractYouTubeVideoId()` (which already supported all 3 patterns). No-op for non-YouTube URLs. `npm run lint` + `type-check` + `build` all pass. Commit: `18ae8e6`.
 
 ### Re-test guidance after fixes
 
