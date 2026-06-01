@@ -35,8 +35,8 @@ Feedback source of truth:
 | Inviting first cohort | **Done** (ALE-89) |
 | Feedback triage round 1 | **Done** (ALE-90) |
 | Beta fixes ALE-141→145 | **Done** ✅ |
-| Production smoke test | **Done** (ALE-146 — 2026-06-01, see `production-smoke-test.md`) |
-| Inviting next cohort | **Blocked** — NO-GO until ALE-147 (remix naturalness) |
+| Production smoke test | **In progress** (ALE-147) |
+| Inviting next cohort | **Pending** ALE-147 PASS |
 
 
 ---

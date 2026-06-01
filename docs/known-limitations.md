@@ -32,7 +32,7 @@ Danh sách giới hạn **cố ý hoặc chưa làm** trong bản beta. Không p
 
 | Giới hạn | Chi tiết |
 |----------|----------|
-| **Không auto-post** | Calendar chỉ **lên lịch nội bộ** — copy/export và đăng thủ công lên MXH. |
+|| **Không auto-post** | Calendar chỉ **lên lịch nội bộ / nhắc nhở** — bạn phải tự copy-paste và đăng thủ công lên MXH. Không tự động đăng lên Facebook, TikTok, LinkedIn, hay bất kỳ nền tảng nào. |
 | **Không Stripe / billing** | MVP beta, chưa thu phí trong app. |
 | **Team / client boards** | Filter Team/Client trên UI **disabled** — chỉ workspace cá nhân. |
 

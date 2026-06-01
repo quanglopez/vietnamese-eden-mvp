@@ -46,8 +46,8 @@ Hướng dẫn cho **10–20 beta users** đầu tiên. Không cần cài đặt
 | 4 | **Tạo remix** — Format Facebook hoặc TikTok, **5 biến thể** | ≥ 5 output |
 | 5 | (Tuỳ chọn) **Giọng văn** — dán ≥ 500 ký tự bài cũ → **Huấn luyện AI với giọng của tôi** | Profile lưu thành công |
 | 6 | Remix lại với voice profile (nếu có) | Output bám giọng hơn |
-| 7 | Một output → **Đưa vào lịch** | Toast OK |
-| 8 | **Lịch nội dung** → refresh trang | Item còn trên lịch |
+| 7 | Một output → **Đưa vào lịch** | Toast OK — lịch chỉ nhắc nhở, không tự động đăng |
+| 8 | **Lịch nội dung** → refresh trang | Item còn trên lịch (bạn tự đăng thủ công sau) |
 
 **⚠️ Thứ tự quan trọng:**  
 - Nếu chưa có Voice Profile: làm **remix baseline trước** → tạo Voice Profile → **remix lại để so sánh** sự khác biệt.
@@ -98,12 +98,14 @@ Gửi cho team (Linear / email / group chat nội bộ):
 
 ## 8. Không nên kỳ vọng ở bản beta
 
-- Tự đăng lên TikTok / Facebook / Instagram  
-- Tự tải transcript từ link TikTok/YouTube (URL-only = lưu link, chưa scrape)  
-- Team workspace / billing / Stripe  
-- Google đăng nhập (có thể chưa bật trên production)  
-- AI luôn hoàn hảo — cần chỉnh tay trước khi đăng  
-- Remix **10 biến thể** có thể **chậm hơn** và tốn token hơn 3–5 biến thể  
+- Tự đăng lên TikTok / Facebook / Instagram — **Calendar chỉ lên lịch nhắc nhở, không tự động đăng**
+- Tự tải transcript từ link TikTok/YouTube (URL-only = lưu link, chưa scrape)
+- Team workspace / billing / Stripe
+- Google đăng nhập (có thể chưa bật trên production)
+- AI luôn hoàn hảo — cần chỉnh tay trước khi đăng
+- Remix **10 biến thể** có thể **chậm hơn** và tốn token hơn 3–5 biến thể
+
+**💡 Về Calendar:** Đưa output vào lịch chỉ để lên kế hoạch — bạn vẫn phải tự copy-paste và đăng thủ công trên từng nền tảng.
 
 Chi tiết: [known-limitations.md](./known-limitations.md)
 
