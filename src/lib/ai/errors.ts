@@ -14,3 +14,11 @@ export class AiProviderError extends Error {
     this.code = code;
   }
 }
+
+/** Thrown when remix output contains CJK / non-Vietnamese glyphs (ALE-148). */
+export class RemixContentError extends AiProviderError {
+  constructor(message: string) {
+    super(message, "invalid_response");
+    this.name = "RemixContentError";
+  }
+}

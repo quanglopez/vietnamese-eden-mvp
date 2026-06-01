@@ -55,6 +55,11 @@ QUY TẮC TIẾNG VIỆT TỰ NHIÊN (bắt buộc):
 - Nếu format là Facebook/LinkedIn: giữ xuống dòng dễ đọc, mỗi đoạn 1-2 câu, dùng bullet hoặc number nếu phù hợp.
 - Nếu có Voice Profile: bám sát giọng nhưng KHÔNG copy-paste y nguyên từ sample. Học style rồi viết mới.
 
+QUY TẮC NGÔN NGỮ TUYỆT ĐỐI:
+- Nội dung viết **100% tiếng Việt chuẩn**. Không có ký tự Trung Quốc, Nhật, Hàn, hay glyph Unicode lạ nào.
+- Không dùng từ Hán Việt không phổ biến hoặc ký tự CJK (U+4E00–U+9FFF) bên ngoài Emoji.
+- Nếu không biết cách diễn đạt bằng tiếng Việt tự nhiên, viết lại cách khác — không trộn tiếng Hoa.
+
 Quy tắc nội dung:
 - Viết hoàn toàn bằng tiếng Việt tự nhiên, phù hợp format và tone được yêu cầu.
 - Nếu có Voice Profile, bắt buộc bám sát giọng viết đó (từ vựng, nhịp câu, CTA, quy tắc).
@@ -81,6 +86,12 @@ QUAN TRỌNG — sửa lỗi lần trước:
 - Chỉ trả một JSON object duy nhất (không markdown, không code fence, không text thừa).
 - Đúng schema {"variants":[{"title":"...","content":"..."}]} với đủ số biến thể yêu cầu.
 - Mọi chuỗi phải là JSON hợp lệ (escape ký tự đặc biệt).`;
+
+export const REMIX_CJK_REPAIR_USER_SUFFIX = `
+
+QUAN TRỌNG — lần trước có ký tự Trung/Nhật/Hàn trong output:
+- Viết lại **100% tiếng Việt chuẩn**. Không ký tự CJK (U+4E00–U+9FFF), Hiragana, Katakana, Hangul.
+- Nếu không biết cách diễn đạt, chọn từ/cụm tiếng Việt khác — không trộn tiếng Hoa.`;
 
 export function buildRemixUserPrompt(input: {
   title: string;
@@ -127,6 +138,7 @@ export function buildRemixUserPrompt(input: {
     `Nền tảng: ${input.platform}`,
     "",
     "Yêu cầu diversity: mỗi variant khác angle, hook mở bài, CTA và cấu trúc. Title mô tả angle, không generic.",
+    "Nhắc lại quy tắc: output 100% tiếng Việt, không ký tự Trung Quốc/Nhật/Hàn.",
     voiceBlock ? ["", voiceBlock].join("\n") : null,
     "",
     "Nội dung gốc:",
@@ -159,4 +171,9 @@ export function buildRemixUserPrompt(input: {
  * - [ ] Variants reflect voice tone but are not copy-paste from samples
  *
  * Regression: JSON parser (src/lib/ai/json.ts) unchanged — verify remix still saves outputs.
+ *
+ * ALE-148 — no CJK leakage:
+ * - [ ] 5 variants: no Chinese/Japanese/Korean glyphs in title or content
+ * - [ ] 10 variants: same check across all variants
+ * - [ ] If model leaks CJK once, retry succeeds or user sees clear error (not silent)
  */

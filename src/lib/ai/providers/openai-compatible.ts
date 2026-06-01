@@ -2,16 +2,18 @@ import {
   chatJsonCompletion,
   type ChatCompletionConfig,
 } from "@/lib/ai/chat-completions";
-import { AiProviderError } from "@/lib/ai/errors";
+import { AiProviderError, RemixContentError } from "@/lib/ai/errors";
 import {
   breakdownAnalysisSchema,
   buildBreakdownUserPrompt,
   BREAKDOWN_SYSTEM_PROMPT,
   type BreakdownAnalysisResult,
 } from "@/lib/ai/prompts/breakdown";
+import { assertRemixVariantsNoCjk } from "@/lib/ai/json";
 import {
   buildRemixUserPrompt,
   remixVariantsSchema,
+  REMIX_CJK_REPAIR_USER_SUFFIX,
   REMIX_JSON_REPAIR_USER_SUFFIX,
   REMIX_SYSTEM_PROMPT,
   type RemixVariantsResult,
@@ -71,13 +73,16 @@ export class OpenAiCompatibleRemixGeneratorProvider
     input: RemixProviderInput,
   ): Promise<RemixVariantsResult> {
     try {
-      return await this.generateVariantsOnce(input, false);
+      return await this.generateVariantsOnce(input, { isRetry: false });
     } catch (error) {
       if (
         error instanceof AiProviderError &&
         error.code === "invalid_response"
       ) {
-        return this.generateVariantsOnce(input, true);
+        return this.generateVariantsOnce(input, {
+          isRetry: true,
+          includeCjkRepair: error instanceof RemixContentError,
+        });
       }
       throw error;
     }
@@ -85,15 +90,19 @@ export class OpenAiCompatibleRemixGeneratorProvider
 
   private async generateVariantsOnce(
     input: RemixProviderInput,
-    isRepairAttempt: boolean,
+    options: { isRetry: boolean; includeCjkRepair?: boolean },
   ): Promise<RemixVariantsResult> {
     const userPrompt = buildRemixUserPrompt(input);
+    const repairSuffix = options.isRetry
+      ? `${REMIX_JSON_REPAIR_USER_SUFFIX}${
+          options.includeCjkRepair ? REMIX_CJK_REPAIR_USER_SUFFIX : ""
+        }`
+      : "";
+
     const parsed = await chatJsonCompletion(this.chat, {
       systemPrompt: REMIX_SYSTEM_PROMPT,
-      userPrompt: isRepairAttempt
-        ? `${userPrompt}${REMIX_JSON_REPAIR_USER_SUFFIX}`
-        : userPrompt,
-      temperature: isRepairAttempt ? 0.5 : 0.7,
+      userPrompt: `${userPrompt}${repairSuffix}`,
+      temperature: options.isRetry ? 0.5 : 0.7,
     });
 
     const validated = remixVariantsSchema.safeParse(parsed);
@@ -111,9 +120,10 @@ export class OpenAiCompatibleRemixGeneratorProvider
       );
     }
 
-    return {
-      variants: validated.data.variants.slice(0, input.variantCount),
-    };
+    const variants = validated.data.variants.slice(0, input.variantCount);
+    assertRemixVariantsNoCjk(variants);
+
+    return { variants };
   }
 }
 

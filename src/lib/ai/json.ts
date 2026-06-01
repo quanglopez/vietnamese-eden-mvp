@@ -1,4 +1,4 @@
-import { AiProviderError } from "@/lib/ai/errors";
+import { AiProviderError, RemixContentError } from "@/lib/ai/errors";
 
 export type ParseAiJsonResult =
   | { ok: true; data: unknown }
@@ -158,4 +158,28 @@ export function parseAiJsonOrThrow(
 /** @deprecated Use extractJsonCandidate — kept for imports from openai-chat */
 export function extractJsonObject(text: string): string {
   return extractJsonCandidate(text);
+}
+
+/** CJK Unified Ideographs, Hiragana, Katakana, Hangul (ALE-148). Emoji allowed. */
+const CJK_BLOCKS =
+  /[\u4E00-\u9FFF\u3400-\u4DBF\uAC00-\uD7AF\u3040-\u309F\u30A0-\u30FF]/;
+
+export function containsNonVietnameseChars(text: string): boolean {
+  return CJK_BLOCKS.test(text);
+}
+
+export function assertRemixVariantsNoCjk(
+  variants: { title: string; content: string }[],
+): void {
+  const hasLeakage = variants.some(
+    (variant) =>
+      containsNonVietnameseChars(variant.title) ||
+      containsNonVietnameseChars(variant.content),
+  );
+
+  if (hasLeakage) {
+    throw new RemixContentError(
+      "Phát hiện ký tự không phải tiếng Việt (Trung/Nhật/Hàn) trong nội dung remix. Vui lòng thử tạo lại.",
+    );
+  }
 }

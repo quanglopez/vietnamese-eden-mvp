@@ -162,6 +162,45 @@ Chạy sau khi hoàn tất [supabase-cloud-setup.md](./supabase-cloud-setup.md) 
 
 ---
 
+## ALE-148 — Remix CJK leakage fix (2026-05-30)
+
+| Field | Value |
+|-------|--------|
+| **Issue** | Remix output sometimes contains Chinese/Japanese/Korean glyphs (e.g. `的东西` in ALE-146 variant 3) |
+| **Root cause** | Xiaomi MiMo V2.5 (Chinese-origin LLM) occasionally leaks CJK when prompted for Vietnamese |
+| **Fix** | Strengthen `REMIX_SYSTEM_PROMPT` + user prompt; post-parse CJK validation in `src/lib/ai/json.ts`; auto-retry once in remix provider |
+
+### Code changes
+
+| File | Change |
+|------|--------|
+| `src/lib/ai/prompts/remix.ts` | `QUY TẮC NGÔN NGỮ TUYỆT ĐỐI` (100% Vietnamese, no CJK); user prompt reminder; `REMIX_CJK_REPAIR_USER_SUFFIX` on retry |
+| `src/lib/ai/json.ts` | `containsNonVietnameseChars()`, `assertRemixVariantsNoCjk()` after parse (ALE-87 repair logic unchanged) |
+| `src/lib/ai/providers/openai-compatible.ts` | Retry once on `RemixContentError` or JSON `invalid_response` (max 1 retry) |
+| `src/lib/ai/errors.ts` | `RemixContentError` for upstream retry + user-facing message |
+
+### Verification checklist (post-deploy)
+
+| Check | Status | Notes |
+|-------|--------|-------|
+| Prompt includes 100% Vietnamese / no CJK rule | **PASS** | Code review |
+| JSON parse + ALE-87 repair unchanged | **PASS** | No changes to `parseAiJsonText` / extract logic |
+| CJK in output → reject + retry once | **PASS** | `assertRemixVariantsNoCjk` + provider retry |
+| After retry exhausted → clear user error | **PASS** | Message: "Phát hiện ký tự không phải tiếng Việt…" |
+| ALE-144 diversity rules preserved | **PASS** | Diversity block untouched |
+| `npm run lint` | **PASS** | 2026-05-30 local |
+| `npm run type-check` | **PASS** | 2026-05-30 local |
+| `npm run build` | **PASS** | 2026-05-30 local (`NODE_OPTIONS=--max-old-space-size=8192`) |
+| Xiaomi 5 variants × 5 batches (25 total) — no CJK | **NOT RUN** | Manual on production after deploy |
+| Xiaomi 10 variants × 2 batches (20 total) — no CJK | **NOT RUN** | Manual on production after deploy |
+| OpenAI fallback 3 variants — no CJK | **NOT RUN** | Requires `AI_PROVIDER=openai` env |
+
+### Re-test ALE-146 failure case
+
+After deploy, re-run remix on same content (`Hook beauty ALE-146`) with Facebook + Gần gũi + 5 variants. Confirm variant 3 (and all others) contain **no** CJK glyphs in title or content body.
+
+---
+
 ## ALE-88 — Beta readiness hardening (2026-05-31)
 
 | Field | Value |
