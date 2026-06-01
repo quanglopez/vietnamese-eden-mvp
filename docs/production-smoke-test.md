@@ -191,13 +191,56 @@ Chạy sau khi hoàn tất [supabase-cloud-setup.md](./supabase-cloud-setup.md) 
 | `npm run lint` | **PASS** | 2026-05-30 local |
 | `npm run type-check` | **PASS** | 2026-05-30 local |
 | `npm run build` | **PASS** | 2026-05-30 local (`NODE_OPTIONS=--max-old-space-size=8192`) |
-| Xiaomi 5 variants × 5 batches (25 total) — no CJK | **NOT RUN** | Manual on production after deploy |
-| Xiaomi 10 variants × 2 batches (20 total) — no CJK | **NOT RUN** | Manual on production after deploy |
+| Xiaomi 5 variants × 5 batches (25 total) — no CJK | **PARTIAL** | 1 batch (5 variants) on production — PASS |
+| Xiaomi 10 variants × 2 batches (20 total) — no CJK | **NOT RUN** | Slider automation blocked (ALE-146) |
 | OpenAI fallback 3 variants — no CJK | **NOT RUN** | Requires `AI_PROVIDER=openai` env |
+| Production smoke post-deploy | **PASS** | See section below (2026-06-01) |
 
 ### Re-test ALE-146 failure case
 
 After deploy, re-run remix on same content (`Hook beauty ALE-146`) with Facebook + Gần gũi + 5 variants. Confirm variant 3 (and all others) contain **no** CJK glyphs in title or content body.
+
+### Production smoke (2026-06-01)
+
+| Field | Value |
+|-------|--------|
+| **Commit tested** | `ab8b984` — `fix: prevent CJK character leakage in remix output` |
+| **Environment** | Production `https://vietnamese-eden-mvp.vercel.app/` |
+| **Account** | `ale146smoke20260531@example.com` |
+| **Content** | `Hook beauty ALE-146` (`242fd785-2b2f-469e-aa9c-e404e2977b23`) |
+| **Provider** | Xiaomi MiMo V2.5 (inferred from prior ALE-146 session; breakdown unchanged) |
+| **Deploy** | Live ~4 min after push; new remix batches saved successfully |
+
+#### Remix Facebook · Gần gũi · 5 variants
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| Generation completed | **PASS** | ~60s latency; ALE-141 overlay visible |
+| 5 variants returned | **PASS** | Saved at 07:25 1 thg 6, 2026 |
+| CJK in title/content | **PASS** | 0/5 new variants contain CJK |
+| ALE-146 variant 3 regression | **PASS** | Old batch (06:55) had `的东西`; new batch variant 3 clean |
+| Retry/error visible to user | **NONE** | First attempt succeeded; no error banner |
+
+**New variant 3 opening (Facebook, 07:25):** *"Đây là quy tắc CTA mình đã test suốt 3 tháng qua…"* — no CJK.
+
+#### Remix TikTok · Gần gũi · 5 variants
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| Generation completed | **PASS** | ~105s latency |
+| 5 variants returned | **PASS** | Saved at 07:26 1 thg 6, 2026 |
+| CJK in title/content | **PASS** | 0/5 variants contain CJK |
+| Retry/error visible to user | **NONE** | First attempt succeeded |
+
+#### Remix 10 variants
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| 10-variant generation | **NOT RUN** | Slider React state stuck at 5 via browser automation (same as ALE-146) |
+
+#### Verdict
+
+**PASS** for ALE-148 CJK fix on production (`ab8b984`). 10/10 newly generated variants (Facebook 5 + TikTok 5) contain no CJK glyphs. Legacy pre-fix outputs may still show CJK in list until user regenerates.
 
 ---
 
