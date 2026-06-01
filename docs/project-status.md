@@ -36,7 +36,10 @@ Feedback source of truth:
 | Feedback triage round 1 | **Done** (ALE-90) |
 | Beta fixes ALE-141→145 | **Done** ✅ |
 | Production smoke test | **Done** (ALE-146 — NO-GO verdict) |
-| Inviting next cohort | **BLOCKED** — fix ALE-148→150 trước |
+| ALE-148 (CJK leakage) | ✅ Done (commit `ab8b984`) |
+| ALE-149 (generic titles) | ✅ Done (commit `01d5de3`) |
+| ALE-150 (hide Google OAuth) | ✅ Done (commit `4417d3d`) |
+| Inviting next cohort | **GO pending final mini smoke** — all ALE-146 blockers cleared |
 
 
 ---
@@ -68,9 +71,9 @@ Feedback source of truth:
 
 | Linear Issue | Title | Priority | Type | Status |
 |--------------|-------|----------|------|--------|
-| [ALE-148](https://linear.app/alexgpt/issue/ALE-148) | Fix remix non-Vietnamese character leakage | **P1** | AI Quality / Production Bug | 🔄 Todo |
-| [ALE-149](https://linear.app/alexgpt/issue/ALE-149) | Replace generic remix variant card titles | **P1** | AI Quality / UX | 🔄 Todo |
-| [ALE-150](https://linear.app/alexgpt/issue/ALE-150) | Hide or disable Google OAuth in production beta | **P1** | Auth / UX | 🔄 Todo |
+| [ALE-148](https://linear.app/alexgpt/issue/ALE-148) | Fix remix non-Vietnamese character leakage | **P1** | AI Quality / Production Bug | ✅ Done |
+| [ALE-149](https://linear.app/alexgpt/issue/ALE-149) | Replace generic remix variant card titles | **P1** | AI Quality / UX | ✅ Done |
+| [ALE-150](https://linear.app/alexgpt/issue/ALE-150) | Hide or disable Google OAuth in production beta | **P1** | Auth / UX | ✅ Done |
 
 **Thứ tự đề xuất:**
 1. **ALE-148** — Fix CJK leakage (blocker niềm tin)
@@ -100,6 +103,9 @@ Feedback source of truth:
 
 | Date | Summary |
 |------|---------|
+| 2026-06-01 | **ALE-150** — Hide Google OAuth (`4417d3d`) + production smoke PASS. |
+| 2026-06-01 | **ALE-149** — Generic remix titles (`01d5de3`) + production smoke PASS. |
+| 2026-06-01 | **ALE-148** — Remix CJK leakage fix (`ab8b984`) + production smoke PASS. |
 | 2026-06-01 | **ALE-146** — Smoke test prompt + docs sync ready. ALE-141→145 Done. |
 | 2026-05-31 | ALE-90 triage beta feedback round 1 (5 responses, beta readiness 4/10, recommend fix Voice Profile before expand) |
 | 2026-05-31 | ALE-145 — Calendar no-auto-post clarity (6 files, zero schema change) |

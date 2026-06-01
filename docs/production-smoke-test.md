@@ -313,6 +313,52 @@ After deploy, re-run remix on same content with Facebook + Gần gũi + 5 varian
 
 ---
 
+## ALE-150 — Hide Google OAuth in production beta (2026-06-01)
+
+| Field | Value |
+|-------|-------|
+| **Commit tested** | `4417d3d` — `fix: hide Google OAuth during production beta` |
+| **Environment** | Production `https://vietnamese-eden-mvp.vercel.app/` |
+| **Method** | Playwright MCP (browser automation) |
+| **Account** | New signup `ale150smoke20260601@example.com` (created during smoke) |
+
+### Scope
+
+Login + signup pages only render Google OAuth button when `GOOGLE_OAUTH_ENABLED=true`. Production env does not set this flag → button must not appear. Email/password remains the primary beta auth path.
+
+### Production smoke (2026-06-01)
+
+| # | Check | Result | Notes |
+|---|-------|--------|-------|
+| 1 | Open `/login` | **PASS** | 5 interactive elements: email, forgot-password link, password, submit, signup link |
+| 2 | No "Tiếp tục với Google" button on `/login` | **PASS** | DOM scan: `hasGoogleText=false`, `hasGoogleIcon=false`; only button = `Đăng nhập` |
+| 3 | Open `/signup` | **PASS** | 5 interactive elements: full name, email, password, submit, login link |
+| 4 | No "Đăng ký với Google" button + no "hoặc" divider | **PASS** | DOM scan: `hasGoogleText=false`, `hasDivider=false`; only button = `Tạo tài khoản` |
+| 5 | Email/password login (new account) | **PASS** | `ale150smoke20260601@example.com` + password → `/dashboard` ~4s |
+| 6 | Email/password signup (fresh email) | **PASS** | New signup → auto-login → `/dashboard` "Tổng quan" rendered |
+| 7 | No console errors / blocking UI | **PASS** | Dashboard load clean, Supabase session cookie set |
+
+### Negative path
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| Login with wrong password | **PASS** | Banner: "Invalid login credentials" — Supabase auth responds, no crash |
+
+### Verdict
+
+**PASS** for ALE-150 on production (`4417d3d`). Google OAuth button completely hidden on both `/login` and `/signup` when `GOOGLE_OAUTH_ENABLED` is unset. Email/password signup and login both functional. NO-GO blockers from ALE-146 are now cleared.
+
+### Re-test guidance for cohort expansion
+
+For next beta cohort smoke (10 minutes manual):
+
+1. Open `/login` (incognito) → confirm no Google button
+2. Open `/signup` (incognito) → confirm no Google button + no "hoặc" divider
+3. Signup with personal email → check inbox for confirmation link
+4. (Optional) Set `GOOGLE_OAUTH_ENABLED=true` in Vercel env → redeploy → confirm Google button re-appears
+
+---
+
 ## ALE-88 — Beta readiness hardening (2026-05-31)
 
 | Field | Value |
