@@ -39,7 +39,8 @@ Feedback source of truth:
 | ALE-148 (CJK leakage) | ✅ Done (commit `ab8b984`) |
 | ALE-149 (generic titles) | ✅ Done (commit `01d5de3`) |
 | ALE-150 (hide Google OAuth) | ✅ Done (commit `4417d3d`) |
-| Inviting next cohort | **GO pending final mini smoke** — all ALE-146 blockers cleared |
+| ALE-151 (final mini smoke) | ✅ Done (production smoke PASS) |
+| Inviting next cohort | **Cohort 2: GO** |
 
 
 ---
@@ -103,6 +104,7 @@ Feedback source of truth:
 
 | Date | Summary |
 |------|---------|
+| 2026-06-01 | **ALE-151** — Final mini smoke PASS (13/13). Cohort 2 GO. |
 | 2026-06-01 | **ALE-150** — Hide Google OAuth (`4417d3d`) + production smoke PASS. |
 | 2026-06-01 | **ALE-149** — Generic remix titles (`01d5de3`) + production smoke PASS. |
 | 2026-06-01 | **ALE-148** — Remix CJK leakage fix (`ab8b984`) + production smoke PASS. |

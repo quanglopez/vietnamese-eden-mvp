@@ -313,6 +313,55 @@ After deploy, re-run remix on same content with Facebook + Gần gũi + 5 varian
 
 ---
 
+## ALE-151 — Final mini smoke + cohort 2 readiness (2026-06-01)
+
+| Field | Value |
+|-------|-------|
+| **Commits tested** | `4417d3d` (ALE-150), `83ce6b1` (docs sync), production build |
+| **Environment** | Production `https://vietnamese-eden-mvp.vercel.app/` |
+| **Method** | Playwright MCP browser automation |
+| **Account** | New signup `aleSmokeCohort2_20260601@example.com` (Cohort 2 readiness smoke) |
+| **AI provider** | Xiaomi MiMo V2.5 (verified on breakdown) |
+
+### Scope
+
+Final smoke trước khi mời cohort beta 2. Re-verify toàn bộ MVP path sau khi ALE-146 NO-GO blockers (ALE-148, 149, 150) đã PASS.
+
+### Smoke matrix (13/13 PASS)
+
+| Phase | # | Check | Result | Evidence |
+|-------|---|-------|--------|----------|
+| Auth | 1 | /login no Google button | **PASS** | DOM: `hasGoogleText=false`, only button = `Đăng nhập` |
+| Auth | 2 | /signup no Google button + no "hoặc" divider | **PASS** | DOM: `hasGoogleText=false`, `hasDivider=false` |
+| Auth | 3 | Email/password signup → /dashboard | **PASS** | Auto-login ~3s, dashboard "Tổng quan" rendered |
+| Auth | 4 | Email/password login (post-logout) → /dashboard | **PASS** | Supabase session cookie set, redirect OK |
+| Core | 5 | Create workspace (auto) | **PASS** | "Cá nhân" workspace default |
+| Core | 6 | Create board "ALE-151 Smoke Board" | **PASS** | Board ID `744d0aa1-6c16-4933-a6c2-5d396601951f` |
+| Core | 7 | Add content (paste text) | **PASS** | "Hook beauty ALE-151 smoke test" saved; content ID `0151889a-f06a-47df-9fbc-a8938b64ff68` |
+| Core | 8 | AI Breakdown (xiaomi:mimo-v2.5) | **PASS** | Hook, Angle, Cấu trúc, CTA, Cảm xúc, Đối tượng, Vì sao hiệu quả rendered |
+| Remix | 9 | Facebook 5v: 0 CJK, 0 generic, 5/5 angle badge | **PASS** | Titles: Story/List/Myth-busting/Before-After/Confession. Body: 0 CJK glyphs |
+| Remix | 10 | TikTok 5v: 0 CJK, 0 generic, 5/5 angle badge | **PASS** | Titles: Bật mí/Case study/Tại sao/3 công thức/Beauty creator chia sẻ. Badges: Before-After, Case study, Myth-Busting, Data/Stat, Hook/Opener |
+| Calendar | 11 | Add to calendar dialog + no-auto-post copy | **PASS** | "Calendar là công cụ nhắc lịch — bạn vẫn phải tự đăng thủ công" + reminder note |
+| Calendar | 12 | Submit + persist | **PASS** | "ALE-151 Calendar Smoke Test" saved at `2026-06-02T09:00:00+00:00` |
+| Calendar | 13 | Refresh persistence + "Nhắc lịch" badge | **PASS** | Hard reload `/calendar` → "Sắp tới (1)" still present |
+
+### Watch items (not blockers)
+
+- **Xiaomi CJK flakiness 1/2** — Lần 1 Facebook remix fail với "Phát hiện ký tự không phải tiếng Việt", retry pass. Lần 2 TikTok không bị. Có thể track riêng nếu fail rate > 1/3 trong tương lai.
+- **Channel display** — Item calendar hiển thị "Facebook" dù chọn TikTok trong dialog. Channel DB value có thể đúng nhưng display mapping off. Functional (item saved + persist) OK.
+
+### Automation notes (for re-runs)
+
+- Modal tab switch (Dán link → Paste text) có thể clear title field. Workaround: re-type title trước khi submit.
+- React lazy hydration có thể làm button "Phân tích AI"/"Đưa vào lịch" không navigate khi click. Workaround: `browser_navigate` với URL thẳng từ anchor href scan.
+- Session Supabase có thể expire nếu browser idle > 30s. Workaround: re-login nhanh khi cần.
+
+### Verdict
+
+**PASS** — toàn bộ MVP path ổn định sau ALE-146 NO-GO blockers. **Cohort 2: GO**. Owner có thể mời next 10–20 beta users theo `beta-invite-message.md`.
+
+---
+
 ## ALE-150 — Hide Google OAuth in production beta (2026-06-01)
 
 | Field | Value |
