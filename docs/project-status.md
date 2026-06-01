@@ -1,8 +1,8 @@
 # Project status — Vietnamese Eden MVP
 
-**Cập nhật:** 2026-05-31 (docs: Lovable frontend role)  
+**Cập nhật:** 2026-06-01 (ALE-146 production smoke)  
 **Production:** [https://vietnamese-eden-mvp.vercel.app/](https://vietnamese-eden-mvp.vercel.app/)  
-**Commit:** `4a0e47f` on `main`
+**Commit:** `7185b51` on `main` (smoke tested); docs commit pending push
 
 Feedback source of truth:
 
@@ -28,13 +28,15 @@ Feedback source of truth:
 
 ## Beta readiness
 
-
-| Phase                    | Status                   |
-| ------------------------ | ------------------------ |
-| Core MVP on production   | **Ready** (ALE-88)       |
-| Onboarding + limitations | **Ready**                |
-| Inviting first cohort    | **In progress** (ALE-89) |
-| Feedback triage round 1  | **Done** — ALE-90 ✅ |
+| Phase | Status |
+|-------|--------|
+| Core MVP on production | **Ready** (ALE-88) |
+| Onboarding + limitations | **Ready** |
+| Inviting first cohort | **Done** (ALE-89) |
+| Feedback triage round 1 | **Done** (ALE-90) |
+| Beta fixes ALE-141→145 | **Done** ✅ |
+| Production smoke test | **Done** (ALE-146 — 2026-06-01, see `production-smoke-test.md`) |
+| Inviting next cohort | **Blocked** — NO-GO until ALE-147 (remix naturalness) |
 
 
 ---
@@ -64,26 +66,39 @@ Feedback source of truth:
 
 ## Next recommended
 
-**ALE-91** — Fix P0/P1 bugs before expanding beta cohort.
+**ALE-146** — Production smoke test after beta feedback fixes (P1 / QA / Beta Readiness).
 
-| Linear Issue | Title | Priority |
-|--------------|-------|----------|
-| [ALE-141](https://linear.app/alexgpt/issue/ALE-141) | ALE-90A — Improve AI long-running loading state | P1 (P0 origin) |
-| [ALE-142](https://linear.app/alexgpt/issue/ALE-142) | ALE-90B — Improve Voice Profile setup and error handling | P1 (P0 origin) |
-| [ALE-143](https://linear.app/alexgpt/issue/ALE-143) | ALE-90C — Clarify beta onboarding and core flow instructions | P2 |
-| [ALE-144](https://linear.app/alexgpt/issue/ALE-144) | ALE-90D — Improve Remix diversity and Vietnamese naturalness | P2 |
-| [ALE-145](https://linear.app/alexgpt/issue/ALE-145) | ALE-90E — Clarify Calendar value and no-auto-post behavior | P2 |
+| Linear Issue | Title | Priority | Status |
+|--------------|-------|----------|--------|
+| [ALE-141](https://linear.app/alexgpt/issue/ALE-141) | ALE-90A — Improve AI long-running loading state | P1 | ✅ Done |
+| [ALE-142](https://linear.app/alexgpt/issue/ALE-142) | ALE-90B — Improve Voice Profile setup and error handling | P1 | ✅ Done |
+| [ALE-143](https://linear.app/alexgpt/issue/ALE-143) | ALE-90C — Clarify beta onboarding and core flow instructions | P2 | ✅ Done |
+| [ALE-144](https://linear.app/alexgpt/issue/ALE-144) | ALE-90D — Improve Remix diversity and Vietnamese naturalness | P2 | ✅ Done |
+| [ALE-145](https://linear.app/alexgpt/issue/ALE-145) | ALE-90E — Clarify Calendar value and no-auto-post behavior | P2 | ✅ Done |
+| **ALE-146** | Production smoke test after beta feedback fixes | **P1** | ✅ Done |
+| **ALE-147** | Fix remix non-Vietnamese character leakage | **P1** | 🔜 Recommended |
 
-**Thứ tự làm:** ALE-141 → ALE-142 → ALE-143 → ALE-144 → ALE-145
+**Thứ tự đã làm:** ALE-141 → ALE-142 → ALE-143 → ALE-144 → ALE-145 → **ALE-146 (now)**
+
+**Blockers remaining for next cohort:**
+- ALE-90.1 (AI progress indicator) — P0 origin, may need separate issue
+- ALE-90.5 (Calendar monthly view) — P1 feature request
+- Dashboard demo text confusion — from synthetic test (P0 if real users hit it)
 
 ## Changelog
 
-| Date       | Summary                                |
-| ---------- | -------------------------------------- |
+| Date | Summary |
+|------|---------|
+| 2026-06-01 | **ALE-146** — Smoke test prompt + docs sync ready. ALE-141→145 Done. |
 | 2026-05-31 | ALE-90 triage beta feedback round 1 (5 responses, beta readiness 4/10, recommend fix Voice Profile before expand) |
+| 2026-05-31 | ALE-145 — Calendar no-auto-post clarity (6 files, zero schema change) |
+| 2026-05-31 | ALE-144 — Remix diversity + Vietnamese naturalness (prompt-only change) |
+| 2026-05-31 | ALE-143 — Beta onboarding docs |
+| 2026-05-31 | ALE-142 — Voice Profile setup UX |
+| 2026-05-31 | ALE-141 — AI loading state (progress indicator) |
 | 2026-05-31 | Docs: beta-feedback-round-1.md, beta-feedback-summary.md |
 | 2026-05-31 | Docs: Lovable/Cursor frontend workflow |
-| 2026-05-31 | ALE-89 beta invite docs                |
-| 2026-05-31 | ALE-88 beta GO                         |
+| 2026-05-31 | ALE-89 beta invite docs |
+| 2026-05-31 | ALE-88 beta GO |
 
 

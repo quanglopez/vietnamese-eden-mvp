@@ -133,7 +133,7 @@
   - Log error chi tiết trong Supabase/Sentry
   - Retry mechanism cho user nếu fail
 
-**ALE-90.3: Improve Voice Profile onboarding (min length hint + examples)**
+**ALE-90.3: Improve Voice Profile onboarding (min length hint + examples)** — ✅ **Resolved** (ALE-142, verified ALE-146 2026-06-01)
 - Priority: P1
 - Category: UX
 - Evidence: 3 users confused: "không rõ cần bao nhiêu ký tự", "thiếu hướng dẫn minimum 500 ký tự"
@@ -141,13 +141,15 @@
   - Inline text: "Nhập ít nhất 500 ký tự về phong cách viết của bạn"
   - Character count (0/500+)
   - 2-3 sample voice profiles
+- **Smoke verification:** `/voice` shows "Tối thiểu 500 ký tự", live counter `N / 500+`, 2 sample profiles; submit + AI train PASS.
 
-**ALE-90.4: Clarify Calendar is internal scheduling only**
+**ALE-90.4: Clarify Calendar is internal scheduling only** — ✅ **Resolved** (ALE-145, verified ALE-146 2026-06-01)
 - Priority: P1
 - Category: UX
 - Evidence: test.eden.vn + tung nguyen confused về auto-post
 - Acceptance criteria:
   - Banner hoặc helper text trong Calendar
+- **Smoke verification:** Dialog + form notes, card badge "Nhắc lịch — không tự động đăng", dashboard footnote PASS.
 
 ### P1 — Feature gap
 **ALE-90.5: Add monthly view + drag-and-drop to Calendar**
@@ -159,13 +161,14 @@
   - Drag-and-drop items between dates
 
 ### P1 — AI Quality
-**ALE-90.6: Reduce Remix output similarity (diversify variant structure)**
+**ALE-90.6: Reduce Remix output similarity (diversify variant structure)** — ⚠️ **Partial** (ALE-144, verified ALE-146 2026-06-01)
 - Priority: P1
 - Category: AI Quality
 - Evidence: test.eden.vn + tung nguyen: variants too similar
 - Acceptance criteria:
   - Remix prompt thêm constraint
   - Test với 5 sample, no 2 variants share same opening 3 sentences
+- **Smoke verification:** 5 variants have distinct openings + CTAs; card labels still "Biến thể N"; one variant had Chinese `的东西` → track as **ALE-147**.
 
 ### P2 — Polish
 **ALE-90.7: Improve landing page differentiation from ChatGPT**

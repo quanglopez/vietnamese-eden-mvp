@@ -10,6 +10,158 @@ Chạy sau khi hoàn tất [supabase-cloud-setup.md](./supabase-cloud-setup.md) 
 
 ---
 
+## ALE-146 — Production smoke after beta fixes (2026-06-01)
+
+| Field | Value |
+|-------|--------|
+| **Test date** | 2026-06-01 |
+| **Environment** | Production `https://vietnamese-eden-mvp.vercel.app/` + mobile 375×812 (CDP) |
+| **Commit tested** | `7185b51` — `feat: clarify calendar manual scheduling UX` |
+| **Health** | `GET /api/health/supabase` → `{"status":"ok","supabase":{"ok":true}}` |
+| **Account** | `ale146smoke20260531@example.com` (workspace "Workspace của ALE-146", board Smoke Board ALE-146) |
+| **AI provider** | `xiaomi:mimo-v2.5` (observed on breakdown) |
+
+### Phase 1 — Auth & onboarding
+
+| Step | Result | Notes |
+|------|--------|-------|
+| 1 Landing `/` | **PASS** | Hero, CTAs, waitlist form; load <3s |
+| 2 Signup | **NOT RUN** | Reused existing smoke account |
+| 3 Login | **PASS** | → `/dashboard` ~5s |
+| 4 Google OAuth | **FAIL** | Button "Tiếp tục với Google" visible & enabled (ALE-90.8 known limitation) |
+| 5 Forgot password | **PASS** | `beta.test@example.com` → "Email đã được gửi", no Invalid input |
+
+### Phase 2 — Board & content
+
+| Step | Result | Notes |
+|------|--------|-------|
+| 6 Dashboard → boards | **PASS** | Smoke Board ALE-146 listed |
+| 7 Create board | **NOT RUN** | Board pre-created in prior session |
+| 8 Add content (paste) | **PASS** | "Hook beauty ALE-146" card present |
+| 9 Content card actions | **PASS** | "Phân tích AI" visible |
+
+### Phase 3 — AI breakdown (ALE-141)
+
+| Step | Result | Notes |
+|------|--------|-------|
+| 10 Navigate breakdown | **PASS** | `/breakdown/242fd785-…` |
+| 11 Loading state | **PASS** | Overlay: Bước 1/4, progress bar, "AI đang phân tích…" on re-run |
+| 12 Breakdown result | **PASS** | Hook, Angle, Cấu trúc, CTA + extras render |
+| 13 Model label | **PASS** | `Model: xiaomi:mimo-v2.5` |
+| 14 Error handling | **NOT RUN** | No API failure observed |
+
+### Phase 4 — Remix (ALE-144)
+
+| Step | Result | Notes |
+|------|--------|-------|
+| 15 Navigate remix | **PASS** | Form visible |
+| 16 Configure remix | **PASS** | Facebook + Gần gũi + 5 variants submitted |
+| 17 Loading state | **PASS** | ALE-141 overlay on remix (~120s wait) |
+| 18 5 variants returned | **PASS** | Exactly 5, no JSON parse error |
+| 19 Title uniqueness | **PARTIAL** | Card headers use "Biến thể 1–5"; opening lines unique (see below) |
+| 20 Opening diversity | **PASS** | 5 distinct styles: before/after, 2s hook, story, question, beginner list |
+| 21 CTA diversity | **PASS** | Inbox/DM, tag friend, save, reply, comment 1/2/3 |
+| 22 Vietnamese naturalness | **PARTIAL** | Mostly natural; variant 3 contains stray Chinese `的东西` |
+| 23 Remix 10 variants | **NOT RUN** | Slider could not be set to 10 via browser automation (React state stuck at 5) |
+| 24 Copy/export | **PASS** | Copy, Export all .txt/.md per variant |
+
+**ALE-144 variant openings (first sentence):**
+
+| # | Opening |
+|---|---------|
+| 1 | Bạn có 2 giây để giữ người xem ở lại. |
+| 2 | Một story ngắn, đúng nhịp, có thể cứu cả video của bạn. |
+| 3 | Bạn tạo video hay mà không ai comment? |
+| 4 | Trước khi biết 3 mẹo này, video của mình cũng chìm nghỉm. |
+| 5 | Nếu bạn mới bắt đầu làm content beauty và thấy hoang mang… |
+
+**ALE-144 variant CTAs (last sentence):**
+
+| # | CTA |
+|---|-----|
+| 1 | Tag ngay 1 người bạn… |
+| 2 | Save lại để lần sau… |
+| 3 | Reply cho mình biết suy nghĩ… |
+| 4 | Inbox mình để mình gửi nhé! |
+| 5 | Comment số 1, 2 hoặc 3… |
+
+### Phase 5 — Voice profile (ALE-90.3 / ALE-142)
+
+| Step | Result | Notes |
+|------|--------|-------|
+| 25 Navigate `/voice` | **PASS** | No 404 |
+| 26 Guidance hint | **PASS** | "Tối thiểu 500 ký tự…" |
+| 27 Character counter | **PASS** | Updates live (`9 / 500+`) |
+| 28 Sample examples | **PASS** | 2 samples + collapsible "Xem ví dụ mẫu" |
+| 29 Validation (<100 chars) | **PASS** | Submit disabled until ≥500 chars |
+| 30 Submit valid | **PASS** | Profile "ALE-146 Smoke Voice" saved |
+| 31 Loading state | **PASS** | ALE-141 overlay ~80s |
+| 32 Error handling | **NOT RUN** | No 500 observed |
+| 33 Remix with voice | **PARTIAL** | Voice selectable in remix form; did not re-generate 3 variants with voice |
+
+### Phase 6 — Calendar (ALE-145)
+
+| Step | Result | Notes |
+|------|--------|-------|
+| 34 Add to calendar dialog | **PASS** | Opens from remix card |
+| 35 Dialog description | **PASS** | "Calendar là công cụ nhắc lịch — … tự đăng thủ công" |
+| 36 Form note | **PASS** | Copy-paste + manual posting note before submit |
+| 37 Submit | **PASS** | "ALE-146 Calendar Smoke Test" saved |
+| 38 Verify in calendar | **PASS** | Under "Sắp tới (1)" |
+| 39 Refresh persistence | **PASS** | Item persists after reload |
+| 40 Card badge | **PASS** | "Nhắc lịch — không tự động đăng" |
+| 41 Empty state | **NOT RUN** | 1 item present; not deleted for empty-state test |
+| 42 Dashboard footnote | **PASS** | "(Chỉ nhắc lịch — không auto-post)" on dashboard quick link |
+
+### Phase 7 — Mobile 375px
+
+| Step | Result | Notes |
+|------|--------|-------|
+| 43 Landing mobile | **PASS** | No horizontal overflow (375px) |
+| 44 Login mobile | **PASS** | Form usable |
+| 45 Dashboard mobile | **PASS** | Shell + board list visible |
+| 46 Remix mobile | **PASS*** | scrollWidth 380 vs 375 (~5px; acceptable) |
+| 47 Calendar mobile | **PASS** | Usable, tabs work |
+
+### Xiaomi MiMo latency (observed)
+
+| Operation | Latency | Notes |
+|-----------|---------|-------|
+| Breakdown re-run | ~45s | ALE-141 overlay visible entire wait |
+| Remix 5 variants | ~120s | Within expected 30–120s band |
+| Voice profile train | ~80s | Overlay Bước 1/4 |
+| Remix 10 variants | **NOT RUN** | — |
+
+### Beta readiness verdict (ALE-146)
+
+| Area | Score | Notes |
+|------|-------|-------|
+| Auth/Signup | 7/10 | Login OK; Google OAuth still visible (FAIL step 4) |
+| Board/Content | 9/10 | Core flow OK |
+| AI Breakdown | 9/10 | Overlay + xiaomi label OK |
+| Remix (5 variants) | 7/10 | Diversity good; card labels + Chinese char leak |
+| Remix (10 variants) | —/10 | NOT RUN |
+| Voice Profile | 9/10 | ALE-90.3 guidance PASS |
+| Calendar | 10/10 | ALE-145 no-auto-post PASS |
+| Mobile | 9/10 | Minor remix scroll |
+| **Overall** | **8/10** | Core beta flow works |
+
+### Decision
+
+- [ ] **ALL PASS**
+- [x] **ANY FAIL / PARTIAL** → follow-up issues before next cohort
+
+**Follow-ups (ALE-147+):**
+
+1. **ALE-147** — Strip non-Vietnamese characters from remix output (variant 3: `的东西`)
+2. **ALE-148** — Replace generic "Biến thể N" card titles with AI-generated unique titles (ALE-144)
+3. **ALE-90.8** — Hide or disable Google OAuth until configured
+4. Re-run remix 10-variant smoke manually (automation could not move slider)
+
+**Verdict:** **NO-GO** for expanding beta cohort until ALE-147 (naturalness) is fixed. Core MVP path (board → breakdown → remix → voice → calendar) is **functional** on production.
+
+---
+
 ## ALE-88 — Beta readiness hardening (2026-05-31)
 
 | Field | Value |
