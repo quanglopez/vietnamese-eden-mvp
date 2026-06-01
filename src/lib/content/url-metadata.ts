@@ -64,7 +64,8 @@ export function getLinkThumbnailUrl(
 
 function getOEmbedEndpoint(sourceUrl: string): string | null {
   const { platform, label } = detectPlatformFromUrl(sourceUrl);
-  const encoded = encodeURIComponent(sourceUrl);
+  const normalized = normalizeYouTubeUrlForOEmbed(sourceUrl);
+  const encoded = encodeURIComponent(normalized);
 
   if (platform === "youtube" || label === "YouTube") {
     return `https://www.youtube.com/oembed?url=${encoded}&format=json`;
@@ -73,6 +74,21 @@ function getOEmbedEndpoint(sourceUrl: string): string | null {
     return `https://www.tiktok.com/oembed?url=${encoded}`;
   }
   return null;
+}
+
+/**
+ * YouTube oEmbed historically had issues with `/shorts/`, `/embed/`,
+ * and query strings like `?si=…` (shared egress IPs getting rate-limited
+ * or returning 404 on non-canonical URLs). Rewriting to canonical
+ * `youtube.com/watch?v=VIDEO_ID` dramatically improves reliability.
+ *
+ * Returns the original URL if it isn't a recognized YouTube pattern,
+ * so this is a safe no-op for other hosts.
+ */
+function normalizeYouTubeUrlForOEmbed(sourceUrl: string): string {
+  const id = extractYouTubeVideoId(sourceUrl);
+  if (!id) return sourceUrl;
+  return `https://www.youtube.com/watch?v=${id}`;
 }
 
 type OEmbedResponse = {

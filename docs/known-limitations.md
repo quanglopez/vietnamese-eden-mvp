@@ -1,6 +1,6 @@
 # Known limitations — Vietnamese Eden MVP (beta)
 
-**Cập nhật:** 2026-05-31 (ALE-88)
+**Cập nhật:** 2026-06-01 (ALE-152 smoke)
 
 Danh sách giới hạn **cố ý hoặc chưa làm** trong bản beta. Không phải bug tạm thời trừ khi ghi rõ.
 
@@ -21,6 +21,8 @@ Danh sách giới hạn **cố ý hoặc chưa làm** trong bản beta. Không p
 | Giới hạn | Chi tiết |
 |----------|----------|
 | **URL-only content** | Lưu link được; **không** scrape caption/video/transcript — cần paste text thủ công trước Breakdown. |
+| **YouTube URL patterns** | Parser hỗ trợ `youtube.com/watch?v=VIDEO_ID` và `youtu.be/VIDEO_ID`. URL dạng khác (vd `/shorts/`, `/embed/`, playlist) có thể không enrich được — fallback message sẽ hiển thị. |
+| **TikTok oEmbed** | TikTok thường **chặn oEmbed** từ server Vercel/IP range. App **fallback an toàn**: card hiển thị "TikTok" badge + URL + message hướng dẫn dùng Paste text. Không cần fix trừ khi user cohort 2 phàn nàn nhiều (P3 watch). |
 | **AI output** | Gợi ý từ Xiaomi MiMo V2.5 — **cần review/chỉnh tay** trước khi đăng. |
 | **Provider production** | `AI_PROVIDER=xiaomi`, model `mimo-v2.5`. Rollback OpenAI: đổi env trên Vercel (không phải user-facing). |
 | **Remix 10 biến thể** | UI hỗ trợ tối đa **10**; latency và token **cao hơn** 3–5 biến thể; đôi khi cần thử lại nếu JSON parse fail (đã harden ALE-87). |
@@ -57,7 +59,10 @@ Danh sách giới hạn **cố ý hoặc chưa làm** trong bản beta. Không p
 ---
 
 ## Đã xử lý (không còn blocker beta)
-
+## Đã xử lý (không còn blocker beta)
 - Workspace RLS (ALE-84/85)  
 - OpenAI 500 trên production → chuyển Xiaomi MiMo (ALE-86)  
 - Remix 5 biến thể JSON parse (ALE-87)  
+- Google OAuth hide in beta (ALE-150)  
+- Calendar no-auto-post UX (ALE-145)
+- ALE-152 follow-ups: see ALE-153 (P1 non-Vietnamese leakage), TikTok oEmbed (P3 watch)
