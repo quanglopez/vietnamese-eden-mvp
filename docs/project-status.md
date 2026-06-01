@@ -1,8 +1,8 @@
 # Project status — Vietnamese Eden MVP
 
-**Cập nhật:** 2026-06-01 (ALE-146 production smoke)  
-**Production:** [https://vietnamese-eden-mvp.vercel.app/](https://vietnamese-eden-mvp.vercel.app/)  
-**Commit:** `7185b51` on `main` (smoke tested); docs commit pending push
+**Cập nhật:** 2026-06-01 (M8 Social URL Importer planned)
+**Production:** [https://vietnamese-eden-mvp.vercel.app/](https://vietnamese-eden-mvp.vercel.app/)
+**Latest deploy:** commit `d3635f3` on `main` (ALE-152 Done)
 
 Feedback source of truth:
 
@@ -43,6 +43,9 @@ Feedback source of truth:
 | Inviting next cohort | **Cohort 2: inviting** 📨 |
 | Cohort 2 feedback tracking | [beta-feedback-round-2.md](./beta-feedback-round-2.md) |
 | **Next decision point** | **After 5 completed tests OR 7–10 days** (whichever first) |
+| **M8 milestone** | **Planned** (see [social-url-importer-plan.md](./social-url-importer-plan.md)) |
+| **Next implementation issue** | [ALE-154](https://linear.app/alexgpt/issue/ALE-154) — M8 Social URL Importer architecture |
+| **ALE-153 prerequisite** | [ALE-153](https://linear.app/alexgpt/issue/ALE-153) (P1) — non-Vietnamese leakage guard must land before M8 importers can safely push to AI |
 
 
 ---
@@ -103,9 +106,12 @@ Feedback source of truth:
 - Dashboard demo text confusion — from synthetic test (P0 if real users hit it)
 
 ## Changelog
-
+## Changelog
 | Date | Summary |
 |------|---------|
+| 2026-06-01 | **M8 — Social URL Importer planned.** 6 issues created (ALE-154→159) under project M8. Architecture spec in `social-url-importer-plan.md`. Next implementation: ALE-154. ALE-153 is hard prerequisite. |
+| 2026-06-01 | **ALE-152** — URL preview + metadata enrichment (commit `fa08afe` + `18ae8e6`) — Done. YouTube Shorts parser fix shipped. |
+| 2026-06-01 | **ALE-153** — Created (P1) — Prevent non-Vietnamese language leakage in metadata-only AI Breakdown. |
 | 2026-06-01 | **Cohort 2 inviting** — `beta-feedback-round-2.md` tracker ready, decision gate set (5 completed tests OR 7–10 days). |
 | 2026-06-01 | **ALE-151** — Final mini smoke PASS (13/13). Cohort 2 GO. |
 | 2026-06-01 | **ALE-150** — Hide Google OAuth (`4417d3d`) + production smoke PASS. |
