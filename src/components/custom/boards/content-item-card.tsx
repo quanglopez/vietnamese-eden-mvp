@@ -4,11 +4,8 @@ import Link from "next/link";
 import { Bookmark, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  getContentPreview,
-  getPlatformGradient,
-  getPlatformLabel,
-} from "@/lib/content/platform-styles";
+import { ContentMediaCover } from "@/components/custom/content/content-media-cover";
+import { getLinkThumbnailUrl } from "@/lib/content/url-metadata";
 import type { BoardContentItem } from "@/types/content";
 
 type ContentItemCardProps = {
@@ -16,28 +13,25 @@ type ContentItemCardProps = {
 };
 
 export function ContentItemCard({ item }: ContentItemCardProps) {
-  const preview = getContentPreview(item.title, item.rawContent);
-  const gradient = getPlatformGradient(item.platform);
+  const thumbnailUrl = getLinkThumbnailUrl(item.sourceUrl, item.platform);
   const hasText = Boolean(item.rawContent?.trim());
   const breakdownHref = `/breakdown/${item.id}`;
 
   return (
     <article className="group rounded-2xl border border-border/60 bg-surface-elev overflow-hidden hover:shadow-card transition flex flex-col">
       <Link href={breakdownHref} className="block flex-1">
-        <div
-          className={`aspect-[4/5] bg-gradient-to-br ${gradient} p-4 flex flex-col justify-between relative`}
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-white bg-black/30 backdrop-blur px-2 py-0.5 rounded-full">
-              {getPlatformLabel(item.platform)}
-            </span>
-            <span className="h-7 w-7 rounded-full bg-black/30 backdrop-blur grid place-items-center">
-              <Bookmark className="h-3.5 w-3.5 text-white" />
-            </span>
-          </div>
-          <div className="text-white font-display font-semibold text-base leading-snug line-clamp-4">
-            {preview}
-          </div>
+        <div className="relative aspect-[4/5]">
+          <ContentMediaCover
+            platform={item.platform}
+            title={item.title}
+            rawContent={item.rawContent}
+            thumbnailUrl={thumbnailUrl}
+            className="h-full"
+            previewClassName="text-white font-display font-semibold text-base leading-snug line-clamp-4"
+          />
+          <span className="absolute top-3 right-3 z-20 h-7 w-7 rounded-full bg-black/30 backdrop-blur grid place-items-center">
+            <Bookmark className="h-3.5 w-3.5 text-white" />
+          </span>
         </div>
         <div className="p-4 pb-2">
           <div className="flex items-start justify-between gap-2 text-xs">
@@ -69,7 +63,7 @@ export function ContentItemCard({ item }: ContentItemCardProps) {
         </Button>
         {!hasText ? (
           <p className="mt-2 text-[11px] text-muted-foreground leading-snug">
-            Chỉ có URL — thêm nội dung text trước khi phân tích.
+            Chỉ có URL — mở Breakdown để thử lấy metadata, hoặc dán caption qua Paste text.
           </p>
         ) : null}
       </div>

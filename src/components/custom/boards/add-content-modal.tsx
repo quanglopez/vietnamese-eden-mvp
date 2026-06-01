@@ -209,8 +209,9 @@ export function AddContentModal({
               </div>
 
               <div className="rounded-lg border border-brand/20 bg-gradient-brand-soft px-3 py-2 text-xs text-muted-foreground">
-                Link sẽ được lưu ngay. Hệ thống chưa trích xuất caption/video — trạng thái{" "}
-                <span className="font-semibold text-foreground">manual_required</span>.
+                Link được lưu ngay. App sẽ thử lấy <strong>thumbnail + tiêu đề</strong> từ
+                YouTube/TikTok (metadata, không phải transcript). Muốn phân tích sâu, dùng tab{" "}
+                <strong>Paste text</strong>.
               </div>
 
               {errors.form ? (

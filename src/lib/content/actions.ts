@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { getBoardById } from "@/lib/boards/queries";
 import type { ActionResult } from "@/lib/boards/actions";
+import { enrichContentItemFromUrl } from "@/lib/content/enrich-url-content";
 import { insertAndLinkContentItem } from "@/lib/content/link-content";
 import {
   detectPlatformFromUrl,
@@ -133,6 +134,9 @@ export async function addContentUrlAction(
     return { success: false, error: result.error };
   }
 
+  revalidateBoardPaths(boardId);
+
+  await enrichContentItemFromUrl(supabase, result.contentItemId);
   revalidateBoardPaths(boardId);
 
   return {

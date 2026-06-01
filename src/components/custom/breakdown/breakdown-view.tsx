@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, Link2, Wand2 } from "lucide-react";
 
 import { AppShell } from "@/components/custom/app/app-shell";
+import { ContentMediaCover } from "@/components/custom/content/content-media-cover";
 import {
   AiErrorBanner,
   AiLoadingOverlay,
@@ -16,11 +17,7 @@ import {
   BreakdownStatusBanner,
 } from "@/components/custom/breakdown/breakdown-sections";
 import { Button } from "@/components/ui/button";
-import {
-  getContentPreview,
-  getPlatformGradient,
-  getPlatformLabel,
-} from "@/lib/content/platform-styles";
+import { getPlatformLabel } from "@/lib/content/platform-styles";
 import { runContentAnalysisAction } from "@/lib/content/analysis-actions";
 import type { ContentAnalysisView, ContentItemDetail } from "@/types/analysis";
 
@@ -28,6 +25,7 @@ type BreakdownViewProps = {
   item: ContentItemDetail;
   analysis: ContentAnalysisView | null;
   canAnalyze: boolean;
+  thumbnailUrl?: string | null;
   fetchError: string | null;
 };
 
@@ -35,6 +33,7 @@ export function BreakdownView({
   item,
   analysis: initialAnalysis,
   canAnalyze,
+  thumbnailUrl,
   fetchError,
 }: BreakdownViewProps) {
   const router = useRouter();
@@ -47,8 +46,6 @@ export function BreakdownView({
     setAnalysis(initialAnalysis);
   }, [initialAnalysis]);
 
-  const preview = getContentPreview(item.title, item.rawContent);
-  const gradient = getPlatformGradient(item.platform);
   const backHref = item.boardId ? `/boards/${item.boardId}` : "/boards";
   const remixHref = `/remix/${item.id}`;
   const canOpenRemix = canAnalyze || Boolean(analysis);
@@ -85,23 +82,20 @@ export function BreakdownView({
 
       <div className="grid lg:grid-cols-[360px_1fr] gap-8">
         <aside>
-          <div
-            className={`rounded-2xl overflow-hidden border border-border/60 aspect-[3/4] bg-gradient-to-br ${gradient} p-5 flex flex-col justify-between sticky top-24`}
-          >
-            <span className="text-[10px] font-bold text-white bg-black/40 backdrop-blur px-2 py-0.5 rounded-full w-fit">
-              {getPlatformLabel(item.platform)}
-            </span>
-            <div>
-              <div className="text-white font-display font-bold text-xl leading-tight line-clamp-6">
-                {preview}
+          <div className="relative rounded-2xl overflow-hidden border border-border/60 aspect-[3/4] sticky top-24">
+            <ContentMediaCover
+              platform={item.platform}
+              title={item.title}
+              rawContent={item.rawContent}
+              thumbnailUrl={thumbnailUrl}
+              className="h-full"
+            />
+            {item.sourceUrl ? (
+              <div className="absolute bottom-0 left-0 right-0 z-20 flex items-center gap-1 bg-black/55 px-4 py-2 text-white/90 text-xs">
+                <Link2 className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">{item.sourceUrl}</span>
               </div>
-              {item.sourceUrl ? (
-                <div className="mt-4 flex items-center gap-1 text-white/90 text-xs">
-                  <Link2 className="h-3.5 w-3.5 shrink-0" />
-                  <span className="truncate">{item.sourceUrl}</span>
-                </div>
-              ) : null}
-            </div>
+            ) : null}
           </div>
         </aside>
 
@@ -110,7 +104,9 @@ export function BreakdownView({
             <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 px-5 py-4 text-sm">
               <p className="font-semibold text-foreground">Chưa thể phân tích bằng AI</p>
               <p className="mt-2 text-muted-foreground">
-                Content này chỉ có URL. Hãy thêm nội dung thủ công trước khi phân tích.
+                Không lấy được metadata từ link (YouTube/TikTok có thể chặn tự động).
+                Hãy dùng tab <strong>Paste text</strong> trên bảng và dán caption/script để phân
+                tích sâu hơn.
               </p>
               {item.boardId ? (
                 <Button asChild variant="outline" size="sm" className="mt-4">
