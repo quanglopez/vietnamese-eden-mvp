@@ -244,6 +244,75 @@ After deploy, re-run remix on same content (`Hook beauty ALE-146`) with Facebook
 
 ---
 
+## ALE-149 — Replace generic remix variant titles (2026-06-01)
+
+| Field | Value |
+|-------|--------|
+| **Commit tested** | `01d5de3` — `fix: replace generic remix variant titles` |
+| **Environment** | Production `https://vietnamese-eden-mvp.vercel.app/` |
+| **Account** | `ale146smoke20260531@example.com` |
+| **Content** | `Hook beauty ALE-146` (`242fd785-2b2f-469e-aa9c-e404e2977b23`) |
+| **Provider** | Xiaomi MiMo V2.5 (inferred; breakdown unchanged) |
+| **Deploy** | Live on production before smoke; new remix batches saved successfully |
+
+### Re-test ALE-146 / ALE-144 failure case
+
+After deploy, re-run remix on same content with Facebook + Gần gũi + 5 variants. Confirm card titles are **not** generic (`Biến thể N`, `Bản 1`, `Variant 2`, `Remix 3`) and each card shows an **angle badge**.
+
+### Production smoke (2026-06-01)
+
+#### Remix Facebook · Gần gũi · 5 variants
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| Generation completed | **PASS** | ~261s latency; overlay visible |
+| 5 variants returned | **PASS** | Saved at 08:37 1 thg 6, 2026 |
+| Generic titles | **PASS** | 0/5 new variants use `Biến thể N` or other generic patterns |
+| AI descriptive / angle fallback titles | **PASS** | e.g. `Bí quyết: Nói lợi ích trong 2 giây đầu`, `3 mẹo hook beauty đã được kiểm chứng` |
+| Angle badge on each card | **PASS** | Bí quyết, Hook/Opener, Trước/sau, Myth-Busting, Story 15 giây |
+| CJK in title/content | **PASS** | 0/5 new variants contain CJK |
+| Retry/error visible to user | **NONE** | First attempt succeeded |
+
+**New titles (Facebook, 08:37):**
+
+1. `Bí quyết: Nói lợi ích trong 2 giây đầu` — badge: Bí quyết
+2. `3 mẹo hook beauty đã được kiểm chứng` — badge: Hook/Opener
+3. `Trước/sau: 3 hook beauty thay đổi kết quả` — badge: Trước/sau
+4. `Hậu trường smoke test ALE-146` — badge: Myth-Busting
+5. `Story 15 giây: Cách kể chuyện giữ view` — badge: Story 15 giây
+
+#### Remix TikTok · Gần gũi · 5 variants
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| Generation completed | **PASS** | Saved at 08:44 1 thg 6, 2026 |
+| 5 variants returned | **PASS** | |
+| Generic titles | **PASS** | 0/5 new variants generic |
+| AI descriptive / angle fallback titles | **PASS** | e.g. `3 bước hook beauty không cần drama`, `Câu chuyện 15 giây thay đổi cách hook` |
+| Angle badge on each card | **PASS** | Hook/Opener, Data/Stat, Myth-Busting, Before/After, List/Tips |
+| CJK in title/content | **PASS** | 0/5 variants contain CJK |
+| Retry/error visible to user | **NONE** | First attempt succeeded |
+
+**New titles (TikTok, 08:44):**
+
+1. `3 bước hook beauty không cần drama` — badge: Hook/Opener
+2. `Bí quyết hook beauty từ người đã test` — badge: Data/Stat
+3. `Trước/sau khi áp dụng 3 mẹo hook` — badge: Myth-Busting
+4. `Câu chuyện 15 giây thay đổi cách hook` — badge: Before/After
+5. `3 hook beauty đã test trên 1 video smoke` — badge: List/Tips
+
+#### Remix 10 variants
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| 10-variant generation | **NOT RUN** | Slider React state stuck at 5 via browser automation (same as ALE-146/148) |
+
+#### Verdict
+
+**PASS** for ALE-149 on production (`01d5de3`). 10/10 newly generated variants (Facebook 5 + TikTok 5) have non-generic descriptive titles and visible angle badges. CJK regression check passed on new batches. Legacy pre-fix outputs may still show generic `Biến thể N` titles in list until user regenerates.
+
+---
+
 ## ALE-88 — Beta readiness hardening (2026-05-31)
 
 | Field | Value |
