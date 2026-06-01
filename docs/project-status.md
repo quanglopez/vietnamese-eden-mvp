@@ -35,8 +35,8 @@ Feedback source of truth:
 | Inviting first cohort | **Done** (ALE-89) |
 | Feedback triage round 1 | **Done** (ALE-90) |
 | Beta fixes ALE-141→145 | **Done** ✅ |
-| Production smoke test | **In progress** (ALE-147) |
-| Inviting next cohort | **Pending** ALE-147 PASS |
+| Production smoke test | **Done** (ALE-146 — NO-GO verdict) |
+| Inviting next cohort | **BLOCKED** — fix ALE-148→150 trước |
 
 
 ---
@@ -64,23 +64,34 @@ Feedback source of truth:
 
 ---
 
-## Next recommended
+## Next recommended (follow-up ALE-146 NO-GO)
 
-**ALE-146** — Production smoke test after beta feedback fixes (P1 / QA / Beta Readiness).
+| Linear Issue | Title | Priority | Type | Status |
+|--------------|-------|----------|------|--------|
+| [ALE-148](https://linear.app/alexgpt/issue/ALE-148) | Fix remix non-Vietnamese character leakage | **P1** | AI Quality / Production Bug | 🔄 Todo |
+| [ALE-149](https://linear.app/alexgpt/issue/ALE-149) | Replace generic remix variant card titles | **P1** | AI Quality / UX | 🔄 Todo |
+| [ALE-150](https://linear.app/alexgpt/issue/ALE-150) | Hide or disable Google OAuth in production beta | **P1** | Auth / UX | 🔄 Todo |
 
-| Linear Issue | Title | Priority | Status |
-|--------------|-------|----------|--------|
-| [ALE-141](https://linear.app/alexgpt/issue/ALE-141) | ALE-90A — Improve AI long-running loading state | P1 | ✅ Done |
-| [ALE-142](https://linear.app/alexgpt/issue/ALE-142) | ALE-90B — Improve Voice Profile setup and error handling | P1 | ✅ Done |
-| [ALE-143](https://linear.app/alexgpt/issue/ALE-143) | ALE-90C — Clarify beta onboarding and core flow instructions | P2 | ✅ Done |
-| [ALE-144](https://linear.app/alexgpt/issue/ALE-144) | ALE-90D — Improve Remix diversity and Vietnamese naturalness | P2 | ✅ Done |
-| [ALE-145](https://linear.app/alexgpt/issue/ALE-145) | ALE-90E — Clarify Calendar value and no-auto-post behavior | P2 | ✅ Done |
-| **ALE-146** | Production smoke test after beta feedback fixes | **P1** | ✅ Done |
-| **ALE-147** | Fix remix non-Vietnamese character leakage | **P1** | 🔜 Recommended |
+**Thứ tự đề xuất:**
+1. **ALE-148** — Fix CJK leakage (blocker niềm tin)
+2. **ALE-149** — Fix generic titles (blocker UX chọn output)  
+3. **ALE-150** — Hide/disable Google OAuth (blocker onboarding misuse)
 
-**Thứ tự đã làm:** ALE-141 → ALE-142 → ALE-143 → ALE-144 → ALE-145 → **ALE-146 (now)**
+**Khi cả 3 Done:** Chạy smoke test vòng 2 → nếu PASS → mở cohort beta tiếp.
 
-**Blockers remaining for next cohort:**
+## ALE-146 background
+
+| Issue | Title | Status |
+|-------|-------|--------|
+| [ALE-141](https://linear.app/alexgpt/issue/ALE-141) | Improve AI long-running loading state | ✅ Done |
+| [ALE-142](https://linear.app/alexgpt/issue/ALE-142) | Improve Voice Profile setup and error handling | ✅ Done |
+| [ALE-143](https://linear.app/alexgpt/issue/ALE-143) | Clarify beta onboarding and core flow instructions | ✅ Done |
+| [ALE-144](https://linear.app/alexgpt/issue/ALE-144) | Improve Remix diversity and Vietnamese naturalness | ✅ Done |
+| [ALE-145](https://linear.app/alexgpt/issue/ALE-145) | Clarify Calendar value and no-auto-post behavior | ✅ Done |
+| **ALE-146** | Production smoke test after beta feedback fixes | ✅ Done (NO-GO) |
+| ALE-147 | *(CANCELED — duplicate)* | ❌ Canceled |
+
+## Beta readiness blockers
 - ALE-90.1 (AI progress indicator) — P0 origin, may need separate issue
 - ALE-90.5 (Calendar monthly view) — P1 feature request
 - Dashboard demo text confusion — from synthetic test (P0 if real users hit it)
