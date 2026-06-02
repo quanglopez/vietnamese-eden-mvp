@@ -1,9 +1,9 @@
 # Project status — Vietnamese Eden MVP
 
-**Cập nhật:** 2026-06-02 (ALE-158 Done — M8 source quality badges shipped)
+**Cập nhật:** 2026-06-02 (ALE-157 Done — M8 Social URL Importer **COMPLETE** for beta)
 **Production:** [https://vietnamese-eden-mvp.vercel.app/](https://vietnamese-eden-mvp.vercel.app/)
-**Latest deploy:** commit `f452acd` on `main` (ALE-158 Done)
-**Mục tiêu tiếp theo:** [ALE-159](https://linear.app/alexgpt/issue/ALE-159) — URL Analysis Pipeline using best available source (M8 final)
+**Latest deploy:** PR #8 merge to `main` (ALE-157 Done)
+**Mục tiêu tiếp theo:** Cohort 2 feedback collection — [beta feedback sheet](https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/)
 Feedback source of truth:
 
 [https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/](https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/)
@@ -43,10 +43,10 @@ Feedback source of truth:
 | Inviting next cohort | **Cohort 2: inviting** 📨 |
 | Cohort 2 feedback tracking | [beta-feedback-round-2.md](./beta-feedback-round-2.md) |
 | **Next decision point** | **After 5 completed tests OR 7–10 days** (whichever first) |
-| **M8 milestone** | **Done** — pipeline shipped (ALE-154, ALE-155, ALE-156, ALE-158, ALE-159) | [social-url-importer-plan.md](./social-url-importer-plan.md) |
-| **Next implementation issue** | [ALE-159](https://linear.app/alexgpt/issue/ALE-159) — URL Analysis Pipeline using best available source (M8 final) |
+| **M8 milestone** | **COMPLETE** — pipeline shipped (ALE-154, ALE-155, ALE-156, ALE-157, ALE-158, ALE-159) | [social-url-importer-plan.md](./social-url-importer-plan.md) |
+| **Next recommended** | Cohort 2 feedback collection — [beta feedback sheet](https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/) |
 | **ALE-153 prerequisite** | ✅ [ALE-153](https://linear.app/alexgpt/issue/ALE-153) Done (commit `736ed99`, PR #2) — M8 importers unblocked |
-| **M8 progress** | ALE-154 ✅ Done · ALE-155 ✅ Done · ALE-156 ✅ Done · ALE-158 ✅ Done · ALE-159 → Next · ALE-157 → Backlog |
+| **M8 progress** | ALE-154 ✅ Done · ALE-155 ✅ Done · ALE-156 ✅ Done · ALE-157 ✅ Done · ALE-158 ✅ Done · ALE-159 ✅ Done |
 
 
 ---
@@ -109,8 +109,9 @@ Feedback source of truth:
 ## Changelog
 | Date | Summary |
 |------|---------|
-| 2026-06-02 | **ALE-156** — TikTok metadata importer Done (commit `02f0928`, PR #7). `TikTokImporter` with oEmbed + blocked fallback. Production smoke 5/5 PASS. Next: ALE-157. |
-| 2026-06-02 | **ALE-158** — M8 source quality badges Done (commit `f452acd`, PR #5). Badge component extends `shadcn/ui` cva với 6 source-quality variants (green/yellow/blue/orange/red). `getSourceQualityFromItem()` pure helper — heuristic mapping từ `rawContent`/`sourceUrl`/`platform` (không DB field). Hiển thị trên BreakdownView và ContentItemCard. Smoke 4/4 PASS: paste text, YouTube metadata, TikTok/Instagram blocked, URL thumbnail regression. Next: ALE-159. |
+| 2026-06-02 | **ALE-156** — TikTok metadata importer Done (commit `02f0928`, PR #7). `TikTokImporter` with oEmbed + blocked fallback. Production smoke 5/5 PASS. |
+| 2026-06-02 | **ALE-157** — Instagram oEmbed best-effort Done (commit PR #8 merge). `InstagramImporter` oEmbed best-effort, graceful fallback to `sourceQuality: "blocked"` khi oEmbed trả về login page. No crash, no HTML scraping. Unit tests 40/40 PASS (10 suites). **M8 COMPLETE** |
+| 2026-06-02 | **ALE-158** — M8 source quality badges Done (commit `f452acd`, PR #5). Badge component extends `shadcn/ui` cva. `getSourceQualityFromItem()` pure helper. Hiển thị trên BreakdownView và ContentItemCard. Smoke 4/4 PASS: paste text, YouTube metadata, TikTok/Instagram blocked, URL thumbnail regression. **M8 COMPLETE** |
 | 2026-06-02 | **ALE-159** — M8 URL Analysis Pipeline Done (commit `0a61000`, PR #6). Rewire `enrichContentItemFromUrl` → `importSocialUrl` + `pickAnalysisInput`. YouTube metadata_only → AI runs with `sourceQuality` prop. TikTok/Instagram blocked → no AI + specific CTA. AI prompt hint with `sourceQuality` label. 34/34 unit tests pass. |
 | 2026-06-02 | **ALE-155** — M8 YouTube metadata importer Done (commit `69109f3`, PR #4). Real `YouTubeImporter.import()` reusing existing `extractYouTubeVideoId` + `normalizeYouTubeUrlForOEmbed` + `fetchUrlEmbedMetadata`. Supports 4 URL forms → canonical watch?v= + hqdefault thumbnail + oEmbed title/author. Transcript seam (`TranscriptFetcher` interface + `DisabledTranscriptFetcher` default) added but disabled. 31/31 unit tests pass (8 new YouTube tests use mocked fetcher). No production rewire. |
 | 2026-06-02 | **ALE-154** — M8 Social URL Importer foundation Done (commit `1a5ddff`, PR #3). Types (`SourceQuality`, `SocialPlatform`, `SocialImportResult`, `SocialUrlImporter`) + `pickAnalysisInput` priority helper + 6 adapter stubs (YouTube metadata-only / TikTok blocked / Instagram blocked / Facebook manual_required / LinkedIn manual_required / Unknown fallback). 23/23 unit tests pass. Zero behavior change — module not yet wired into pipeline (deferred to ALE-159). |

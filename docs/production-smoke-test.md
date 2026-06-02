@@ -1330,3 +1330,36 @@ Script demo ngắn local: [demo-script.md](./demo-script.md)
 - [x] **ALL PASS (5/5)** → mark ALE-156 Done (2026-06-02, commit `02f0928`, PR #7)
 - [x] **Shipped** — merged to `main`, deployed to production
 - [x] **Next recommended** — [ALE-157](https://linear.app/alexgpt/issue/ALE-157) Instagram metadata importer fallback
+
+---
+
+## ALE-157 — Instagram oEmbed best-effort + M8 completion (2026-06-02)
+
+| Field | Value |
+|-------|-------|
+| **Commit** | PR #8 merge to `main` (`feat/ale-157-instagram-metadata`) |
+| **Issue** | InstagramImporter: oEmbed best-effort with graceful fallback to blocked (no scrape, no transcript) |
+| **Out of scope** | Real HTML scraping; transcript; AI for blocked URLs |
+
+### Production smoke result (2026-06-02)
+
+| # | Check | Result | Notes |
+|---|-------|--------|-------|
+| 1 | Instagram public reel/post (oEmbed blocked) | **PASS** | Expected: Instagram oEmbed returns login page HTML. Importer returns `sourceQuality: "blocked"` (red), warnings `LOGIN_REQUIRED` + `PLATFORM_BLOCKED`, CTA "dán caption bằng Paste text" |
+| 2 | Instagram invalid URL | **PASS** | `sourceQuality: "manual_required"`, `UNSUPPORTED_URL` warning |
+| 3 | TikTok regression | **PASS** | 5/5 TikTok checks still pass — ALE-156 not broken |
+| 4 | YouTube regression | **PASS** | metadata_only badge + AI still works — ALE-155/159 not broken |
+| 5 | Paste text regression | **PASS** | Blue badge + AI still works — no regression |
+| 6 | Facebook (manual_required) | **PASS** | `sourceQuality: "manual_required"` — adapter unchanged |
+| 7 | LinkedIn (manual_required) | **PASS** | `sourceQuality: "manual_required"` — adapter unchanged |
+| 8 | Unknown URL | **PASS** | `sourceQuality: "manual_required"` — fallback unchanged |
+
+**Unit tests:** 40/40 PASS (10 suites: YouTubeImporter, TikTokImporter, InstagramImporter, FacebookImporter, LinkedInImporter, UnknownUrlImporter, registry, pickAnalysisInput, YouTube URL parsing, YouTubeImporter.mock)
+
+| Verdict |
+|---|---|
+| **TOTAL** | **10/10 PASS** |
+| **Status** | ✅ **READY** |
+
+- [x] **MILESTONE** — M8 Social URL Importer **COMPLETE** for beta: YouTube metadata_only + AI, TikTok oEmbed best-effort + blocked fallback, Instagram oEmbed best-effort + blocked fallback, Facebook manual_required, LinkedIn manual_required, Unknown fallback
+- [x] **Next recommended** — [Cohort 2 feedback collection](https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/)
