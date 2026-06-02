@@ -13,7 +13,8 @@
     "supabase:reset": "supabase db reset",
     "supabase:status": "supabase status",
     "supabase:test": "tsx scripts/test-supabase-connection.ts",
-    "auth:test": "tsx scripts/test-auth-flow.ts"
+    "auth:test": "tsx scripts/test-auth-flow.ts",
+    "smoke:browser": "tsx scripts/browser-use/index.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
@@ -35,6 +36,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
