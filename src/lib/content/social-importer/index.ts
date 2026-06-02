@@ -1,3 +1,9 @@
+import { FacebookImporter } from "@/lib/content/social-importer/adapters/facebook";
+import { InstagramImporter } from "@/lib/content/social-importer/adapters/instagram";
+import { LinkedInImporter } from "@/lib/content/social-importer/adapters/linkedin";
+import { TikTokImporter } from "@/lib/content/social-importer/adapters/tiktok";
+import { UnknownUrlImporter } from "@/lib/content/social-importer/adapters/unknown";
+import { YouTubeImporter } from "@/lib/content/social-importer/adapters/youtube";
 import { pickAnalysisInput } from "@/lib/content/social-importer/priority";
 import type {
   SocialImportResult,
@@ -19,15 +25,25 @@ export type {
 
 export { pickAnalysisInput };
 
-/** Registry adapter — Commit 2 sẽ gán danh sách thật. */
-export const ADAPTERS: SocialUrlImporter[] = [];
+/** Registry adapter — thứ tự quan trọng; Unknown luôn cuối. */
+export const ADAPTERS: SocialUrlImporter[] = [
+  new YouTubeImporter(),
+  new TikTokImporter(),
+  new InstagramImporter(),
+  new FacebookImporter(),
+  new LinkedInImporter(),
+  new UnknownUrlImporter(),
+];
 
 /**
- * Import URL qua adapter phù hợp. Chưa kích hoạt cho đến Commit 2.
+ * Import URL qua adapter đầu tiên khớp `canHandle`.
  */
 export async function importSocialUrl(url: string): Promise<SocialImportResult> {
-  void url;
-  throw new Error(
-    "importSocialUrl chưa được kích hoạt — Commit 2 sẽ wire registry",
-  );
+  for (const adapter of ADAPTERS) {
+    if (adapter.canHandle(url)) {
+      return adapter.import(url);
+    }
+  }
+
+  throw new Error("Không có adapter nào khớp URL — kiểm tra registry.");
 }
