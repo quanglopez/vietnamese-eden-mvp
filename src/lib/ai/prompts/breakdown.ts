@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+import {
+  getSourceQualityDescription,
+  getSourceQualityLabel,
+} from "@/lib/content/analysis-source-quality";
+import type { AnalysisSourceQualityHint } from "@/lib/ai/types";
+
 export const breakdownAnalysisSchema = z.object({
   hook: z.string().min(1),
   angle: z.string().min(1),
@@ -57,16 +63,24 @@ export function buildBreakdownUserPrompt(input: {
   rawContent: string;
   sourceUrl?: string | null;
   vietnameseOnlyRepair?: boolean;
+  sourceQuality?: AnalysisSourceQualityHint | null;
 }): string {
+  const qualityLine = input.sourceQuality
+    ? `Nguồn dữ liệu phân tích: ${getSourceQualityLabel(input.sourceQuality)}. Lưu ý: ${
+        getSourceQualityDescription(input.sourceQuality) ?? ""
+      }`.trim()
+    : null;
+
   const base = [
     `Tiêu đề: ${input.title}`,
     `Nền tảng: ${input.platform}`,
     input.sourceUrl ? `Link nguồn: ${input.sourceUrl}` : null,
+    qualityLine,
     "",
     "Nội dung cần phân tích:",
     input.rawContent,
   ]
-    .filter((line) => line !== null)
+    .filter((line) => line !== null && line !== "")
     .join("\n");
 
   return input.vietnameseOnlyRepair

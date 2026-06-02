@@ -5,6 +5,13 @@ import type { ContentAnalysisView } from "@/types/analysis";
 import type { RemixFormat, RemixTone } from "@/types/remix";
 import type { VoiceProfileView } from "@/types/voice";
 
+/** Gợi ý chất lượng nguồn gửi vào prompt Breakdown (ALE-159). */
+export type AnalysisSourceQualityHint =
+  | "transcript"
+  | "caption"
+  | "paste_text"
+  | "metadata_only";
+
 export type AnalysisProviderInput = {
   title: string;
   platform: string;
@@ -12,6 +19,8 @@ export type AnalysisProviderInput = {
   sourceUrl?: string | null;
   /** Retry với prompt siết tiếng Việt sau khi guard ALE-153 phát hiện rò rỉ. */
   vietnameseOnlyRepair?: boolean;
+  /** Chất lượng nguồn — giúp model biết mức độ tin cậy của rawContent. */
+  sourceQuality?: AnalysisSourceQualityHint | null;
 };
 
 export interface ContentAnalysisProvider {
