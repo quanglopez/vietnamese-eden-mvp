@@ -19,6 +19,18 @@ const badgeVariants = cva(
         ghost:
           "hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50",
         link: "text-primary underline-offset-4 hover:underline",
+        /** M8 source quality (ALE-158) — additive, không đổi variant mặc định */
+        transcript: "border-transparent bg-green-500 text-white [a]:hover:bg-green-500/90",
+        caption:
+          "border-transparent bg-yellow-500 text-yellow-950 [a]:hover:bg-yellow-500/90",
+        paste_text:
+          "border-transparent bg-blue-500 text-white [a]:hover:bg-blue-500/90",
+        metadata_only:
+          "border-transparent bg-orange-500 text-white [a]:hover:bg-orange-500/90",
+        blocked:
+          "border-transparent bg-red-500 text-white [a]:hover:bg-red-500/90",
+        manual_required:
+          "border-transparent bg-red-500 text-white [a]:hover:bg-red-500/90",
       },
     },
     defaultVariants: {
