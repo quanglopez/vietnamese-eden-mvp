@@ -42,3 +42,25 @@ export type BoardDetail = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type SavedBoardViewPlatform =
+  | "tiktok"
+  | "instagram"
+  | "youtube"
+  | "facebook"
+  | "linkedin"
+  | "other";
+
+export type BoardSavedView = {
+  id: string;
+  workspaceId: string;
+  boardId: string;
+  createdBy: string;
+  name: string;
+  searchQuery: string | null;
+  platformFilters: SavedBoardViewPlatform[] | null;
+  tagFilters: string[] | null;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+};

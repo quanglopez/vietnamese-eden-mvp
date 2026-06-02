@@ -7,6 +7,7 @@ import {
   getBoardById,
   listBoardContentItems,
 } from "@/lib/boards/queries";
+import { getSavedViewsForBoard } from "@/lib/boards/saved-views-queries";
 import { listTagsForWorkspace } from "@/lib/content/tag-queries";
 import { isValidUuid } from "@/lib/boards/utils";
 import { createClient } from "@/lib/supabase/server";
@@ -62,21 +63,21 @@ export default async function BoardDetailPage({ params }: BoardDetailPageProps) 
     notFound();
   }
 
-  const { items, error: itemsError } = await listBoardContentItems(
-    supabase,
-    params.boardId,
-  );
-  const { tags: workspaceTags, error: tagsError } = await listTagsForWorkspace(
-    supabase,
-    board.workspaceId,
-  );
-  const mergedError = [itemsError, tagsError].filter(Boolean).join(" ") || null;
+  const [{ items, error: itemsError }, { tags: workspaceTags, error: tagsError }, savedViewsResult] =
+    await Promise.all([
+      listBoardContentItems(supabase, params.boardId),
+      listTagsForWorkspace(supabase, board.workspaceId),
+      getSavedViewsForBoard(supabase, params.boardId),
+    ]);
+  const mergedError =
+    [itemsError, tagsError, savedViewsResult.error].filter(Boolean).join(" ") || null;
 
   return (
     <BoardDetailView
       board={board}
       items={items}
       workspaceTags={workspaceTags}
+      savedViews={savedViewsResult.views}
       fetchError={mergedError}
     />
   );

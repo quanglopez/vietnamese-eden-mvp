@@ -10,6 +10,7 @@ import {
   Grid3x3,
   List,
   Plus,
+  Save,
   SearchX,
   Share2,
   Sparkles,
@@ -19,15 +20,35 @@ import {
 import { AppShell } from "@/components/custom/app/app-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { formatBoardUpdatedAt } from "@/lib/boards/constants";
+import {
+  createSavedViewAction,
+  deleteSavedViewAction,
+} from "@/lib/boards/saved-views-actions";
 import {
   assignTagToContent,
   createTag,
   deleteTag,
   removeTagFromContent,
 } from "@/lib/content/tag-actions";
-import type { BoardDetail } from "@/types/boards";
+import type { BoardDetail, BoardSavedView, SavedBoardViewPlatform } from "@/types/boards";
 import type { BoardContentItem } from "@/types/content";
 import type { ManualTag } from "@/types/tags";
 
@@ -38,6 +59,7 @@ type BoardDetailViewProps = {
   board: BoardDetail;
   items: BoardContentItem[];
   workspaceTags: ManualTag[];
+  savedViews: BoardSavedView[];
   fetchError: string | null;
 };
 
@@ -77,6 +99,7 @@ export function BoardDetailView({
   board,
   items,
   workspaceTags,
+  savedViews,
   fetchError,
 }: BoardDetailViewProps) {
   const router = useRouter();
@@ -89,6 +112,10 @@ export function BoardDetailView({
     useState<FilterPlatform[]>([...FILTER_PLATFORMS]);
   const [activeTagIds, setActiveTagIds] = useState<string[]>([]);
   const [isTagPending, startTagTransition] = useTransition();
+  const [isViewPending, startViewTransition] = useTransition();
+  const [saveViewOpen, setSaveViewOpen] = useState(false);
+  const [saveViewName, setSaveViewName] = useState("");
+  const [viewFeedback, setViewFeedback] = useState<string | null>(null);
 
   const subtitle = `${board.contentCount} nội dung đã lưu · Cập nhật ${formatBoardUpdatedAt(board.updatedAt)}`;
 
@@ -98,6 +125,143 @@ export function BoardDetailView({
     }, 300);
     return () => clearTimeout(timer);
   }, [searchQuery]);
+
+  const currentFilters = useMemo(() => {
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+    const platformsToSave: SavedBoardViewPlatform[] | null =
+      activePlatforms.length === FILTER_PLATFORMS.length
+        ? null
+        : (activePlatforms as SavedBoardViewPlatform[]);
+    const tagsToSave = activeTagIds.length > 0 ? activeTagIds : null;
+    return {
+      searchQuery: normalizedQuery.length > 0 ? normalizedQuery : null,
+      platformFilters: platformsToSave ? new Set(platformsToSave) : null,
+      tagFilters: tagsToSave ? new Set(tagsToSave) : null,
+    };
+  }, [activePlatforms, activeTagIds, searchQuery]);
+
+  const activeSavedViewId = useMemo(() => {
+    for (const view of savedViews) {
+      const viewQuery = view.searchQuery?.trim().toLowerCase() ?? null;
+      if ((currentFilters.searchQuery ?? null) !== viewQuery) {
+        continue;
+      }
+
+      const viewPlatforms = view.platformFilters;
+      if (currentFilters.platformFilters === null) {
+        if (viewPlatforms !== null) {
+          continue;
+        }
+      } else {
+        if (!viewPlatforms) {
+          continue;
+        }
+        const platformSet = new Set(viewPlatforms);
+        if (platformSet.size !== currentFilters.platformFilters.size) {
+          continue;
+        }
+        let ok = true;
+        for (const p of currentFilters.platformFilters) {
+          if (!platformSet.has(p)) {
+            ok = false;
+            break;
+          }
+        }
+        if (!ok) {
+          continue;
+        }
+      }
+
+      const viewTags = view.tagFilters;
+      if (currentFilters.tagFilters === null) {
+        if (viewTags !== null) {
+          continue;
+        }
+      } else {
+        if (!viewTags) {
+          continue;
+        }
+        const tagSet = new Set(viewTags);
+        if (tagSet.size !== currentFilters.tagFilters.size) {
+          continue;
+        }
+        let ok = true;
+        for (const t of currentFilters.tagFilters) {
+          if (!tagSet.has(t)) {
+            ok = false;
+            break;
+          }
+        }
+        if (!ok) {
+          continue;
+        }
+      }
+
+      return view.id;
+    }
+    return null;
+  }, [currentFilters, savedViews]);
+
+  const applySavedView = (view: BoardSavedView) => {
+    setViewFeedback(null);
+    setSuccessMessage(`Đã áp dụng view "${view.name}".`);
+    setSearchQuery(view.searchQuery ?? "");
+    const platforms =
+      view.platformFilters && view.platformFilters.length > 0
+        ? (view.platformFilters as FilterPlatform[])
+        : [...FILTER_PLATFORMS];
+    setActivePlatforms(platforms);
+    setActiveTagIds(view.tagFilters ?? []);
+  };
+
+  const openSaveView = () => {
+    const defaultName = `Xem lọc ${new Date().toLocaleDateString("vi-VN")}`;
+    setSaveViewName(defaultName);
+    setViewFeedback(null);
+    setSaveViewOpen(true);
+  };
+
+  const handleCreateSavedView = () => {
+    setViewFeedback(null);
+    startViewTransition(async () => {
+      const result = await createSavedViewAction({
+        boardId: board.id,
+        workspaceId: board.workspaceId,
+        name: saveViewName,
+        searchQuery: searchQuery.trim() ? searchQuery : null,
+        platformFilters:
+          activePlatforms.length === FILTER_PLATFORMS.length
+            ? null
+            : (activePlatforms as SavedBoardViewPlatform[]),
+        tagFilters: activeTagIds.length > 0 ? activeTagIds : null,
+        sortOrder: 0,
+      });
+      if (!result.success) {
+        setViewFeedback(result.error);
+        return;
+      }
+      setSaveViewOpen(false);
+      setSuccessMessage("Đã lưu bộ lọc.");
+      router.refresh();
+    });
+  };
+
+  const handleDeleteSavedView = (view: BoardSavedView) => {
+    setViewFeedback(null);
+    startViewTransition(async () => {
+      const confirmed = window.confirm(`Xóa saved view "${view.name}"?`);
+      if (!confirmed) {
+        return;
+      }
+      const result = await deleteSavedViewAction({ boardId: board.id, viewId: view.id });
+      if (!result.success) {
+        setViewFeedback(result.error);
+        return;
+      }
+      setSuccessMessage("Đã xóa saved view.");
+      router.refresh();
+    });
+  };
 
   const handleAddSuccess = (message: string) => {
     setSuccessMessage(message);
@@ -288,6 +452,11 @@ export function BoardDetailView({
           {tagFeedback}
         </div>
       ) : null}
+      {viewFeedback ? (
+        <div className="mb-4 rounded-lg border border-border/60 bg-surface-elev px-3 py-2 text-sm">
+          {viewFeedback}
+        </div>
+      ) : null}
 
       <div
         className={`rounded-3xl bg-gradient-to-br ${board.gradientClass} p-8 mb-8 text-white relative overflow-hidden`}
@@ -326,24 +495,79 @@ export function BoardDetailView({
       </div>
 
       <div className="mb-6 space-y-3">
-        <div className="relative">
-          <Input
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-            aria-label="Tìm kiếm content"
-            placeholder="Tìm theo tiêu đề, nội dung hoặc URL..."
-            className="h-10 pr-10"
-          />
-          {searchQuery ? (
-            <button
-              type="button"
-              onClick={() => setSearchQuery("")}
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground"
-              aria-label="Xóa tìm kiếm"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          ) : null}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative flex-1 min-w-[240px]">
+            <Input
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              aria-label="Tìm kiếm content"
+              placeholder="Tìm theo tiêu đề, nội dung hoặc URL..."
+              className="h-10 pr-10"
+            />
+            {searchQuery ? (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground"
+                aria-label="Xóa tìm kiếm"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            ) : null}
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="gap-2"
+            onClick={openSaveView}
+            disabled={isViewPending}
+          >
+            <Save className="h-4 w-4" />
+            Lưu bộ lọc
+          </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button type="button" variant="outline" className="gap-2" disabled={isViewPending}>
+                <FolderOpen className="h-4 w-4" />
+                Saved views
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64">
+              <DropdownMenuLabel>Saved views</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {savedViews.length === 0 ? (
+                <DropdownMenuItem disabled>Chưa có saved view nào.</DropdownMenuItem>
+              ) : (
+                savedViews.map((view) => (
+                  <DropdownMenuItem
+                    key={view.id}
+                    onSelect={() => applySavedView(view)}
+                    className="flex items-center justify-between gap-2"
+                  >
+                    <span className="truncate">
+                      {activeSavedViewId === view.id ? "✓ " : ""}
+                      {view.name}
+                    </span>
+                    <button
+                      type="button"
+                      className="ml-2 text-muted-foreground hover:text-foreground"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleDeleteSavedView(view);
+                      }}
+                      aria-label={`Xóa saved view ${view.name}`}
+                      disabled={isViewPending}
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </DropdownMenuItem>
+                ))
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -533,6 +757,45 @@ export function BoardDetailView({
         onOpenChange={setAddOpen}
         onSuccess={handleAddSuccess}
       />
+
+      <Dialog open={saveViewOpen} onOpenChange={setSaveViewOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Lưu bộ lọc</DialogTitle>
+            <DialogDescription>
+              Lưu lại search + platform + tag filter hiện tại để dùng lại nhanh.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium" htmlFor="saved-view-name">
+              Tên view
+            </label>
+            <Input
+              id="saved-view-name"
+              value={saveViewName}
+              onChange={(e) => setSaveViewName(e.target.value)}
+              disabled={isViewPending}
+              placeholder="VD: Viral Hooks"
+            />
+          </div>
+
+          {viewFeedback ? (
+            <div className="rounded-lg border border-border/60 bg-surface-elev px-3 py-2 text-sm">
+              {viewFeedback}
+            </div>
+          ) : null}
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setSaveViewOpen(false)}>
+              Huỷ
+            </Button>
+            <Button type="button" onClick={handleCreateSavedView} disabled={isViewPending}>
+              Lưu
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
