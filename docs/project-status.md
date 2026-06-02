@@ -1,8 +1,8 @@
 # Project status — Vietnamese Eden MVP
 
-**Cập nhật:** 2026-06-02 (ALE-153 Done)
+**Cập nhật:** 2026-06-02 (ALE-154 Done — M8 foundation shipped)
 **Production:** [https://vietnamese-eden-mvp.vercel.app/](https://vietnamese-eden-mvp.vercel.app/)
-**Latest deploy:** commit `736ed99` on `main` (ALE-153 Done)
+**Latest deploy:** commit `1a5ddff` on `main` (ALE-154 Done)
 
 Feedback source of truth:
 
@@ -43,9 +43,10 @@ Feedback source of truth:
 | Inviting next cohort | **Cohort 2: inviting** 📨 |
 | Cohort 2 feedback tracking | [beta-feedback-round-2.md](./beta-feedback-round-2.md) |
 | **Next decision point** | **After 5 completed tests OR 7–10 days** (whichever first) |
-| **M8 milestone** | **Planned** (see [social-url-importer-plan.md](./social-url-importer-plan.md)) |
-| **Next implementation issue** | [ALE-154](https://linear.app/alexgpt/issue/ALE-154) — M8 Social URL Importer architecture |
+| **M8 milestone** | **In Progress** — foundation shipped (ALE-154) | [social-url-importer-plan.md](./social-url-importer-plan.md) |
+| **Next implementation issue** | [ALE-155](https://linear.app/alexgpt/issue/ALE-155) — M8 YouTube metadata + transcript importer |
 | **ALE-153 prerequisite** | ✅ [ALE-153](https://linear.app/alexgpt/issue/ALE-153) Done (commit `736ed99`, PR #2) — M8 importers unblocked |
+| **M8 progress** | ALE-154 ✅ Done · ALE-155/156/157/158/159 → Backlog |
 
 
 ---
@@ -108,6 +109,7 @@ Feedback source of truth:
 ## Changelog
 | Date | Summary |
 |------|---------|
+| 2026-06-02 | **ALE-154** — M8 Social URL Importer foundation Done (commit `1a5ddff`, PR #3). Types (`SourceQuality`, `SocialPlatform`, `SocialImportResult`, `SocialUrlImporter`) + `pickAnalysisInput` priority helper + 6 adapter stubs (YouTube metadata-only / TikTok blocked / Instagram blocked / Facebook manual_required / LinkedIn manual_required / Unknown fallback). 23/23 unit tests pass. Zero behavior change — module not yet wired into pipeline (deferred to ALE-159). |
 | 2026-06-02 | **ALE-153** — Non-Vietnamese leakage guard Done (commit `736ed99`, PR #2). Production smoke 4/4 PASS: YouTube watch?v=…, YouTube Shorts metadata-only breakdown, paste text regression, Remix CJK regression. 10/10 unit tests pass. M8 importers unblocked. |
 | 2026-06-01 | **M8 — Social URL Importer planned.** 6 issues created (ALE-154→159) under project M8. Architecture spec in `social-url-importer-plan.md`. Next implementation: ALE-154. ALE-153 is hard prerequisite. |
 | 2026-06-01 | **ALE-152** — URL preview + metadata enrichment (commit `fa08afe` + `18ae8e6`) — Done. YouTube Shorts parser fix shipped. |
