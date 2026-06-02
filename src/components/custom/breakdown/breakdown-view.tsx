@@ -3,10 +3,11 @@
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Link2, Wand2 } from "lucide-react";
+import { ArrowLeft, CalendarPlus, Link2, Sparkles, Wand2 } from "lucide-react";
 
 import { AppShell } from "@/components/custom/app/app-shell";
 import { ContentMediaCover } from "@/components/custom/content/content-media-cover";
+import { AddToCalendarDialog } from "@/components/custom/calendar/add-to-calendar-dialog";
 import {
   AiErrorBanner,
   AiLoadingOverlay,
@@ -18,23 +19,45 @@ import {
 } from "@/components/custom/breakdown/breakdown-sections";
 import { SourceQualityBadge } from "@/components/custom/breakdown/source-quality-badge";
 import type { SourceQuality } from "@/lib/content/social-importer/types";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { formatOutputCreatedAt } from "@/lib/remix/output-display";
 import { getPlatformLabel } from "@/lib/content/platform-styles";
 import { runContentAnalysisAction } from "@/lib/content/analysis-actions";
 import type { ContentAnalysisView, ContentItemDetail } from "@/types/analysis";
+import type { CalendarItemView } from "@/types/calendar";
+import type { GeneratedOutputView } from "@/types/remix";
 
 type BreakdownViewProps = {
   item: ContentItemDetail;
   analysis: ContentAnalysisView | null;
+  outputs: GeneratedOutputView[];
+  calendarItems: CalendarItemView[];
   canAnalyze: boolean;
   thumbnailUrl?: string | null;
   fetchError: string | null;
   sourceQuality: SourceQuality;
 };
 
+function formatCalendarDateTime(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+  return date.toLocaleString("vi-VN", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 export function BreakdownView({
   item,
   analysis: initialAnalysis,
+  outputs,
+  calendarItems,
   canAnalyze,
   thumbnailUrl,
   fetchError,
@@ -43,6 +66,7 @@ export function BreakdownView({
   const router = useRouter();
   const [analysis, setAnalysis] = useState(initialAnalysis);
   const [formError, setFormError] = useState<string | null>(null);
+  const [calendarOpen, setCalendarOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const loading = useAiLoadingTimer(isPending, "breakdown");
 
@@ -52,7 +76,8 @@ export function BreakdownView({
 
   const backHref = item.boardId ? `/boards/${item.boardId}` : "/boards";
   const remixHref = `/remix/${item.id}`;
-  const canOpenRemix = canAnalyze || Boolean(analysis);
+  const latestOutput = outputs[0] ?? null;
+  const canAddToCalendar = latestOutput !== null;
   const isBlockedQuality =
     sourceQuality === "blocked" || sourceQuality === "manual_required";
   const showBlockedCallout = !canAnalyze && isBlockedQuality;
@@ -74,9 +99,17 @@ export function BreakdownView({
 
   return (
     <AppShell
-      title="AI Breakdown"
+      title="Content Detail"
       subtitle={`${item.title} · ${getPlatformLabel(item.platform)}`}
     >
+      <AddToCalendarDialog
+        output={latestOutput}
+        contentItemId={item.id}
+        open={calendarOpen}
+        onOpenChange={setCalendarOpen}
+        onSuccess={() => router.refresh()}
+      />
+
       <Link
         href={backHref}
         className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6"
@@ -110,6 +143,67 @@ export function BreakdownView({
         </aside>
 
         <div className="space-y-4">
+          <div className="rounded-2xl border border-border/60 bg-surface-elev p-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                onClick={handleAnalyze}
+                disabled={isPending}
+                className="gap-2"
+              >
+                <Sparkles className="h-4 w-4" />
+                Phân tích AI
+              </Button>
+              <Button asChild variant="outline" className="gap-2">
+                <Link href={remixHref}>
+                  <Wand2 className="h-4 w-4" />
+                  Tạo remix
+                </Link>
+              </Button>
+              <Button
+                variant="outline"
+                className="gap-2"
+                onClick={() => setCalendarOpen(true)}
+                disabled={!canAddToCalendar}
+              >
+                <CalendarPlus className="h-4 w-4" />
+                Add to Calendar
+              </Button>
+            </div>
+            {!canAddToCalendar ? (
+              <p className="mt-2 text-xs text-muted-foreground">
+                Chưa có remix output để đưa vào lịch. Hãy tạo remix trước.
+              </p>
+            ) : null}
+          </div>
+
+          <SourceQualityBadge
+            quality={sourceQuality}
+            showDescription={false}
+            boardId={item.boardId}
+          />
+
+          {item.tags.length > 0 ? (
+            <div className="rounded-xl border border-border/60 bg-surface-elev p-3">
+              <p className="text-xs text-muted-foreground mb-2">Tags</p>
+              <div className="flex flex-wrap gap-1.5">
+                {item.tags.map((tag) => (
+                  <Badge
+                    key={tag.id}
+                    variant="outline"
+                    className="text-[11px]"
+                    style={{
+                      backgroundColor: tag.color ?? undefined,
+                      borderColor: tag.color ?? undefined,
+                      color: tag.color ? "#111827" : undefined,
+                    }}
+                  >
+                    {tag.name}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
           {showBlockedCallout ? (
             <SourceQualityBadge
               quality={sourceQuality}
@@ -157,29 +251,7 @@ export function BreakdownView({
                     isAnalyzing={isPending}
                   />
 
-                  <SourceQualityBadge
-                    quality={sourceQuality}
-                    showDescription={sourceQuality === "metadata_only"}
-                    boardId={item.boardId}
-                  />
-
                   {analysis && !isPending ? <BreakdownSections analysis={analysis} /> : null}
-
-                  {canOpenRemix ? (
-                    <div className="pt-2">
-                      <Button asChild variant="outline" className="gap-2 w-full sm:w-auto">
-                        <Link href={remixHref}>
-                          <Wand2 className="h-4 w-4" />
-                          Tạo remix
-                        </Link>
-                      </Button>
-                      {!analysis ? (
-                        <p className="mt-2 text-xs text-muted-foreground">
-                          Cần phân tích AI trước khi generate remix.
-                        </p>
-                      ) : null}
-                    </div>
-                  ) : null}
 
                   {!analysis && !isPending && !formError ? (
                     <div className="rounded-2xl border border-dashed border-border/80 p-8 text-center text-muted-foreground">
@@ -201,6 +273,59 @@ export function BreakdownView({
               {formError ? <AiErrorBanner message={formError} /> : null}
             </>
           ) : null}
+
+          <div className="rounded-2xl border border-border/60 bg-surface-elev p-4">
+            <h3 className="font-semibold">Remix outputs</h3>
+            {outputs.length > 0 ? (
+              <div className="mt-3 space-y-2">
+                {outputs.map((output) => (
+                  <div
+                    key={output.id}
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border/50 px-3 py-2"
+                  >
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">{output.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {output.formatLabel} · {output.toneLabel} ·{" "}
+                        {formatOutputCreatedAt(output.createdAt)}
+                      </p>
+                    </div>
+                    <Button asChild size="sm" variant="outline">
+                      <Link href={`/remix/${item.id}`}>Mở remix</Link>
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-2 text-sm text-muted-foreground">
+                Chưa có remix. Tạo remix từ AI Breakdown.
+              </p>
+            )}
+          </div>
+
+          <div className="rounded-2xl border border-border/60 bg-surface-elev p-4">
+            <h3 className="font-semibold">Calendar usage</h3>
+            {calendarItems.length > 0 ? (
+              <div className="mt-3 space-y-2">
+                {calendarItems.map((calendarItem) => (
+                  <div
+                    key={calendarItem.id}
+                    className="rounded-lg border border-border/50 px-3 py-2"
+                  >
+                    <p className="text-sm font-medium">{calendarItem.title}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatCalendarDateTime(calendarItem.scheduledAt)} ·{" "}
+                      {calendarItem.channelLabel} · {calendarItem.status}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-2 text-sm text-muted-foreground">
+                Chưa lên lịch. Thêm vào Content Calendar.
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </AppShell>

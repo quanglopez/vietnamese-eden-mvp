@@ -70,7 +70,25 @@ export async function getContentItemById(
 ): Promise<{ item: ContentItemDetail | null; error: string | null }> {
   const { data, error } = await supabase
     .from("content_items")
-    .select("id, workspace_id, title, platform, source_url, raw_content, author_name, saved_at")
+    .select(
+      `
+      id,
+      workspace_id,
+      title,
+      platform,
+      source_url,
+      raw_content,
+      author_name,
+      saved_at,
+      content_item_tags (
+        tags (
+          id,
+          name,
+          color
+        )
+      )
+    `,
+    )
     .eq("id", contentItemId)
     .maybeSingle();
 
@@ -80,6 +98,27 @@ export async function getContentItemById(
   if (!data) {
     return { item: null, error: null };
   }
+
+  type ContentItemWithTagsRow = {
+    id: string;
+    workspace_id: string;
+    title: string;
+    platform: PlatformType;
+    source_url: string | null;
+    raw_content: string | null;
+    author_name: string | null;
+    saved_at: string;
+    content_item_tags:
+      | {
+          tags: {
+            id: string;
+            name: string;
+            color: string | null;
+          } | null;
+        }[]
+      | null;
+  };
+  const row = data as ContentItemWithTagsRow;
 
   const { data: boardLink } = await supabase
     .from("board_content_items")
@@ -91,15 +130,23 @@ export async function getContentItemById(
 
   return {
     item: {
-      id: data.id,
-      workspaceId: data.workspace_id,
-      title: data.title,
-      platform: data.platform as PlatformType,
-      sourceUrl: data.source_url,
-      rawContent: data.raw_content,
-      authorName: data.author_name,
-      savedAt: data.saved_at,
+      id: row.id,
+      workspaceId: row.workspace_id,
+      title: row.title,
+      platform: row.platform,
+      sourceUrl: row.source_url,
+      rawContent: row.raw_content,
+      authorName: row.author_name,
+      savedAt: row.saved_at,
       boardId: boardLink?.board_id ?? null,
+      tags: (row.content_item_tags ?? [])
+        .map((row) => row.tags)
+        .filter((tag): tag is { id: string; name: string; color: string | null } => Boolean(tag))
+        .map((tag) => ({
+          id: tag.id,
+          name: tag.name,
+          color: tag.color,
+        })),
     },
     error: null,
   };

@@ -7,7 +7,9 @@ import {
   getContentItemById,
 } from "@/lib/content/analysis-queries";
 import { getSourceQualityFromItem } from "@/lib/content/analysis-source-quality";
+import { listCalendarItemsForWorkspace } from "@/lib/calendar/queries";
 import { enrichContentItemFromUrl } from "@/lib/content/enrich-url-content";
+import { listGeneratedOutputsByItemId } from "@/lib/content/remix-queries";
 import type { SourceQuality } from "@/lib/content/social-importer/types";
 import {
   fetchUrlEmbedMetadata,
@@ -61,25 +63,38 @@ export default async function BreakdownPage({ params }: BreakdownPageProps) {
     }
   }
 
-  const { analysis, error: analysisError } = await getContentAnalysisByItemId(
-    supabase,
-    contentItemId,
-  );
-
-  const embedMeta =
+  const [analysisResult, outputsResult, calendarResult, embedMeta] = await Promise.all([
+    getContentAnalysisByItemId(supabase, contentItemId),
+    listGeneratedOutputsByItemId(supabase, contentItemId),
+    listCalendarItemsForWorkspace(supabase, item.workspaceId),
     item.sourceUrl && !getLinkThumbnailUrl(item.sourceUrl, item.platform)
-      ? await fetchUrlEmbedMetadata(item.sourceUrl)
-      : null;
+      ? fetchUrlEmbedMetadata(item.sourceUrl)
+      : Promise.resolve(null),
+  ]);
+
+  const analysis = analysisResult.analysis;
+  const analysisError = analysisResult.error;
+  const outputs = outputsResult.outputs;
+  const outputsError = outputsResult.error;
+  const calendarItems = calendarResult.items.filter(
+    (calendarItem) => calendarItem.contentItemId === contentItemId,
+  );
+  const calendarError = calendarResult.error;
+
   const thumbnailUrl = resolveThumbnailUrl(item.sourceUrl, item.platform, embedMeta);
 
   const canAnalyze = Boolean(item.rawContent?.trim());
   const fetchError =
-    [itemError, analysisError, enrichError].filter(Boolean).join(" ") || null;
+    [itemError, analysisError, outputsError, calendarError, enrichError]
+      .filter(Boolean)
+      .join(" ") || null;
 
   return (
     <BreakdownView
       item={item}
       analysis={analysis}
+      outputs={outputs}
+      calendarItems={calendarItems}
       canAnalyze={canAnalyze}
       thumbnailUrl={thumbnailUrl}
       fetchError={fetchError}

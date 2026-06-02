@@ -34,4 +34,5 @@ export type ContentItemDetail = {
   authorName: string | null;
   savedAt: string;
   boardId: string | null;
+  tags: import("@/types/tags").ManualTag[];
 };
