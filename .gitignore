@@ -34,6 +34,10 @@ yarn-error.log*
 # browser use env
 .env.browser-use
 
+# local smoke env files (ALE-163/164)
+.env.smoke-test
+.env.local.backup
+
 # vercel
 .vercel
 
