@@ -6,7 +6,11 @@ import {
   getVoiceAnalysisProvider,
 } from "@/lib/ai/provider";
 import type { BreakdownAnalysisResult } from "@/lib/ai/prompts/breakdown";
-import type { AnalysisProviderInput, RemixGeneratorProvider } from "@/lib/ai/types";
+import type {
+  AnalysisProviderInput,
+  AnalysisSourceQualityHint,
+  RemixGeneratorProvider,
+} from "@/lib/ai/types";
 
 export { getActiveAiModelLabel } from "@/lib/ai/provider";
 
@@ -24,6 +28,7 @@ export async function analyzeContentText(input: {
   platform: string;
   rawContent: string;
   sourceUrl?: string | null;
+  sourceQuality?: AnalysisSourceQualityHint | null;
 }): Promise<BreakdownAnalysisResult> {
   try {
     return await analyzeContentTextOnce(input);

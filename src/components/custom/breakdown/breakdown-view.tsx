@@ -17,7 +17,7 @@ import {
   BreakdownStatusBanner,
 } from "@/components/custom/breakdown/breakdown-sections";
 import { SourceQualityBadge } from "@/components/custom/breakdown/source-quality-badge";
-import { getSourceQualityFromItem } from "@/lib/content/analysis-source-quality";
+import type { SourceQuality } from "@/lib/content/social-importer/types";
 import { Button } from "@/components/ui/button";
 import { getPlatformLabel } from "@/lib/content/platform-styles";
 import { runContentAnalysisAction } from "@/lib/content/analysis-actions";
@@ -29,6 +29,7 @@ type BreakdownViewProps = {
   canAnalyze: boolean;
   thumbnailUrl?: string | null;
   fetchError: string | null;
+  sourceQuality: SourceQuality;
 };
 
 export function BreakdownView({
@@ -37,6 +38,7 @@ export function BreakdownView({
   canAnalyze,
   thumbnailUrl,
   fetchError,
+  sourceQuality,
 }: BreakdownViewProps) {
   const router = useRouter();
   const [analysis, setAnalysis] = useState(initialAnalysis);
@@ -51,7 +53,6 @@ export function BreakdownView({
   const backHref = item.boardId ? `/boards/${item.boardId}` : "/boards";
   const remixHref = `/remix/${item.id}`;
   const canOpenRemix = canAnalyze || Boolean(analysis);
-  const sourceQuality = getSourceQualityFromItem(item);
   const isBlockedQuality =
     sourceQuality === "blocked" || sourceQuality === "manual_required";
   const showBlockedCallout = !canAnalyze && isBlockedQuality;

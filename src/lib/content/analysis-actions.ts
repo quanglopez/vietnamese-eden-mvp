@@ -11,8 +11,10 @@ import {
   getContentItemById,
 } from "@/lib/content/analysis-queries";
 import { createClient } from "@/lib/supabase/server";
+import { getSourceQualityFromItem } from "@/lib/content/analysis-source-quality";
 import { getPlatformLabel } from "@/lib/content/platform-styles";
 import { isValidUuid } from "@/lib/boards/utils";
+import type { SourceQuality } from "@/lib/content/social-importer/types";
 
 export async function runContentAnalysisAction(
   contentItemId: string,
@@ -38,12 +40,21 @@ export async function runContentAnalysisAction(
     return { success: false, error: "Không tìm thấy nội dung hoặc bạn không có quyền truy cập." };
   }
 
+  const sourceQuality = getSourceQualityFromItem(item);
+
+  if (sourceQuality === "blocked" || sourceQuality === "manual_required") {
+    return {
+      success: false,
+      error:
+        "Không lấy được caption/transcript từ link này. Hãy dán caption/script bằng Paste text.",
+    };
+  }
+
   const rawContent = item.rawContent?.trim() ?? "";
   if (rawContent.length === 0) {
     return {
       success: false,
-      error:
-        "Content này chỉ có URL. Hãy thêm nội dung thủ công trước khi phân tích.",
+      error: "Content này chỉ có URL. Hãy thêm nội dung thủ công.",
     };
   }
 
@@ -56,6 +67,7 @@ export async function runContentAnalysisAction(
       platform: getPlatformLabel(item.platform),
       rawContent,
       sourceUrl: item.sourceUrl,
+      sourceQuality: toAnalysisSourceQualityHint(sourceQuality),
     });
     analysisResult = providerResult;
     aiModel = getActiveAiModelLabel();
@@ -128,6 +140,20 @@ export async function runContentAnalysisAction(
 
   revalidateBreakdownPaths(contentItemId, item.boardId);
   return { success: true, data: { analysisId: data.id } };
+}
+
+function toAnalysisSourceQualityHint(
+  quality: SourceQuality,
+): "transcript" | "caption" | "paste_text" | "metadata_only" | null {
+  if (
+    quality === "transcript" ||
+    quality === "caption" ||
+    quality === "paste_text" ||
+    quality === "metadata_only"
+  ) {
+    return quality;
+  }
+  return null;
 }
 
 function revalidateBreakdownPaths(contentItemId: string, boardId: string | null) {
