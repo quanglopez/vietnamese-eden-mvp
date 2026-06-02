@@ -4,6 +4,7 @@ import {
   getBoardEmoji,
   getBoardGradient,
 } from "@/lib/boards/constants";
+import type { ManualTag } from "@/types/tags";
 import type { Database } from "@/types/database";
 import type { BoardContentItem, PlatformType } from "@/types/content";
 import type { BoardDetail, BoardListItem } from "@/types/boards";
@@ -79,6 +80,16 @@ type BoardContentJoinRow = {
     raw_content: string | null;
     author_name: string | null;
     saved_at: string;
+    content_item_tags:
+      | {
+          tag_id: string;
+          tags: {
+            id: string;
+            name: string;
+            color: string | null;
+          } | null;
+        }[]
+      | null;
   } | null;
 };
 
@@ -147,7 +158,15 @@ export async function listBoardContentItems(
         source_url,
         raw_content,
         author_name,
-        saved_at
+        saved_at,
+        content_item_tags (
+          tag_id,
+          tags (
+            id,
+            name,
+            color
+          )
+        )
       )
     `,
     )
@@ -167,6 +186,8 @@ export async function listBoardContentItems(
       return [];
     }
     return [
+      // Tag manual (ALE-162)
+      // de-dup theo id để phòng dữ liệu lặp từ join.
       {
         id: content.id,
         title: content.title,
@@ -177,6 +198,14 @@ export async function listBoardContentItems(
         savedAt: content.saved_at,
         sortOrder: row.sort_order,
         addedAt: row.added_at,
+        tags: Array.from(
+          new Map(
+            (content.content_item_tags ?? [])
+              .map((link) => link.tags)
+              .filter((tag): tag is NonNullable<typeof tag> => Boolean(tag))
+              .map((tag) => [tag.id, { id: tag.id, name: tag.name, color: tag.color } satisfies ManualTag]),
+          ).values(),
+        ),
       },
     ];
   });

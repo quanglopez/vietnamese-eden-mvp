@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -17,11 +17,19 @@ import {
 } from "lucide-react";
 
 import { AppShell } from "@/components/custom/app/app-shell";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatBoardUpdatedAt } from "@/lib/boards/constants";
+import {
+  assignTagToContent,
+  createTag,
+  deleteTag,
+  removeTagFromContent,
+} from "@/lib/content/tag-actions";
 import type { BoardDetail } from "@/types/boards";
 import type { BoardContentItem } from "@/types/content";
+import type { ManualTag } from "@/types/tags";
 
 import { AddContentModal } from "./add-content-modal";
 import { ContentItemCard } from "./content-item-card";
@@ -29,6 +37,7 @@ import { ContentItemCard } from "./content-item-card";
 type BoardDetailViewProps = {
   board: BoardDetail;
   items: BoardContentItem[];
+  workspaceTags: ManualTag[];
   fetchError: string | null;
 };
 
@@ -42,6 +51,7 @@ const FILTER_PLATFORMS = [
 ] as const;
 
 type FilterPlatform = (typeof FILTER_PLATFORMS)[number];
+const TAG_COLORS = ["#bfdbfe", "#fed7aa", "#fde68a", "#fecdd3", "#bbf7d0", "#ddd6fe", "#d9f99d"] as const;
 
 const FILTER_PLATFORM_LABELS: Record<FilterPlatform, string> = {
   tiktok: "TikTok",
@@ -63,14 +73,22 @@ function getItemFilterPlatform(item: BoardContentItem): FilterPlatform {
   return "other";
 }
 
-export function BoardDetailView({ board, items, fetchError }: BoardDetailViewProps) {
+export function BoardDetailView({
+  board,
+  items,
+  workspaceTags,
+  fetchError,
+}: BoardDetailViewProps) {
   const router = useRouter();
   const [addOpen, setAddOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [tagFeedback, setTagFeedback] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [activePlatforms, setActivePlatforms] =
     useState<FilterPlatform[]>([...FILTER_PLATFORMS]);
+  const [activeTagIds, setActiveTagIds] = useState<string[]>([]);
+  const [isTagPending, startTagTransition] = useTransition();
 
   const subtitle = `${board.contentCount} nội dung đã lưu · Cập nhật ${formatBoardUpdatedAt(board.updatedAt)}`;
 
@@ -100,6 +118,103 @@ export function BoardDetailView({ board, items, fetchError }: BoardDetailViewPro
     setActivePlatforms([...FILTER_PLATFORMS]);
   };
 
+  const addTagToItem = (contentItemId: string, tagName: string) => {
+    const normalizedName = tagName
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim()
+      .toLowerCase();
+
+    if (!normalizedName) {
+      return;
+    }
+
+    startTagTransition(async () => {
+      const existingGlobalTag = workspaceTags.find(
+        (tag) =>
+          tag.name
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .trim()
+            .toLowerCase() === normalizedName,
+      );
+
+      const pickedColor = TAG_COLORS[workspaceTags.length % TAG_COLORS.length] ?? null;
+      const created = existingGlobalTag
+        ? { success: true as const, data: { tag: existingGlobalTag } }
+        : await createTag({
+            workspaceId: board.workspaceId,
+            name: tagName.trim(),
+            color: pickedColor,
+            boardId: board.id,
+          });
+
+      if (!created.success) {
+        setTagFeedback(created.error);
+        return;
+      }
+
+      const assigned = await assignTagToContent({
+        contentItemId,
+        tagId: created.data.tag.id,
+        boardId: board.id,
+      });
+
+      if (!assigned.success) {
+        setTagFeedback(assigned.error);
+        return;
+      }
+
+      setTagFeedback("Đã cập nhật tag.");
+      router.refresh();
+    });
+  };
+
+  const toggleTagOnItem = (contentItemId: string, tagId: string) => {
+    const item = items.find((candidate) => candidate.id === contentItemId);
+    const exists = item?.tags.some((tag) => tag.id === tagId) ?? false;
+    startTagTransition(async () => {
+      const result = exists
+        ? await removeTagFromContent({ contentItemId, tagId, boardId: board.id })
+        : await assignTagToContent({ contentItemId, tagId, boardId: board.id });
+      if (!result.success) {
+        setTagFeedback(result.error);
+        return;
+      }
+      setTagFeedback("Đã cập nhật tag.");
+      router.refresh();
+    });
+  };
+
+  const deleteTagFromWorkspace = (tagId: string) => {
+    startTagTransition(async () => {
+      const confirmed = window.confirm(
+        "Xóa tag này khỏi workspace? Tag sẽ bị gỡ khỏi tất cả content.",
+      );
+      if (!confirmed) {
+        return;
+      }
+      const result = await deleteTag({ tagId, boardId: board.id });
+      if (!result.success) {
+        setTagFeedback(result.error);
+        return;
+      }
+      setTagFeedback("Đã xóa tag.");
+      setActiveTagIds((prev) => prev.filter((id) => id !== tagId));
+      router.refresh();
+    });
+  };
+
+  const toggleTagFilter = (tagId: string) => {
+    setActiveTagIds((prev) =>
+      prev.includes(tagId) ? prev.filter((value) => value !== tagId) : [...prev, tagId],
+    );
+  };
+
+  const clearTagFilter = () => {
+    setActiveTagIds([]);
+  };
+
   const isAllSelected = activePlatforms.length === FILTER_PLATFORMS.length;
 
   const filteredItems = useMemo(() => {
@@ -108,20 +223,33 @@ export function BoardDetailView({ board, items, fetchError }: BoardDetailViewPro
       if (!inPlatform) {
         return false;
       }
+      if (activeTagIds.length > 0) {
+        const currentTags = item.tags ?? [];
+        const hasSelectedTag = currentTags.some((tag) => activeTagIds.includes(tag.id));
+        if (!hasSelectedTag) {
+          return false;
+        }
+      }
       if (!debouncedQuery) {
         return true;
       }
       const haystack = `${item.title} ${item.rawContent ?? ""} ${item.sourceUrl ?? ""}`.toLowerCase();
       return haystack.includes(debouncedQuery);
     });
-  }, [activePlatforms, debouncedQuery, items]);
+  }, [activePlatforms, activeTagIds, debouncedQuery, items]);
 
   const hasSearch = debouncedQuery.length > 0;
   const hasPlatformFilter = !isAllSelected;
+  const hasTagFilter = activeTagIds.length > 0;
   const platformFilteredOnlyEmpty =
     filteredItems.length === 0 && !hasSearch && hasPlatformFilter;
+  const tagFilteredOnlyEmpty = filteredItems.length === 0 && !hasSearch && hasTagFilter;
   const selectedPlatformText = activePlatforms
     .map((platform) => FILTER_PLATFORM_LABELS[platform])
+    .join(", ");
+  const selectedTagText = workspaceTags
+    .filter((tag) => activeTagIds.includes(tag.id))
+    .map((tag) => tag.name)
     .join(", ");
 
   return (
@@ -153,6 +281,11 @@ export function BoardDetailView({ board, items, fetchError }: BoardDetailViewPro
           >
             <X className="h-4 w-4" />
           </button>
+        </div>
+      ) : null}
+      {tagFeedback ? (
+        <div className="mb-4 rounded-lg border border-border/60 bg-surface-elev px-3 py-2 text-sm">
+          {tagFeedback}
         </div>
       ) : null}
 
@@ -252,6 +385,56 @@ export function BoardDetailView({ board, items, fetchError }: BoardDetailViewPro
           </Button>
           </div>
         </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {workspaceTags.length > 0 ? (
+            workspaceTags.map((tag) => {
+              const active = activeTagIds.includes(tag.id);
+              return (
+                <div
+                  key={tag.id}
+                  className={`inline-flex items-center rounded-md border ${
+                    active ? "border-foreground/25 bg-foreground/10" : "border-border bg-background"
+                  }`}
+                >
+                  <button
+                    type="button"
+                    onClick={() => toggleTagFilter(tag.id)}
+                    className="px-1 py-1 text-xs"
+                    aria-label={`Lọc tag ${tag.name}`}
+                  >
+                    <Badge
+                      variant="outline"
+                      className="text-[11px]"
+                      style={{
+                        backgroundColor: tag.color ?? undefined,
+                        borderColor: tag.color ?? undefined,
+                        color: tag.color ? "#111827" : undefined,
+                      }}
+                    >
+                      {tag.name}
+                    </Badge>
+                  </button>
+                  <button
+                    type="button"
+                    className="pr-1 text-muted-foreground hover:text-foreground"
+                    aria-label={`Xóa tag ${tag.name}`}
+                    onClick={() => deleteTagFromWorkspace(tag.id)}
+                    disabled={isTagPending}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              );
+            })
+          ) : (
+            <p className="text-xs text-muted-foreground">Chưa có tag.</p>
+          )}
+          {hasTagFilter ? (
+            <Button type="button" variant="outline" size="sm" onClick={clearTagFilter}>
+              Xóa tag filter
+            </Button>
+          ) : null}
+        </div>
       </div>
 
       {items.length === 0 ? (
@@ -273,7 +456,14 @@ export function BoardDetailView({ board, items, fetchError }: BoardDetailViewPro
       ) : filteredItems.length > 0 ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredItems.map((item) => (
-            <ContentItemCard key={item.id} item={item} />
+            <ContentItemCard
+              key={item.id}
+              item={item}
+              tags={item.tags}
+              workspaceTags={workspaceTags}
+              onAddTag={addTagToItem}
+              onToggleTag={toggleTagOnItem}
+            />
           ))}
         </div>
       ) : (
@@ -298,6 +488,26 @@ export function BoardDetailView({ board, items, fetchError }: BoardDetailViewPro
               <p className="mt-2 text-sm text-muted-foreground">
                 Hãy chọn nền tảng khác hoặc thêm content mới.
               </p>
+            </>
+          ) : tagFilteredOnlyEmpty ? (
+            <>
+              <h2 className="font-display text-xl font-bold">
+                {hasPlatformFilter
+                  ? `Không có content ${selectedPlatformText} được gắn tag "${selectedTagText}"`
+                  : `Không có content nào được gắn tag "${selectedTagText}"`}
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Hãy chọn tag khác hoặc thêm tag cho content phù hợp.
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="mt-3"
+                onClick={clearTagFilter}
+              >
+                Xóa tag filter
+              </Button>
             </>
           ) : (
             <>

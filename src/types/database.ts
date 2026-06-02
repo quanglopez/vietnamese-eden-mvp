@@ -210,6 +210,54 @@ export type Database = {
         };
         Relationships: [];
       };
+      tags: {
+        Row: {
+          id: string;
+          workspace_id: string;
+          name: string;
+          name_normalized: string;
+          color: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          workspace_id: string;
+          name: string;
+          name_normalized: string;
+          color?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          workspace_id?: string;
+          name?: string;
+          name_normalized?: string;
+          color?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      content_item_tags: {
+        Row: {
+          content_item_id: string;
+          tag_id: string;
+          created_at: string;
+        };
+        Insert: {
+          content_item_id: string;
+          tag_id: string;
+          created_at?: string;
+        };
+        Update: {
+          content_item_id?: string;
+          tag_id?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
       content_analyses: {
         Row: {
           id: string;

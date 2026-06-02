@@ -1,25 +1,43 @@
 "use client";
 
 import Link from "next/link";
-import { Bookmark, Sparkles } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Bookmark, Plus, Sparkles, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { ContentMediaCover } from "@/components/custom/content/content-media-cover";
 import { SourceQualityBadge } from "@/components/custom/breakdown/source-quality-badge";
 import { getSourceQualityFromItem } from "@/lib/content/analysis-source-quality";
 import { getLinkThumbnailUrl } from "@/lib/content/url-metadata";
 import type { BoardContentItem } from "@/types/content";
+import type { ManualTag } from "@/types/tags";
 
 type ContentItemCardProps = {
   item: BoardContentItem;
+  tags: ManualTag[];
+  workspaceTags: ManualTag[];
+  onAddTag: (contentItemId: string, tagName: string) => void;
+  onToggleTag: (contentItemId: string, tagId: string) => void;
 };
 
-export function ContentItemCard({ item }: ContentItemCardProps) {
+export function ContentItemCard({
+  item,
+  tags,
+  workspaceTags,
+  onAddTag,
+  onToggleTag,
+}: ContentItemCardProps) {
   const thumbnailUrl = getLinkThumbnailUrl(item.sourceUrl, item.platform);
   const hasText = Boolean(item.rawContent?.trim());
   const breakdownHref = `/breakdown/${item.id}`;
   const sourceQuality = getSourceQualityFromItem(item);
   const showCompactBadge = sourceQuality !== "paste_text";
+  const [tagPanelOpen, setTagPanelOpen] = useState(false);
+  const [newTagName, setNewTagName] = useState("");
+
+  const displayedTags = useMemo(() => tags.slice(0, 3), [tags]);
+  const remainingTagCount = Math.max(tags.length - displayedTags.length, 0);
 
   return (
     <article className="group rounded-2xl border border-border/60 bg-surface-elev overflow-hidden hover:shadow-card transition flex flex-col">
@@ -57,6 +75,92 @@ export function ContentItemCard({ item }: ContentItemCardProps) {
         {showCompactBadge ? (
           <SourceQualityBadge quality={sourceQuality} showDescription={false} />
         ) : null}
+        {tags.length > 0 ? (
+          <div className="flex flex-wrap gap-1">
+            {displayedTags.map((tag) => (
+              <Badge
+                key={tag.id}
+                variant="outline"
+                className="text-[11px]"
+                style={{
+                  backgroundColor: tag.color ?? undefined,
+                  borderColor: tag.color ?? undefined,
+                  color: tag.color ? "#111827" : undefined,
+                }}
+              >
+                {tag.name}
+              </Badge>
+            ))}
+            {remainingTagCount > 0 ? (
+              <Badge variant="outline" className="text-[11px]">
+                +{remainingTagCount}
+              </Badge>
+            ) : null}
+          </div>
+        ) : null}
+        <div className="space-y-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="w-full gap-2"
+            onClick={() => setTagPanelOpen((prev) => !prev)}
+          >
+            <Plus className="h-3.5 w-3.5" />
+            Quản lý tag
+          </Button>
+          {tagPanelOpen ? (
+            <div className="rounded-lg border border-border/70 bg-muted/20 p-2 space-y-2">
+              <div className="flex gap-2">
+                <input
+                  value={newTagName}
+                  onChange={(event) => setNewTagName(event.target.value)}
+                  className="h-8 w-full rounded-md border border-input bg-background px-2 text-xs"
+                  placeholder="Tag mới..."
+                  aria-label="Tag mới cho content"
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={() => {
+                    const tagName = newTagName.trim();
+                    if (!tagName) {
+                      return;
+                    }
+                    onAddTag(item.id, tagName);
+                    setNewTagName("");
+                  }}
+                >
+                  Thêm
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-1">
+                {workspaceTags.length > 0 ? (
+                  workspaceTags.map((tag) => {
+                    const assigned = tags.some((current) => current.id === tag.id);
+                    return (
+                      <button
+                        key={tag.id}
+                        type="button"
+                        onClick={() => onToggleTag(item.id, tag.id)}
+                        className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[11px] ${
+                          assigned
+                            ? "border-foreground/20 bg-foreground/10"
+                            : "border-border bg-background"
+                        }`}
+                      >
+                        <span>{tag.name}</span>
+                        {assigned ? <X className="h-3 w-3" /> : null}
+                      </button>
+                    );
+                  })
+                ) : (
+                  <p className="text-[11px] text-muted-foreground">Chưa có tag trong board.</p>
+                )}
+              </div>
+            </div>
+          ) : null}
+        </div>
         <Button
           asChild
           variant={hasText ? "default" : "outline"}
