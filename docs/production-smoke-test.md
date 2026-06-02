@@ -1304,3 +1304,29 @@ Script demo ngắn local: [demo-script.md](./demo-script.md)
 - [x] **ALL PASS (7/7 core + 1 thumbnail + 1 remix = 9/9)** → mark ALE-159 Done (2026-06-02, commit `0a61000`, PR #6)
 - [x] **Shipped** — pipeline merged to `main`, deployed to production
 - [x] **M8 milestone** — foundation (ALE-154) + YouTube metadata (ALE-155) + badges (ALE-158) + pipeline (ALE-159) = **Done**
+
+---
+
+## ALE-156 — TikTok metadata importer + caption fallback (2026-06-02)
+
+| Field | Value |
+|-------|-------|
+| **Commit** | `02f0928` on `main` — PR #7 (`feat/ale-156-tiktok-metadata`) |
+| **Issue** | TikTok real oEmbed importer: `TikTokImporter.import()` uses `noembed.com` for title/caption + thumbnail; fallback to blocked if oEmbed fails |
+| **Out of scope** | Instagram real importer (ALE-157); transcript fetcher (disabled) |
+
+### Production smoke result (2026-06-02, commit `02f0928`)
+
+| # | Check | Result | Notes |
+|---|-------|--------|-------|
+| 1 | TikTok oEmbed success path | **PASS** | sourceQuality `caption` / `metadata_only` works |
+| 2 | TikTok oEmbed blocked path | **PASS** | sourceQuality `blocked` + Paste text CTA works |
+| 3 | No transcript claim | **PASS** | Breakdown does not claim transcript for metadata-only TikTok |
+| 4 | YouTube regression | **PASS** | No behavior change on YouTube watch/Shorts |
+| 5 | Paste text regression | **PASS** | No behavior change on paste text flow |
+
+### Verdict
+
+- [x] **ALL PASS (5/5)** → mark ALE-156 Done (2026-06-02, commit `02f0928`, PR #7)
+- [x] **Shipped** — merged to `main`, deployed to production
+- [x] **Next recommended** — [ALE-157](https://linear.app/alexgpt/issue/ALE-157) Instagram metadata importer fallback
