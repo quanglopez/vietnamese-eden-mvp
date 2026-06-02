@@ -1,9 +1,9 @@
 # Project status — Vietnamese Eden MVP
 
-**Cập nhật:** 2026-06-02 (ALE-157 Done — M8 Social URL Importer **COMPLETE** for beta)
+**Cập nhật:** 2026-06-02 (ALE-160 Done — Browser Use QA smoke runner)
 **Production:** [https://vietnamese-eden-mvp.vercel.app/](https://vietnamese-eden-mvp.vercel.app/)
-**Latest deploy:** PR #8 merge to `main` (ALE-157 Done)
-**Mục tiêu tiếp theo:** Cohort 2 feedback collection — [beta feedback sheet](https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/)
+**Latest deploy:** commit `293ebc2` (ALE-160 Done, PR #9)
+**Mục tiêu tiếp theo:** Cohort 2 feedback collection — [beta feedback sheet](https: //docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/)
 Feedback source of truth:
 
 [https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/](https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/)
@@ -129,6 +129,7 @@ Feedback source of truth:
 ## Changelog
 | Date | Summary |
 |------|---------|
+| 2026-06-02 | **ALE-160** — Browser Use QA smoke runner (commit `293ebc2`, PR #9). Local Playwright-based smoke tests in `scripts/browser-use/`. 7 tasks: auth, board, ai-breakdown, remix, voice-profile, calendar, m8-source-quality. Markdown report + screenshot on fail. `npm run smoke:browser` with `.env.browser-use` (gitignored). No production code changes — `scripts/browser-use/` excluded from app `tsconfig.json`. lint/build/type-check all PASS. Runner exits early if env missing. |
 | 2026-06-02 | **ALE-156** — TikTok metadata importer Done (commit `02f0928`, PR #7). `TikTokImporter` with oEmbed + blocked fallback. Production smoke 5/5 PASS. |
 | 2026-06-02 | **ALE-157** — Instagram oEmbed best-effort Done (commit PR #8 merge). `InstagramImporter` oEmbed best-effort, graceful fallback to `sourceQuality: "blocked"` khi oEmbed trả về login page. No crash, no HTML scraping. Unit tests 40/40 PASS (10 suites). **M8 COMPLETE** |
 | 2026-06-02 | **ALE-158** — M8 source quality badges Done (commit `f452acd`, PR #5). Badge component extends `shadcn/ui` cva. `getSourceQualityFromItem()` pure helper. Hiển thị trên BreakdownView và ContentItemCard. Smoke 4/4 PASS: paste text, YouTube metadata, TikTok/Instagram blocked, URL thumbnail regression. **M8 COMPLETE** |
