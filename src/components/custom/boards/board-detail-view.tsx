@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft,
+  ArrowRightLeft,
   CheckCircle2,
   FolderOpen,
   Grid3x3,
@@ -14,6 +15,8 @@ import {
   SearchX,
   Share2,
   Sparkles,
+  Tag,
+  Trash2,
   X,
 } from "lucide-react";
 
@@ -43,12 +46,22 @@ import {
   deleteSavedViewAction,
 } from "@/lib/boards/saved-views-actions";
 import {
+  bulkAddTagAction,
+  bulkMoveToBoardAction,
+  bulkUnlinkFromBoardAction,
+} from "@/lib/content/bulk-actions";
+import {
   assignTagToContent,
   createTag,
   deleteTag,
   removeTagFromContent,
 } from "@/lib/content/tag-actions";
-import type { BoardDetail, BoardSavedView, SavedBoardViewPlatform } from "@/types/boards";
+import type {
+  BoardDetail,
+  BoardListItem,
+  BoardSavedView,
+  SavedBoardViewPlatform,
+} from "@/types/boards";
 import type { BoardContentItem } from "@/types/content";
 import type { ManualTag } from "@/types/tags";
 
@@ -60,6 +73,7 @@ type BoardDetailViewProps = {
   items: BoardContentItem[];
   workspaceTags: ManualTag[];
   savedViews: BoardSavedView[];
+  workspaceBoards: BoardListItem[];
   fetchError: string | null;
 };
 
@@ -100,6 +114,7 @@ export function BoardDetailView({
   items,
   workspaceTags,
   savedViews,
+  workspaceBoards,
   fetchError,
 }: BoardDetailViewProps) {
   const router = useRouter();
@@ -116,8 +131,19 @@ export function BoardDetailView({
   const [saveViewOpen, setSaveViewOpen] = useState(false);
   const [saveViewName, setSaveViewName] = useState("");
   const [viewFeedback, setViewFeedback] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
+  const [bulkUnlinkOpen, setBulkUnlinkOpen] = useState(false);
+  const [bulkFeedback, setBulkFeedback] = useState<string | null>(null);
+  const [isBulkPending, startBulkTransition] = useTransition();
+  const lastClickedIndexRef = useRef<number | null>(null);
 
   const subtitle = `${board.contentCount} nội dung đã lưu · Cập nhật ${formatBoardUpdatedAt(board.updatedAt)}`;
+  const otherBoards = useMemo(
+    () => workspaceBoards.filter((b) => b.id !== board.id),
+    [workspaceBoards, board.id],
+  );
+  const selectedCount = selectedIds.size;
+  const selectedIdList = useMemo(() => Array.from(selectedIds), [selectedIds]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -416,6 +442,101 @@ export function BoardDetailView({
     .map((tag) => tag.name)
     .join(", ");
 
+  const clearSelection = () => {
+    setSelectedIds(new Set());
+    lastClickedIndexRef.current = null;
+  };
+
+  const handleSelectToggle = (id: string, mode: "single" | "range", index: number) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (mode === "range" && lastClickedIndexRef.current !== null) {
+        const start = Math.min(lastClickedIndexRef.current, index);
+        const end = Math.max(lastClickedIndexRef.current, index);
+        for (let i = start; i <= end; i++) {
+          const item = filteredItems[i];
+          if (item) {
+            next.add(item.id);
+          }
+        }
+      } else if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+    lastClickedIndexRef.current = index;
+  };
+
+  const handleBulkAddTag = (tagId: string, tagName: string) => {
+    if (selectedCount === 0) {
+      return;
+    }
+    setBulkFeedback(null);
+    startBulkTransition(async () => {
+      const result = await bulkAddTagAction({
+        contentItemIds: selectedIdList,
+        tagId,
+        boardId: board.id,
+      });
+      if (!result.success) {
+        setBulkFeedback(result.error);
+        return;
+      }
+      const { updated, failed } = result.data;
+      setSuccessMessage(
+        failed > 0
+          ? `Đã thêm tag "${tagName}" cho ${updated} nội dung (${failed} lỗi).`
+          : `Đã thêm tag "${tagName}" cho ${updated} nội dung.`,
+      );
+      clearSelection();
+      router.refresh();
+    });
+  };
+
+  const handleBulkUnlinkFromBoard = () => {
+    if (selectedCount === 0) {
+      return;
+    }
+    setBulkFeedback(null);
+    startBulkTransition(async () => {
+      const result = await bulkUnlinkFromBoardAction({
+        contentItemIds: selectedIdList,
+        boardId: board.id,
+      });
+      if (!result.success) {
+        setBulkFeedback(result.error);
+        return;
+      }
+      setBulkUnlinkOpen(false);
+      setSuccessMessage(`Đã gỡ ${result.data.removed} nội dung khỏi bảng.`);
+      clearSelection();
+      router.refresh();
+    });
+  };
+
+  const handleBulkMove = (targetBoardId: string, targetBoardName: string) => {
+    if (selectedCount === 0) {
+      return;
+    }
+    setBulkFeedback(null);
+    startBulkTransition(async () => {
+      const result = await bulkMoveToBoardAction({
+        contentItemIds: selectedIdList,
+        sourceBoardId: board.id,
+        targetBoardId,
+      });
+      if (!result.success) {
+        setBulkFeedback(result.error);
+        return;
+      }
+      setSuccessMessage(`Đã chuyển ${result.data.moved} nội dung sang bảng "${targetBoardName}".`);
+      clearSelection();
+      router.refresh();
+    });
+  };
+
   return (
     <AppShell title={board.name} subtitle={subtitle}>
       <div className="mb-6">
@@ -455,6 +576,11 @@ export function BoardDetailView({
       {viewFeedback ? (
         <div className="mb-4 rounded-lg border border-border/60 bg-surface-elev px-3 py-2 text-sm">
           {viewFeedback}
+        </div>
+      ) : null}
+      {bulkFeedback ? (
+        <div className="mb-4 rounded-lg border border-border/60 bg-surface-elev px-3 py-2 text-sm">
+          {bulkFeedback}
         </div>
       ) : null}
 
@@ -678,13 +804,17 @@ export function BoardDetailView({
           </Button>
         </div>
       ) : filteredItems.length > 0 ? (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredItems.map((item) => (
+        <div
+          className={`grid sm:grid-cols-2 lg:grid-cols-3 gap-5 ${selectedCount > 0 ? "pb-24" : ""}`}
+        >
+          {filteredItems.map((item, index) => (
             <ContentItemCard
               key={item.id}
               item={item}
               tags={item.tags}
               workspaceTags={workspaceTags}
+              selected={selectedIds.has(item.id)}
+              onSelectToggle={(id, mode) => handleSelectToggle(id, mode, index)}
               onAddTag={addTagToItem}
               onToggleTag={toggleTagOnItem}
             />
@@ -757,6 +887,132 @@ export function BoardDetailView({
         onOpenChange={setAddOpen}
         onSuccess={handleAddSuccess}
       />
+
+      {selectedCount > 0 ? (
+        <div
+          className="fixed bottom-6 left-1/2 z-40 flex w-[calc(100%-2rem)] max-w-3xl -translate-x-1/2 flex-wrap items-center gap-2 rounded-2xl border border-border/80 bg-background/95 px-4 py-3 shadow-lg backdrop-blur"
+          data-testid="bulk-action-toolbar"
+        >
+          <span className="text-sm font-medium shrink-0">
+            Đã chọn {selectedCount} nội dung
+          </span>
+          <div className="flex flex-wrap items-center gap-2 ml-auto">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  disabled={isBulkPending || selectedCount === 0 || workspaceTags.length === 0}
+                >
+                  <Tag className="h-4 w-4" />
+                  Thêm tag
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuLabel>Chọn tag</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {workspaceTags.length === 0 ? (
+                  <DropdownMenuItem disabled>Chưa có tag.</DropdownMenuItem>
+                ) : (
+                  workspaceTags.map((tag) => (
+                    <DropdownMenuItem
+                      key={tag.id}
+                      onSelect={() => handleBulkAddTag(tag.id, tag.name)}
+                    >
+                      {tag.name}
+                    </DropdownMenuItem>
+                  ))
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  disabled={isBulkPending || selectedCount === 0 || otherBoards.length === 0}
+                  title={
+                    otherBoards.length === 0
+                      ? "Không có bảng khác trong workspace."
+                      : undefined
+                  }
+                >
+                  <ArrowRightLeft className="h-4 w-4" />
+                  Chuyển board
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>Chọn bảng đích</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {otherBoards.length === 0 ? (
+                  <DropdownMenuItem disabled>Không có bảng khác.</DropdownMenuItem>
+                ) : (
+                  otherBoards.map((target) => (
+                    <DropdownMenuItem
+                      key={target.id}
+                      onSelect={() => handleBulkMove(target.id, target.name)}
+                    >
+                      {target.name}
+                    </DropdownMenuItem>
+                  ))
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              className="gap-2"
+              disabled={isBulkPending || selectedCount === 0}
+              onClick={() => setBulkUnlinkOpen(true)}
+            >
+              <Trash2 className="h-4 w-4" />
+              Gỡ khỏi board
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={clearSelection}
+              disabled={isBulkPending}
+            >
+              Bỏ chọn
+            </Button>
+          </div>
+        </div>
+      ) : null}
+
+      <Dialog open={bulkUnlinkOpen} onOpenChange={setBulkUnlinkOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Gỡ khỏi bảng</DialogTitle>
+            <DialogDescription>
+              {selectedCount} nội dung đã chọn sẽ được gỡ khỏi bảng &quot;{board.name}&quot; —
+              không xóa vĩnh viễn khỏi workspace. Nội dung gốc vẫn giữ trong thư viện workspace;
+              nếu mục đó còn ở bảng khác, bạn vẫn thấy ở các bảng đó.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setBulkUnlinkOpen(false)}>
+              Huỷ
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={handleBulkUnlinkFromBoard}
+              disabled={isBulkPending || selectedCount === 0}
+            >
+              Gỡ {selectedCount} mục khỏi bảng
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={saveViewOpen} onOpenChange={setSaveViewOpen}>
         <DialogContent>

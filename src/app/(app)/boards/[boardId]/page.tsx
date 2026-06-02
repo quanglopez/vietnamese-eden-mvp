@@ -6,6 +6,7 @@ import { BoardDetailView } from "@/components/custom/boards/board-detail-view";
 import {
   getBoardById,
   listBoardContentItems,
+  listBoardsForWorkspace,
 } from "@/lib/boards/queries";
 import { getSavedViewsForBoard } from "@/lib/boards/saved-views-queries";
 import { listTagsForWorkspace } from "@/lib/content/tag-queries";
@@ -63,14 +64,21 @@ export default async function BoardDetailPage({ params }: BoardDetailPageProps) 
     notFound();
   }
 
-  const [{ items, error: itemsError }, { tags: workspaceTags, error: tagsError }, savedViewsResult] =
-    await Promise.all([
-      listBoardContentItems(supabase, params.boardId),
-      listTagsForWorkspace(supabase, board.workspaceId),
-      getSavedViewsForBoard(supabase, params.boardId),
-    ]);
+  const [
+    { items, error: itemsError },
+    { tags: workspaceTags, error: tagsError },
+    savedViewsResult,
+    { boards: workspaceBoards, error: boardsListError },
+  ] = await Promise.all([
+    listBoardContentItems(supabase, params.boardId),
+    listTagsForWorkspace(supabase, board.workspaceId),
+    getSavedViewsForBoard(supabase, params.boardId),
+    listBoardsForWorkspace(supabase, board.workspaceId),
+  ]);
   const mergedError =
-    [itemsError, tagsError, savedViewsResult.error].filter(Boolean).join(" ") || null;
+    [itemsError, tagsError, savedViewsResult.error, boardsListError]
+      .filter(Boolean)
+      .join(" ") || null;
 
   return (
     <BoardDetailView
@@ -78,6 +86,7 @@ export default async function BoardDetailPage({ params }: BoardDetailPageProps) 
       items={items}
       workspaceTags={workspaceTags}
       savedViews={savedViewsResult.views}
+      workspaceBoards={workspaceBoards}
       fetchError={mergedError}
     />
   );
