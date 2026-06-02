@@ -85,7 +85,7 @@ function getOEmbedEndpoint(sourceUrl: string): string | null {
  * Returns the original URL if it isn't a recognized YouTube pattern,
  * so this is a safe no-op for other hosts.
  */
-function normalizeYouTubeUrlForOEmbed(sourceUrl: string): string {
+export function normalizeYouTubeUrlForOEmbed(sourceUrl: string): string {
   const id = extractYouTubeVideoId(sourceUrl);
   if (!id) return sourceUrl;
   return `https://www.youtube.com/watch?v=${id}`;

@@ -10,6 +10,8 @@ import { YouTubeImporter } from "@/lib/content/social-importer/adapters/youtube"
 import { ADAPTERS, importSocialUrl } from "@/lib/content/social-importer/index";
 
 const YOUTUBE_URL = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+const YOUTUBE_VIDEO_ID = "dQw4w9WgXcQ";
+const YOUTUBE_THUMB = `https://img.youtube.com/vi/${YOUTUBE_VIDEO_ID}/hqdefault.jpg`;
 const TIKTOK_URL = "https://www.tiktok.com/@creator/video/1234567890";
 const INSTAGRAM_URL = "https://www.instagram.com/reel/ABC123/";
 const FACEBOOK_URL = "https://www.facebook.com/watch/?v=123";
@@ -17,18 +19,30 @@ const LINKEDIN_URL = "https://www.linkedin.com/posts/user_activity-123";
 const OTHER_URL = "https://example.com/page";
 
 describe("YouTubeImporter", () => {
-  const importer = new YouTubeImporter();
+  const importer = new YouTubeImporter({
+    fetchMetadata: async () => ({
+      title: "Tiêu đề test",
+      author: "Kênh test",
+      description: null,
+      thumbnailUrl: YOUTUBE_THUMB,
+    }),
+    transcriptFetcher: { fetchTranscript: async () => null },
+  });
 
   it("canHandle nhận diện URL YouTube", () => {
     assert.equal(importer.canHandle(YOUTUBE_URL), true);
     assert.equal(importer.canHandle(OTHER_URL), false);
   });
 
-  it("import trả metadata_only và cảnh báo METADATA_ONLY", async () => {
+  it("import trả metadata_only và cảnh báo METADATA_ONLY (mock, không HTTP)", async () => {
     const result = await importer.import(YOUTUBE_URL);
     assert.equal(result.platform, "youtube");
     assert.equal(result.sourceQuality, "metadata_only");
+    assert.equal(result.canonicalUrl, YOUTUBE_URL);
     assert.ok(result.warnings.some((warning) => warning.code === "METADATA_ONLY"));
+    assert.ok(
+      result.warnings.some((warning) => warning.code === "TRANSCRIPT_UNAVAILABLE"),
+    );
     assert.equal(result.transcriptText, undefined);
   });
 });
@@ -118,9 +132,11 @@ describe("importSocialUrl registry", () => {
     assert.ok(ADAPTERS[ADAPTERS.length - 1] instanceof UnknownUrlImporter);
   });
 
-  it("importSocialUrl chọn YouTube trước Unknown", async () => {
-    const result = await importSocialUrl(YOUTUBE_URL);
-    assert.equal(result.platform, "youtube");
+  it("importSocialUrl: YouTube là adapter đầu tiên khớp URL watch", () => {
+    const first = ADAPTERS[0];
+    assert.ok(first);
+    assert.ok(first.canHandle(YOUTUBE_URL));
+    assert.ok(first instanceof YouTubeImporter);
   });
 
   it("importSocialUrl fallback Unknown cho URL lạ", async () => {
