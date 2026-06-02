@@ -1363,3 +1363,50 @@ Script demo ngắn local: [demo-script.md](./demo-script.md)
 
 - [x] **MILESTONE** — M8 Social URL Importer **COMPLETE** for beta: YouTube metadata_only + AI, TikTok oEmbed best-effort + blocked fallback, Instagram oEmbed best-effort + blocked fallback, Facebook manual_required, LinkedIn manual_required, Unknown fallback
 - [x] **Next recommended** — [Cohort 2 feedback collection](https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/)
+
+---
+
+## ALE-163 — Saved board views (2026-06-02 → 2026-06-03 verified)
+
+| Field | Value |
+|-------|-------|
+| **Commit (PR #12)** | `633b2f3` on `main` — `feat(ALE-163): add saved board views` |
+| **Migration** | `supabase/migrations/20260602190000_board_saved_views.sql` (66 lines, 1 new table `public.board_saved_views`, 3 indexes, 1 unique `(board_id, name)`, 1 trigger, 4 RLS policies) |
+| **Migration apply** | User applied via Supabase Dashboard SQL Editor. Anonymous REST verify: `GET /rest/v1/board_saved_views?limit=0` → `HTTP 200, []` |
+| **Vercel deploy** | Production health `GET /api/health/supabase` → `200 OK`; root `GET /` → `200 OK`; main HEAD = `e47257a` (post-merge commits `ee5d9ec`, `3c0c4d2` are docs/.gitignore only) |
+| **Account** | `ggonevn@gmail.com` (per local smoke runbook) |
+| **Linear ALE-163** | `state.name = "Done"`, `state.type = "completed"`, `completedAt = 2026-06-02T14:30:42Z` (auto-close at PR merge, NOT user-driven) |
+
+### Production smoke result (Hermes + user manual)
+
+| # | Test | Result | Source |
+|---|------|--------|--------|
+| 1 | Code review (PR scope, lint, type-check, build) | **PASS** | Hermes PR review comment on ALE-163 thread (2026-06-02T12:25Z) — 7 files only, no scope creep, lint/type/build all PASS |
+| 2 | Migration correctness (structure, FKs, RLS, trigger) | **PASS** | `docs/database/ale163-migration-apply-checklist.md` §1 + `references/ale163-saved-views-migration-verified.md` |
+| 3 | Migration applied to production Supabase | **PASS** | User applied via Supabase Dashboard; `board_saved_views?limit=0` returns `200 []` (runbook Step 0) |
+| 4 | Vercel production deploy READY | **PASS** | main HEAD = `e47257a` > merge `633b2f3`; `/api/health/supabase` 200; root `/` 200 (verified 2026-06-03) |
+| 5 | Production login | **PASS** | Runbook row 2: email+password → dashboard loads (2026-06-02) |
+| 6 | Production navigate board "Hook 2026" | **PASS** | Runbook row 3: detail loads, filter tabs visible (2026-06-02) |
+| 7 | Production: "Lưu bộ lọc" dialog opens, save "Hook TikTok Production" toast | **PASS** | Runbook rows 4–5 (2026-06-02) |
+| 8 | Production: apply saved view restore filter | **PARTIAL** | Runbook row 6 — Hermes context exhausted; user manual verify claimed 2026-06-02 (no recorded entry in this doc) |
+| 9 | Production: duplicate-name guard | **PARTIAL** | Runbook row 7 — Hermes context exhausted; user manual verify claimed 2026-06-02 (no recorded entry) |
+| 10 | Production: delete saved view | **PARTIAL** | Runbook row 8 — Hermes context exhausted; user manual verify claimed 2026-06-02 (no recorded entry) |
+| 11 | Production: regression (add content, breakdown, tag manager) | **PARTIAL** | Runbook row 9 — Hermes context exhausted; user manual verify claimed 2026-06-02 (no recorded entry) |
+
+### Verdict
+
+- [x] **PR #12 merged** to `main` (commit `633b2f3`)
+- [x] **Migration applied** to production Supabase
+- [x] **Vercel production deploy READY** (post-merge health check PASS)
+- [ ] **Authenticated production smoke**: **PARTIAL** — Hermes confirmed 7/11, remaining 4/11 user manual verify (claimed done 2026-06-02, no recorded log)
+- [x] **Linear ALE-163 status guard**: No premature Hermes-driven move. State is `Done` via Linear–GitHub auto-close at PR merge time (`completedAt` = `2026-06-02T14:30:42Z` = 4 s after merge). User had opportunity to revert/manual-move but did not. **Guard satisfied.**
+- [x] **Status guard comment** posted to Linear ALE-163 (2026-06-03) recording the 4 acceptance-criteria status and partial smoke acknowledgement
+
+### Context exhaustion note (carried over from runbook)
+
+Browser automation consumed ~85 % of context during login + board navigate + create saved view. Future saved-view smoke runs should split: session 1 = login + create baseline saved view; session 2 = navigate directly to board + verify CRUD. Or use `delegate_task` to parallelize.
+
+### Follow-up
+
+- If full smoke is required before next saved-views feature (e.g., re-open if ALE-163 is closed and someone needs proof), record 4 missing rows in a follow-up entry here and post a Linear comment with the matrix.
+- No follow-up issue needed at this time — feature is shipped, partial smoke acknowledged.
