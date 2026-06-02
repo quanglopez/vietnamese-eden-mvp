@@ -1241,10 +1241,21 @@ Verify ALE-152 deliverable: URL-only content cards (YouTube, TikTok, etc.) must 
 
 **Note:** Nếu lần 1 vẫn leak, retry tự động (~thêm 60–90s). Nếu sau retry vẫn lỗi → UI hiện: *"Phát hiện từ/ký tự không phải tiếng Việt trong phân tích. Vui lòng thử lại."*
 
+### Production smoke result (2026-06-02, commit `736ed99`)
+
+| # | Test | Result | Notes |
+|---|------|--------|-------|
+| 1 | YouTube watch?v=… metadata-only Breakdown | **PASS** | `Vì sao hiệu quả` 100% Vietnamese, no `pontos` / foreign tokens |
+| 2 | YouTube Shorts metadata-only Breakdown | **PASS** | Re-analyze clean, no leakage |
+| 3 | Paste text Breakdown (regression) | **PASS** | No regression on paste flow |
+| 4 | Remix CJK guard (regression) | **PASS** | ALE-148 CJK guard still holds on remix Facebook 5 variants |
+
+**Unit tests (local):** `node --import tsx --test src/lib/ai/__tests__/language-leak.test.ts` — 10/10 pass.
+
 ### Verdict
 
-- [ ] **PASS** — mark ALE-153 Done (fill after manual smoke)
-- [x] **Shipped** — guard merged to feature branch; production smoke pending
+- [x] **ALL PASS** → mark ALE-153 Done (2026-06-02, commit `736ed99`, PR #2)
+- [x] **Shipped** — guard merged to `main`, deployed to production
 
 
 Script demo ngắn local: [demo-script.md](./demo-script.md)

@@ -1,8 +1,8 @@
 # Project status — Vietnamese Eden MVP
 
-**Cập nhật:** 2026-06-01 (M8 Social URL Importer planned)
+**Cập nhật:** 2026-06-02 (ALE-153 Done)
 **Production:** [https://vietnamese-eden-mvp.vercel.app/](https://vietnamese-eden-mvp.vercel.app/)
-**Latest deploy:** commit `d3635f3` on `main` (ALE-152 Done)
+**Latest deploy:** commit `736ed99` on `main` (ALE-153 Done)
 
 Feedback source of truth:
 
@@ -45,7 +45,7 @@ Feedback source of truth:
 | **Next decision point** | **After 5 completed tests OR 7–10 days** (whichever first) |
 | **M8 milestone** | **Planned** (see [social-url-importer-plan.md](./social-url-importer-plan.md)) |
 | **Next implementation issue** | [ALE-154](https://linear.app/alexgpt/issue/ALE-154) — M8 Social URL Importer architecture |
-| **ALE-153 prerequisite** | [ALE-153](https://linear.app/alexgpt/issue/ALE-153) (P1) — non-Vietnamese leakage guard must land before M8 importers can safely push to AI |
+| **ALE-153 prerequisite** | ✅ [ALE-153](https://linear.app/alexgpt/issue/ALE-153) Done (commit `736ed99`, PR #2) — M8 importers unblocked |
 
 
 ---
@@ -106,9 +106,9 @@ Feedback source of truth:
 - Dashboard demo text confusion — from synthetic test (P0 if real users hit it)
 
 ## Changelog
-## Changelog
 | Date | Summary |
 |------|---------|
+| 2026-06-02 | **ALE-153** — Non-Vietnamese leakage guard Done (commit `736ed99`, PR #2). Production smoke 4/4 PASS: YouTube watch?v=…, YouTube Shorts metadata-only breakdown, paste text regression, Remix CJK regression. 10/10 unit tests pass. M8 importers unblocked. |
 | 2026-06-01 | **M8 — Social URL Importer planned.** 6 issues created (ALE-154→159) under project M8. Architecture spec in `social-url-importer-plan.md`. Next implementation: ALE-154. ALE-153 is hard prerequisite. |
 | 2026-06-01 | **ALE-152** — URL preview + metadata enrichment (commit `fa08afe` + `18ae8e6`) — Done. YouTube Shorts parser fix shipped. |
 | 2026-06-01 | **ALE-153** — Created (P1) — Prevent non-Vietnamese language leakage in metadata-only AI Breakdown. |
