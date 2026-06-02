@@ -168,6 +168,48 @@ export type Database = {
         };
         Relationships: [];
       };
+      board_saved_views: {
+        Row: {
+          id: string;
+          board_id: string;
+          workspace_id: string;
+          created_by: string;
+          name: string;
+          search_query: string | null;
+          platform_filters: string[] | null;
+          tag_filters: string[] | null;
+          sort_order: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          board_id: string;
+          workspace_id: string;
+          created_by: string;
+          name: string;
+          search_query?: string | null;
+          platform_filters?: string[] | null;
+          tag_filters?: string[] | null;
+          sort_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          board_id?: string;
+          workspace_id?: string;
+          created_by?: string;
+          name?: string;
+          search_query?: string | null;
+          platform_filters?: string[] | null;
+          tag_filters?: string[] | null;
+          sort_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       content_items: {
         Row: {
           id: string;
