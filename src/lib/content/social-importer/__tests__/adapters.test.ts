@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import { FacebookImporter } from "@/lib/content/social-importer/adapters/facebook";
-import { InstagramImporter } from "@/lib/content/social-importer/adapters/instagram";
+import {
+  InstagramImporter,
+  type InstagramOEmbedFetchResult,
+} from "@/lib/content/social-importer/adapters/instagram";
 import { LinkedInImporter } from "@/lib/content/social-importer/adapters/linkedin";
 import {
   TikTokImporter,
@@ -27,6 +30,16 @@ function tikTokImporterWithOEmbed(result: TikTokOEmbedFetchResult) {
   });
 }
 const INSTAGRAM_URL = "https://www.instagram.com/reel/ABC123/";
+const INSTAGRAM_INVALID_URL = "https://www.instagram.com/";
+const INSTAGRAM_LONG_TITLE = `Caption Instagram đủ dài để phân tích. ${"z".repeat(40)}`;
+const INSTAGRAM_SHORT_TITLE = "IG ngắn";
+const INSTAGRAM_THUMB = "https://instagram.cdn/thumb.jpg";
+
+function instagramImporterWithOEmbed(result: InstagramOEmbedFetchResult) {
+  return new InstagramImporter({
+    fetchOEmbed: async () => result,
+  });
+}
 const FACEBOOK_URL = "https://www.facebook.com/watch/?v=123";
 const LINKEDIN_URL = "https://www.linkedin.com/posts/user_activity-123";
 const OTHER_URL = "https://example.com/page";
@@ -135,18 +148,64 @@ describe("TikTokImporter", () => {
 });
 
 describe("InstagramImporter", () => {
-  const importer = new InstagramImporter();
-
   it("canHandle nhận diện URL Instagram", () => {
+    const importer = new InstagramImporter();
     assert.equal(importer.canHandle(INSTAGRAM_URL), true);
     assert.equal(importer.canHandle(OTHER_URL), false);
   });
 
-  it("import trả blocked và LOGIN_REQUIRED", async () => {
+  it("import oEmbed success → caption khi title đủ dài", async () => {
+    const importer = instagramImporterWithOEmbed({
+      ok: true,
+      title: INSTAGRAM_LONG_TITLE,
+      author: "@creator",
+      thumbnailUrl: INSTAGRAM_THUMB,
+    });
     const result = await importer.import(INSTAGRAM_URL);
-    assert.equal(result.platform, "instagram");
+    assert.equal(result.sourceQuality, "caption");
+    assert.equal(result.captionText, INSTAGRAM_LONG_TITLE);
+    assert.equal(result.transcriptText, undefined);
+    assert.ok(result.warnings.some((w) => w.code === "CAPTION_UNAVAILABLE"));
+  });
+
+  it("import oEmbed success → metadata_only khi title ngắn", async () => {
+    const importer = instagramImporterWithOEmbed({
+      ok: true,
+      title: INSTAGRAM_SHORT_TITLE,
+      author: "@creator",
+      thumbnailUrl: INSTAGRAM_THUMB,
+    });
+    const result = await importer.import(INSTAGRAM_URL);
+    assert.equal(result.sourceQuality, "metadata_only");
+    assert.equal(result.captionText, undefined);
+    assert.equal(result.transcriptText, undefined);
+    assert.ok(result.warnings.some((w) => w.code === "METADATA_ONLY"));
+  });
+
+  it("import oEmbed fail → blocked + LOGIN_REQUIRED, không throw", async () => {
+    const importer = instagramImporterWithOEmbed({ ok: false, status: 403 });
+    const result = await importer.import(INSTAGRAM_URL);
     assert.equal(result.sourceQuality, "blocked");
-    assert.ok(result.warnings.some((warning) => warning.code === "LOGIN_REQUIRED"));
+    assert.ok(result.warnings.some((w) => w.code === "LOGIN_REQUIRED"));
+    assert.ok(result.warnings.some((w) => w.code === "PLATFORM_BLOCKED"));
+  });
+
+  it("import oEmbed 429 → blocked + RATE_LIMITED", async () => {
+    const importer = instagramImporterWithOEmbed({ ok: false, status: 429 });
+    const result = await importer.import(INSTAGRAM_URL);
+    assert.ok(result.warnings.some((w) => w.code === "RATE_LIMITED"));
+  });
+
+  it("import URL Instagram không hợp lệ → manual_required", async () => {
+    const importer = instagramImporterWithOEmbed({
+      ok: true,
+      title: INSTAGRAM_LONG_TITLE,
+      author: null,
+      thumbnailUrl: null,
+    });
+    const result = await importer.import(INSTAGRAM_INVALID_URL);
+    assert.equal(result.sourceQuality, "manual_required");
+    assert.ok(result.warnings.some((w) => w.code === "UNSUPPORTED_URL"));
   });
 });
 
