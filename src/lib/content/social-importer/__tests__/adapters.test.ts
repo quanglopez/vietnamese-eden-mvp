@@ -4,7 +4,10 @@ import { describe, it } from "node:test";
 import { FacebookImporter } from "@/lib/content/social-importer/adapters/facebook";
 import { InstagramImporter } from "@/lib/content/social-importer/adapters/instagram";
 import { LinkedInImporter } from "@/lib/content/social-importer/adapters/linkedin";
-import { TikTokImporter } from "@/lib/content/social-importer/adapters/tiktok";
+import {
+  TikTokImporter,
+  type TikTokOEmbedFetchResult,
+} from "@/lib/content/social-importer/adapters/tiktok";
 import { UnknownUrlImporter } from "@/lib/content/social-importer/adapters/unknown";
 import { YouTubeImporter } from "@/lib/content/social-importer/adapters/youtube";
 import { ADAPTERS, importSocialUrl } from "@/lib/content/social-importer/index";
@@ -13,6 +16,16 @@ const YOUTUBE_URL = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
 const YOUTUBE_VIDEO_ID = "dQw4w9WgXcQ";
 const YOUTUBE_THUMB = `https://img.youtube.com/vi/${YOUTUBE_VIDEO_ID}/hqdefault.jpg`;
 const TIKTOK_URL = "https://www.tiktok.com/@creator/video/1234567890";
+const TIKTOK_INVALID_URL = "https://www.tiktok.com/";
+const TIKTOK_LONG_TITLE = `Caption TikTok đủ dài để phân tích. ${"x".repeat(40)}`;
+const TIKTOK_SHORT_TITLE = "TikTok ngắn";
+const TIKTOK_THUMB = "https://p16-sign.tiktokcdn.com/thumb.jpeg";
+
+function tikTokImporterWithOEmbed(result: TikTokOEmbedFetchResult) {
+  return new TikTokImporter({
+    fetchOEmbed: async () => result,
+  });
+}
 const INSTAGRAM_URL = "https://www.instagram.com/reel/ABC123/";
 const FACEBOOK_URL = "https://www.facebook.com/watch/?v=123";
 const LINKEDIN_URL = "https://www.linkedin.com/posts/user_activity-123";
@@ -48,18 +61,76 @@ describe("YouTubeImporter", () => {
 });
 
 describe("TikTokImporter", () => {
-  const importer = new TikTokImporter();
-
   it("canHandle nhận diện URL TikTok", () => {
+    const importer = new TikTokImporter();
     assert.equal(importer.canHandle(TIKTOK_URL), true);
     assert.equal(importer.canHandle(YOUTUBE_URL), false);
   });
 
-  it("import trả blocked và cảnh báo PLATFORM_BLOCKED", async () => {
+  it("import oEmbed success → caption khi title đủ dài", async () => {
+    const importer = tikTokImporterWithOEmbed({
+      ok: true,
+      title: TIKTOK_LONG_TITLE,
+      author: "@creator",
+      thumbnailUrl: TIKTOK_THUMB,
+    });
     const result = await importer.import(TIKTOK_URL);
-    assert.equal(result.platform, "tiktok");
+    assert.equal(result.sourceQuality, "caption");
+    assert.equal(result.captionText, TIKTOK_LONG_TITLE);
+    assert.equal(result.transcriptText, undefined);
+    assert.equal(result.title, TIKTOK_LONG_TITLE);
+    assert.equal(result.author, "@creator");
+    assert.equal(result.thumbnailUrl, TIKTOK_THUMB);
+    assert.ok(result.warnings.some((w) => w.code === "CAPTION_UNAVAILABLE"));
+  });
+
+  it("import oEmbed success → metadata_only khi title ngắn", async () => {
+    const importer = tikTokImporterWithOEmbed({
+      ok: true,
+      title: TIKTOK_SHORT_TITLE,
+      author: "@creator",
+      thumbnailUrl: TIKTOK_THUMB,
+    });
+    const result = await importer.import(TIKTOK_URL);
+    assert.equal(result.sourceQuality, "metadata_only");
+    assert.equal(result.captionText, undefined);
+    assert.equal(result.transcriptText, undefined);
+    assert.ok(result.warnings.some((w) => w.code === "METADATA_ONLY"));
+    assert.ok(result.warnings.some((w) => w.code === "TRANSCRIPT_UNAVAILABLE"));
+  });
+
+  it("import oEmbed 403 → blocked, không throw", async () => {
+    const importer = tikTokImporterWithOEmbed({ ok: false, status: 403 });
+    const result = await importer.import(TIKTOK_URL);
     assert.equal(result.sourceQuality, "blocked");
-    assert.ok(result.warnings.some((warning) => warning.code === "PLATFORM_BLOCKED"));
+    assert.ok(result.warnings.some((w) => w.code === "PLATFORM_BLOCKED"));
+    assert.equal(result.captionText, undefined);
+  });
+
+  it("import oEmbed 429 → blocked + RATE_LIMITED", async () => {
+    const importer = tikTokImporterWithOEmbed({ ok: false, status: 429 });
+    const result = await importer.import(TIKTOK_URL);
+    assert.equal(result.sourceQuality, "blocked");
+    assert.ok(result.warnings.some((w) => w.code === "RATE_LIMITED"));
+  });
+
+  it("import oEmbed network fail → blocked, không throw", async () => {
+    const importer = tikTokImporterWithOEmbed({ ok: false });
+    const result = await importer.import(TIKTOK_URL);
+    assert.equal(result.sourceQuality, "blocked");
+    assert.ok(result.warnings.some((w) => w.code === "PLATFORM_BLOCKED"));
+  });
+
+  it("import URL TikTok không hợp lệ → manual_required", async () => {
+    const importer = tikTokImporterWithOEmbed({
+      ok: true,
+      title: TIKTOK_LONG_TITLE,
+      author: null,
+      thumbnailUrl: null,
+    });
+    const result = await importer.import(TIKTOK_INVALID_URL);
+    assert.equal(result.sourceQuality, "manual_required");
+    assert.ok(result.warnings.some((w) => w.code === "UNSUPPORTED_URL"));
   });
 });
 
