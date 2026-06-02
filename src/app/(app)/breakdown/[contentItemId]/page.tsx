@@ -6,7 +6,9 @@ import {
   getContentAnalysisByItemId,
   getContentItemById,
 } from "@/lib/content/analysis-queries";
+import { getSourceQualityFromItem } from "@/lib/content/analysis-source-quality";
 import { enrichContentItemFromUrl } from "@/lib/content/enrich-url-content";
+import type { SourceQuality } from "@/lib/content/social-importer/types";
 import {
   fetchUrlEmbedMetadata,
   getLinkThumbnailUrl,
@@ -45,12 +47,18 @@ export default async function BreakdownPage({ params }: BreakdownPageProps) {
   }
 
   let enrichError: string | null = null;
+  let sourceQuality: SourceQuality = getSourceQualityFromItem(item);
   if (!item.rawContent?.trim() && item.sourceUrl?.trim()) {
     const enrichResult = await enrichContentItemFromUrl(supabase, contentItemId);
     if (enrichResult.item) {
       item = enrichResult.item;
     }
     enrichError = enrichResult.error;
+    if (enrichResult.sourceQuality != null) {
+      sourceQuality = enrichResult.sourceQuality;
+    } else if (enrichResult.item) {
+      sourceQuality = getSourceQualityFromItem(enrichResult.item);
+    }
   }
 
   const { analysis, error: analysisError } = await getContentAnalysisByItemId(
@@ -75,6 +83,7 @@ export default async function BreakdownPage({ params }: BreakdownPageProps) {
       canAnalyze={canAnalyze}
       thumbnailUrl={thumbnailUrl}
       fetchError={fetchError}
+      sourceQuality={sourceQuality}
     />
   );
 }
