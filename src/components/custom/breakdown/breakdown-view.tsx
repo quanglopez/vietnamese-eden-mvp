@@ -16,6 +16,8 @@ import {
   BreakdownSections,
   BreakdownStatusBanner,
 } from "@/components/custom/breakdown/breakdown-sections";
+import { SourceQualityBadge } from "@/components/custom/breakdown/source-quality-badge";
+import { getSourceQualityFromItem } from "@/lib/content/analysis-source-quality";
 import { Button } from "@/components/ui/button";
 import { getPlatformLabel } from "@/lib/content/platform-styles";
 import { runContentAnalysisAction } from "@/lib/content/analysis-actions";
@@ -49,6 +51,13 @@ export function BreakdownView({
   const backHref = item.boardId ? `/boards/${item.boardId}` : "/boards";
   const remixHref = `/remix/${item.id}`;
   const canOpenRemix = canAnalyze || Boolean(analysis);
+  const sourceQuality = getSourceQualityFromItem(item);
+  const isBlockedQuality =
+    sourceQuality === "blocked" || sourceQuality === "manual_required";
+  const showBlockedCallout = !canAnalyze && isBlockedQuality;
+  const showAmberFallback = !canAnalyze && !isBlockedQuality;
+  const showMetadataCalloutWhenBlocked =
+    !canAnalyze && sourceQuality === "metadata_only";
 
   const handleAnalyze = () => {
     setFormError(null);
@@ -100,7 +109,23 @@ export function BreakdownView({
         </aside>
 
         <div className="space-y-4">
-          {!canAnalyze ? (
+          {showBlockedCallout ? (
+            <SourceQualityBadge
+              quality={sourceQuality}
+              showDescription
+              boardId={item.boardId}
+            />
+          ) : null}
+
+          {showMetadataCalloutWhenBlocked ? (
+            <SourceQualityBadge
+              quality={sourceQuality}
+              showDescription
+              boardId={item.boardId}
+            />
+          ) : null}
+
+          {showAmberFallback ? (
             <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 px-5 py-4 text-sm">
               <p className="font-semibold text-foreground">Chưa thể phân tích bằng AI</p>
               <p className="mt-2 text-muted-foreground">
@@ -114,7 +139,9 @@ export function BreakdownView({
                 </Button>
               ) : null}
             </div>
-          ) : (
+          ) : null}
+
+          {canAnalyze ? (
             <>
               <div className="relative space-y-4">
                 <div
@@ -127,6 +154,12 @@ export function BreakdownView({
                     aiModel={analysis?.aiModel ?? null}
                     onReanalyze={handleAnalyze}
                     isAnalyzing={isPending}
+                  />
+
+                  <SourceQualityBadge
+                    quality={sourceQuality}
+                    showDescription={sourceQuality === "metadata_only"}
+                    boardId={item.boardId}
                   />
 
                   {analysis && !isPending ? <BreakdownSections analysis={analysis} /> : null}
@@ -166,7 +199,7 @@ export function BreakdownView({
 
               {formError ? <AiErrorBanner message={formError} /> : null}
             </>
-          )}
+          ) : null}
         </div>
       </div>
     </AppShell>
