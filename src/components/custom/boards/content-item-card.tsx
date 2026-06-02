@@ -6,6 +6,13 @@ import { Bookmark, Plus, Sparkles, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { ContentMediaCover } from "@/components/custom/content/content-media-cover";
 import { SourceQualityBadge } from "@/components/custom/breakdown/source-quality-badge";
 import { getSourceQualityFromItem } from "@/lib/content/analysis-source-quality";
@@ -33,7 +40,7 @@ export function ContentItemCard({
   const breakdownHref = `/breakdown/${item.id}`;
   const sourceQuality = getSourceQualityFromItem(item);
   const showCompactBadge = sourceQuality !== "paste_text";
-  const [tagPanelOpen, setTagPanelOpen] = useState(false);
+  const [tagDialogOpen, setTagDialogOpen] = useState(false);
   const [newTagName, setNewTagName] = useState("");
 
   const displayedTags = useMemo(() => tags.slice(0, 3), [tags]);
@@ -98,31 +105,52 @@ export function ContentItemCard({
             ) : null}
           </div>
         ) : null}
-        <div className="space-y-2">
+        <Dialog open={tagDialogOpen} onOpenChange={setTagDialogOpen}>
           <Button
             type="button"
             variant="outline"
             size="sm"
             className="w-full gap-2"
-            onClick={() => setTagPanelOpen((prev) => !prev)}
+            data-testid="manage-tags-button"
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              setTagDialogOpen(true);
+            }}
           >
             <Plus className="h-3.5 w-3.5" />
             Quản lý tag
           </Button>
-          {tagPanelOpen ? (
-            <div className="rounded-lg border border-border/70 bg-muted/20 p-2 space-y-2">
+          <DialogContent
+            className="max-w-md"
+            data-testid="tag-manager-dialog"
+            onPointerDownOutside={(event) => {
+              event.preventDefault();
+            }}
+          >
+            <DialogHeader>
+              <DialogTitle>Quản lý tag</DialogTitle>
+              <DialogDescription>
+                Thêm tag mới hoặc bật/tắt tag cho content này.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-3">
               <div className="flex gap-2">
                 <input
                   value={newTagName}
                   onChange={(event) => setNewTagName(event.target.value)}
-                  className="h-8 w-full rounded-md border border-input bg-background px-2 text-xs"
+                  className="h-9 w-full rounded-md border border-input bg-background px-2 text-xs"
                   placeholder="Tag mới..."
                   aria-label="Tag mới cho content"
+                  data-testid="tag-input"
                 />
                 <Button
                   type="button"
                   size="sm"
-                  onClick={() => {
+                  data-testid="create-tag-button"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
                     const tagName = newTagName.trim();
                     if (!tagName) {
                       return;
@@ -142,7 +170,11 @@ export function ContentItemCard({
                       <button
                         key={tag.id}
                         type="button"
-                        onClick={() => onToggleTag(item.id, tag.id)}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          onToggleTag(item.id, tag.id);
+                        }}
                         className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[11px] ${
                           assigned
                             ? "border-foreground/20 bg-foreground/10"
@@ -159,8 +191,8 @@ export function ContentItemCard({
                 )}
               </div>
             </div>
-          ) : null}
-        </div>
+          </DialogContent>
+        </Dialog>
         <Button
           asChild
           variant={hasText ? "default" : "outline"}
