@@ -1259,3 +1259,48 @@ Verify ALE-152 deliverable: URL-only content cards (YouTube, TikTok, etc.) must 
 
 
 Script demo ngắn local: [demo-script.md](./demo-script.md)
+
+---
+
+## ALE-159 — URL Analysis Pipeline using best available source (2026-06-02)
+
+| Field | Value |
+|-------|-------|
+| **Commit** | `0a61000` on `main` — PR #6 (`feat/ale-159-url-analysis-pipeline`) |
+| **Issue** | Rewire enrichment to `importSocialUrl` + `pickAnalysisInput`; YouTube metadata_only → AI runs; TikTok/Instagram blocked → no AI + Paste text CTA |
+| **Out of scope** | TikTok/Instagram real importer (ALE-156/157); transcript fetcher (disabled); DB schema change |
+
+### Manual smoke (human — after deploy, Vercel production)
+
+| # | Test | Steps | Expected |
+|---|------|-------|----------|
+| 1 | YouTube watch URL-only | Login → board → Add content bằng link `youtube.com/watch?v=…` → mở Breakdown | Badge **"Metadata only"** (cam) + callout vàng |
+| 2 | YouTube watch AI runs | Trên card → bấm **Phân tích AI** | AI chạy, không bị block. Breakdown sections render. Copy ở `Vì sao hiệu quả` nói rõ metadata-only, chưa phải transcript đầy đủ |
+| 3 | YouTube Shorts URL-only | Add link `youtube.com/shorts/…` → mở Breakdown | Badge **"Metadata only"** (cam) + AI chạy |
+| 4 | TikTok URL-only | Add link TikTok → mở Breakdown | Badge **"Cần dán thủ công"** (đỏ) + red callout |
+| 5 | TikTok no AI | Bấm **Phân tích AI** | KHÔNG gọi AI. Message: *"Không lấy được caption/transcript từ link này. Hãy dán caption/script bằng Paste text."* |
+| 6 | Instagram URL-only | Add link Instagram → mở Breakdown | Same blocked badge + no AI + Paste text CTA |
+| 7 | Paste text regression | Add content bằng Paste text → mở Breakdown | Badge **"Paste text"** (xanh) + AI chạy bình thường |
+| 8 | Thumbnail regression | YouTube card / TikTok card | YouTube thumbnail hiển thị hqdefault.jpg; TikTok fallback không trắng trống |
+| 9 | Remix regression | Breakdown một content đã có → **Remix 5 variants Facebook** | Generate thành công, không CJK, title không generic |
+
+### Production smoke result (2026-06-02, commit `0a61000`)
+
+| # | Test | Result | Notes |
+|---|------|--------|-------|
+| 1 | YouTube watch metadata-only badge | **PASS** | "Metadata only" badge cam hiển thị |
+| 2 | YouTube watch AI Breakdown | **PASS** | AI chạy, sections render, không block |
+| 3 | YouTube Shorts metadata-only badge + AI | **PASS** | Same metadata_only, AI chạy |
+| 4 | TikTok blocked badge + no AI | **PASS** | "Cần dán thủ công" đỏ, bấm phân tích → message rõ ràng |
+| 5 | Instagram blocked badge + no AI | **PASS** | Same TikTok behavior |
+| 6 | Paste text badge + AI | **PASS** | "Paste text" xanh, AI bình thường |
+| 7 | Thumbnail preview | **PASS** | YouTube hqdefault.jpg hiển thị |
+| 8 | Remix Facebook 5 variants | **PASS** | No CJK, no generic title regression |
+
+**Unit tests (local):** `node --import tsx --test src/lib/content/social-importer/__tests__/*.test.ts src/lib/ai/prompts/__tests__/*.test.ts` — 34/34 pass.
+
+### Verdict
+
+- [x] **ALL PASS (7/7 core + 1 thumbnail + 1 remix = 9/9)** → mark ALE-159 Done (2026-06-02, commit `0a61000`, PR #6)
+- [x] **Shipped** — pipeline merged to `main`, deployed to production
+- [x] **M8 milestone** — foundation (ALE-154) + YouTube metadata (ALE-155) + badges (ALE-158) + pipeline (ALE-159) = **Done**
