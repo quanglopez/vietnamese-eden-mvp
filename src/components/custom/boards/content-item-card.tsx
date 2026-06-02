@@ -5,6 +5,8 @@ import { Bookmark, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { ContentMediaCover } from "@/components/custom/content/content-media-cover";
+import { SourceQualityBadge } from "@/components/custom/breakdown/source-quality-badge";
+import { getSourceQualityFromItem } from "@/lib/content/analysis-source-quality";
 import { getLinkThumbnailUrl } from "@/lib/content/url-metadata";
 import type { BoardContentItem } from "@/types/content";
 
@@ -16,6 +18,8 @@ export function ContentItemCard({ item }: ContentItemCardProps) {
   const thumbnailUrl = getLinkThumbnailUrl(item.sourceUrl, item.platform);
   const hasText = Boolean(item.rawContent?.trim());
   const breakdownHref = `/breakdown/${item.id}`;
+  const sourceQuality = getSourceQualityFromItem(item);
+  const showCompactBadge = sourceQuality !== "paste_text";
 
   return (
     <article className="group rounded-2xl border border-border/60 bg-surface-elev overflow-hidden hover:shadow-card transition flex flex-col">
@@ -49,7 +53,10 @@ export function ContentItemCard({ item }: ContentItemCardProps) {
           </div>
         </div>
       </Link>
-      <div className="px-4 pb-4">
+      <div className="px-4 pb-4 space-y-2">
+        {showCompactBadge ? (
+          <SourceQualityBadge quality={sourceQuality} showDescription={false} />
+        ) : null}
         <Button
           asChild
           variant={hasText ? "default" : "outline"}
