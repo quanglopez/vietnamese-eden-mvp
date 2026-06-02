@@ -48,6 +48,26 @@ Feedback source of truth:
 | **ALE-153 prerequisite** | ✅ [ALE-153](https://linear.app/alexgpt/issue/ALE-153) Done (commit `736ed99`, PR #2) — M8 importers unblocked |
 | **M8 progress** | ALE-154 ✅ Done · ALE-155 ✅ Done · ALE-156 ✅ Done · ALE-157 ✅ Done · ALE-158 ✅ Done · ALE-159 ✅ Done |
 
+### M8 known risks / watch items
+
+| # | Risk | Mitigation | Severity |
+|---|------|-----------|----------|
+| 1 | **TikTok/Instagram oEmbed có thể bị block** hoàn toàn bởi platform | Importer trả `sourceQuality: "blocked"` + CTA "Paste text" — graceful degradation, không crash | Medium |
+| 2 | **Metadata-only analysis không phải transcript đầy đủ** | AI prompt hint nói rõ là metadata-only, callout vàng trên BreakdownView | Medium |
+| 3 | **User confusion giữa Paste text vs URL import** | Badge + callout rõ ràng (`caption` = xanh, `metadata_only` = cam, `blocked` = đỏ) | Medium |
+| 4 | **TikTok oEmbed rate limit** | `RATE_LIMITED` warning → retry sau hoặc Paste text | Low |
+
+**Policy:** Không tạo P0/P1 issue code mới cho M8 — chỉ sửa khi Cohort 2 feedback chỉ ra lỗi nghiêm trọng.
+
+### Cohort 2 current status
+
+| Item | Status |
+|------|--------|
+| **Recruiting** | `beta-feedback-round-2.md` tracker active — inviting creators |
+| **Decision gate** | After **5 completed tests** OR **7–10 days** (whichever first) |
+| **Expected signal** | TikTok/Instagram feedback quality; Paste text vs URL confusion |
+| **Do NOT start** | M9 feature, ALE-160 Browser Use implementation, hay code PR mới |
+
 
 ---
 
