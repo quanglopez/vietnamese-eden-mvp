@@ -1,9 +1,9 @@
 # Project status — Vietnamese Eden MVP
 
-**Cập nhật:** 2026-06-02 (ALE-159 Done — M8 URL Analysis Pipeline shipped)
+**Cập nhật:** 2026-06-02 (ALE-158 Done — M8 source quality badges shipped)
 **Production:** [https://vietnamese-eden-mvp.vercel.app/](https://vietnamese-eden-mvp.vercel.app/)
-**Latest deploy:** commit `02f0928` on `main` (ALE-156 Done)
-**Mục tiêu tiếp theo:** [ALE-157](https://linear.app/alexgpt/issue/ALE-157) — Instagram metadata importer fallback (P2) hoặc bước sang M9 nếu M8 ổn định.
+**Latest deploy:** commit `f452acd` on `main` (ALE-158 Done)
+**Mục tiêu tiếp theo:** [ALE-159](https://linear.app/alexgpt/issue/ALE-159) — URL Analysis Pipeline using best available source (M8 final)
 Feedback source of truth:
 
 [https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/](https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/)
@@ -43,10 +43,10 @@ Feedback source of truth:
 | Inviting next cohort | **Cohort 2: inviting** 📨 |
 | Cohort 2 feedback tracking | [beta-feedback-round-2.md](./beta-feedback-round-2.md) |
 | **Next decision point** | **After 5 completed tests OR 7–10 days** (whichever first) |
-| **M8 milestone** | **Done** — pipeline shipped (ALE-154, ALE-155, ALE-158, ALE-159) | [social-url-importer-plan.md](./social-url-importer-plan.md) |
-| **Next implementation issue** | [ALE-156](https://linear.app/alexgpt/issue/ALE-156) — TikTok real importer (P2) hoặc M9 nếu M8 ổn định |
+| **M8 milestone** | **Done** — pipeline shipped (ALE-154, ALE-155, ALE-156, ALE-158, ALE-159) | [social-url-importer-plan.md](./social-url-importer-plan.md) |
+| **Next implementation issue** | [ALE-159](https://linear.app/alexgpt/issue/ALE-159) — URL Analysis Pipeline using best available source (M8 final) |
 | **ALE-153 prerequisite** | ✅ [ALE-153](https://linear.app/alexgpt/issue/ALE-153) Done (commit `736ed99`, PR #2) — M8 importers unblocked |
-| **M8 progress** | ALE-154 ✅ Done · ALE-155 ✅ Done · ALE-156 ✅ Done · ALE-158 ✅ Done · ALE-159 ✅ Done · ALE-157 → Backlog |
+| **M8 progress** | ALE-154 ✅ Done · ALE-155 ✅ Done · ALE-156 ✅ Done · ALE-158 ✅ Done · ALE-159 → Next · ALE-157 → Backlog |
 
 
 ---
@@ -110,9 +110,9 @@ Feedback source of truth:
 | Date | Summary |
 |------|---------|
 | 2026-06-02 | **ALE-156** — TikTok metadata importer Done (commit `02f0928`, PR #7). `TikTokImporter` with oEmbed + blocked fallback. Production smoke 5/5 PASS. Next: ALE-157. |
-| 2026-06-02 | **ALE-159** — M8 URL Analysis Pipeline Done (commit `0a61000`, PR #6). Rewire `enrichContentItemFromUrl` → `importSocialUrl` + `pickAnalysisInput`. YouTube metadata_only → AI runs with `sourceQuality` prop on `BreakdownView`. TikTok/Instagram blocked → no AI + specific CTA "Hãy dán caption/script bằng Paste text.". AI prompt hint with `sourceQuality` label. 34/34 unit tests pass. No DB migration. No regression Paste text / thumbnail / Remix / ALE-153 guard. |
-| 2026-06-02 | **ALE-158** — M8 source quality badges Done (commit `f452acd`, PR #5). Badge component extends `shadcn/ui` cva với 6 source-quality variants (green/yellow/blue/orange/red). `getSourceQualityFromItem()` pure helper — heuristic mapping từ `rawContent`/`sourceUrl`/`platform` (không DB field). Hiển thị trên BreakdownView (dưới status banner, với callout cho metadata_only/blocked) và ContentItemCard (compact badge). Paste text → blue, YouTube metadata → orange + yellow callout, TikTok/Instagram → red + red callout. Smoke 4/4 PASS: paste text, YouTube metadata, TikTok/Instagram blocked, URL thumbnail regression. |
-| 2026-06-02 | **ALE-155** — M8 YouTube metadata importer Done (commit `69109f3`, PR #4). Real `YouTubeImporter.import()` reusing existing `extractYouTubeVideoId` + `normalizeYouTubeUrlForOEmbed` + `fetchUrlEmbedMetadata`. Supports 4 URL forms (watch?v=, youtu.be/, /shorts/, /embed/) → canonical watch?v= + hqdefault thumbnail + oEmbed title/author. Transcript seam (`TranscriptFetcher` interface + `DisabledTranscriptFetcher` default) added but disabled — no production HTTP, no new npm dep. 31/31 unit tests pass (8 new YouTube tests use mocked fetcher, no real network). No production rewire — module not yet imported by any existing file. |
+| 2026-06-02 | **ALE-158** — M8 source quality badges Done (commit `f452acd`, PR #5). Badge component extends `shadcn/ui` cva với 6 source-quality variants (green/yellow/blue/orange/red). `getSourceQualityFromItem()` pure helper — heuristic mapping từ `rawContent`/`sourceUrl`/`platform` (không DB field). Hiển thị trên BreakdownView và ContentItemCard. Smoke 4/4 PASS: paste text, YouTube metadata, TikTok/Instagram blocked, URL thumbnail regression. Next: ALE-159. |
+| 2026-06-02 | **ALE-159** — M8 URL Analysis Pipeline Done (commit `0a61000`, PR #6). Rewire `enrichContentItemFromUrl` → `importSocialUrl` + `pickAnalysisInput`. YouTube metadata_only → AI runs with `sourceQuality` prop. TikTok/Instagram blocked → no AI + specific CTA. AI prompt hint with `sourceQuality` label. 34/34 unit tests pass. |
+| 2026-06-02 | **ALE-155** — M8 YouTube metadata importer Done (commit `69109f3`, PR #4). Real `YouTubeImporter.import()` reusing existing `extractYouTubeVideoId` + `normalizeYouTubeUrlForOEmbed` + `fetchUrlEmbedMetadata`. Supports 4 URL forms → canonical watch?v= + hqdefault thumbnail + oEmbed title/author. Transcript seam (`TranscriptFetcher` interface + `DisabledTranscriptFetcher` default) added but disabled. 31/31 unit tests pass (8 new YouTube tests use mocked fetcher). No production rewire. |
 | 2026-06-02 | **ALE-154** — M8 Social URL Importer foundation Done (commit `1a5ddff`, PR #3). Types (`SourceQuality`, `SocialPlatform`, `SocialImportResult`, `SocialUrlImporter`) + `pickAnalysisInput` priority helper + 6 adapter stubs (YouTube metadata-only / TikTok blocked / Instagram blocked / Facebook manual_required / LinkedIn manual_required / Unknown fallback). 23/23 unit tests pass. Zero behavior change — module not yet wired into pipeline (deferred to ALE-159). |
 | 2026-06-02 | **ALE-153** — Non-Vietnamese leakage guard Done (commit `736ed99`, PR #2). Production smoke 4/4 PASS: YouTube watch?v=…, YouTube Shorts metadata-only breakdown, paste text regression, Remix CJK regression. 10/10 unit tests pass. M8 importers unblocked. |
 | 2026-06-01 | **M8 — Social URL Importer planned.** 6 issues created (ALE-154→159) under project M8. Architecture spec in `social-url-importer-plan.md`. Next implementation: ALE-154. ALE-153 is hard prerequisite. |
