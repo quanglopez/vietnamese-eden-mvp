@@ -1,3 +1,5 @@
+import type { ManualTag } from "@/types/tags";
+
 export type PlatformType =
   | "tiktok"
   | "facebook"
@@ -15,4 +17,5 @@ export type BoardContentItem = {
   savedAt: string;
   sortOrder: number;
   addedAt: string;
+  tags: ManualTag[];
 };

@@ -7,6 +7,7 @@ import {
   getBoardById,
   listBoardContentItems,
 } from "@/lib/boards/queries";
+import { listTagsForWorkspace } from "@/lib/content/tag-queries";
 import { isValidUuid } from "@/lib/boards/utils";
 import { createClient } from "@/lib/supabase/server";
 
@@ -65,8 +66,18 @@ export default async function BoardDetailPage({ params }: BoardDetailPageProps) 
     supabase,
     params.boardId,
   );
+  const { tags: workspaceTags, error: tagsError } = await listTagsForWorkspace(
+    supabase,
+    board.workspaceId,
+  );
+  const mergedError = [itemsError, tagsError].filter(Boolean).join(" ") || null;
 
   return (
-    <BoardDetailView board={board} items={items} fetchError={itemsError} />
+    <BoardDetailView
+      board={board}
+      items={items}
+      workspaceTags={workspaceTags}
+      fetchError={mergedError}
+    />
   );
 }
