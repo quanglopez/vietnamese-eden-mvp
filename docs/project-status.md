@@ -3,7 +3,7 @@
 **Cập nhật:** 2026-06-02 (ALE-160 Done — Browser Use QA smoke runner)
 **Production:** [https://vietnamese-eden-mvp.vercel.app/](https://vietnamese-eden-mvp.vercel.app/)
 **Latest deploy:** commit `293ebc2` (ALE-160 Done, PR #9)
-**Mục tiêu tiếp theo:** Cohort 2 feedback collection — [beta feedback sheet](https: //docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/)
+**Mục tiêu tiếp theo:** [M9 — Content Library & Search](https://linear.app/alexgpt/project/m9) → ALE-161 Board search + filter
 Feedback source of truth:
 
 [https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/](https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/)
