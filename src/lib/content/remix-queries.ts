@@ -125,3 +125,19 @@ export async function getRemixPageContext(
     error: null,
   };
 }
+
+export async function getWorkspaceRemixCount(
+  supabase: SupabaseClient<Database>,
+  workspaceId: string,
+): Promise<number> {
+  const { count, error } = await supabase
+    .from("generated_outputs")
+    .select("id", { count: "exact", head: true })
+    .eq("workspace_id", workspaceId)
+    .in("status", ["draft", "ready", "published"]);
+
+  if (error) {
+    return 0;
+  }
+  return count ?? 0;
+}

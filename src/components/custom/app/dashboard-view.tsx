@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import type { OnboardingChecklistProgress } from "@/components/custom/dashboard/onboarding-checklist";
+import { OnboardingChecklist } from "@/components/custom/dashboard/onboarding-checklist";
 import type { BoardListItem } from "@/types/boards";
 
 import { AppShell } from "./app-shell";
@@ -20,6 +22,7 @@ type DashboardViewProps = {
   title: string;
   subtitle: string;
   boards: BoardListItem[];
+  checklistProgress: OnboardingChecklistProgress | null;
 };
 
 const quickLinks = [
@@ -44,25 +47,35 @@ const quickLinks = [
   },
 ] as const;
 
-export function DashboardView({ title, subtitle, boards }: DashboardViewProps) {
+function DashboardHeroCard() {
+  return (
+    <div className="rounded-2xl border border-brand/30 bg-gradient-brand-soft p-6 mb-8">
+      <h2 className="font-display text-lg font-bold flex items-center gap-2">
+        <Sparkles className="h-5 w-5 text-brand" />
+        Bắt đầu demo MVP
+      </h2>
+      <p className="text-sm text-muted-foreground mt-2 max-w-2xl">
+        Luồng chính: Board → thêm content → AI Breakdown → Remix → Calendar. Số liệu dưới đây là
+        minh hoạ UI; dữ liệu thật nằm trong từng board.
+      </p>
+      <Button asChild size="sm" className="mt-4 gap-2 bg-foreground text-background">
+        <Link href="/boards">
+          <FolderHeart className="h-4 w-4" />
+          Mở bảng cảm hứng
+        </Link>
+      </Button>
+    </div>
+  );
+}
+
+export function DashboardView({ title, subtitle, boards, checklistProgress }: DashboardViewProps) {
   return (
     <AppShell title={title} subtitle={subtitle}>
-      <div className="rounded-2xl border border-brand/30 bg-gradient-brand-soft p-6 mb-8">
-        <h2 className="font-display text-lg font-bold flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-brand" />
-          Bắt đầu demo MVP
-        </h2>
-        <p className="text-sm text-muted-foreground mt-2 max-w-2xl">
-          Luồng chính: Board → thêm content → AI Breakdown → Remix → Calendar. Số liệu dưới đây là
-          minh hoạ UI; dữ liệu thật nằm trong từng board.
-        </p>
-        <Button asChild size="sm" className="mt-4 gap-2 bg-foreground text-background">
-          <Link href="/boards">
-            <FolderHeart className="h-4 w-4" />
-            Mở bảng cảm hứng
-          </Link>
-        </Button>
-      </div>
+      {checklistProgress ? (
+        <OnboardingChecklist progress={checklistProgress} fallback={<DashboardHeroCard />} />
+      ) : (
+        <DashboardHeroCard />
+      )}
 
       <div className="grid lg:grid-cols-4 gap-4 mb-8">
         {[

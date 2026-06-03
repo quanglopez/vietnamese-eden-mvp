@@ -57,6 +57,21 @@ export async function listBoardsForWorkspace(
   return { boards, error: null };
 }
 
+export async function getWorkspaceContentCount(
+  supabase: SupabaseClient<Database>,
+  workspaceId: string,
+): Promise<number> {
+  const { count, error } = await supabase
+    .from("content_items")
+    .select("id", { count: "exact", head: true })
+    .eq("workspace_id", workspaceId);
+
+  if (error) {
+    return 0;
+  }
+  return count ?? 0;
+}
+
 type BoardDetailRow = {
   id: string;
   workspace_id: string;
