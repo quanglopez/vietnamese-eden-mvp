@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
+import { trackEvent } from "@/lib/analytics/tracker";
 import { getBoardById } from "@/lib/boards/queries";
 import type { ActionResult } from "@/lib/boards/actions";
 import { enrichContentItemFromUrl } from "@/lib/content/enrich-url-content";
@@ -74,6 +75,15 @@ export async function addContentTextAction(
   }
 
   revalidateBoardPaths(boardId);
+  await trackEvent(
+    "content_add",
+    {
+      content_id: result.contentItemId,
+      method: "text",
+      platform: platform ?? "other",
+    },
+    { workspaceId: board.workspaceId },
+  );
   return { success: true, data: { contentItemId: result.contentItemId } };
 }
 
@@ -138,6 +148,16 @@ export async function addContentUrlAction(
 
   await enrichContentItemFromUrl(supabase, result.contentItemId);
   revalidateBoardPaths(boardId);
+
+  await trackEvent(
+    "content_add",
+    {
+      content_id: result.contentItemId,
+      method: "url",
+      platform: detected.platform,
+    },
+    { workspaceId: board.workspaceId },
+  );
 
   return {
     success: true,

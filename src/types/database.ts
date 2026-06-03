@@ -9,6 +9,48 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      analytics_events: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          workspace_id: string | null;
+          event_type: Database["public"]["Enums"]["analytics_event_type"];
+          metadata: Json;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          workspace_id?: string | null;
+          event_type: Database["public"]["Enums"]["analytics_event_type"];
+          metadata?: Json;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string | null;
+          workspace_id?: string | null;
+          event_type?: Database["public"]["Enums"]["analytics_event_type"];
+          metadata?: Json;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "analytics_events_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "analytics_events_workspace_id_fkey";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       beta_waitlist: {
         Row: {
           id: string;
@@ -475,6 +517,14 @@ export type Database = {
     Views: Record<string, never>;
     Functions: Record<string, never>;
     Enums: {
+      analytics_event_type:
+        | "signup"
+        | "login"
+        | "board_create"
+        | "content_add"
+        | "breakdown_run"
+        | "remix_run"
+        | "calendar_add";
       workspace_role: "owner" | "admin" | "member" | "viewer";
       platform_type: "tiktok" | "facebook" | "instagram" | "youtube" | "other";
       analysis_status: "pending" | "completed" | "failed";

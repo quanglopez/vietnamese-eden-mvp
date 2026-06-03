@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { trackEvent } from "@/lib/analytics/tracker";
 import { createClient } from "@/lib/supabase/client";
 import {
   getAuthCallbackUrl,
@@ -61,10 +62,13 @@ export function SignupForm() {
     }
 
     if (data.session) {
+      // Best-effort: void avoids blocking redirect; workspace_id stays null (Option A).
+      void trackEvent("signup", { method: "email" });
       window.location.href = "/dashboard";
       return;
     }
 
+    // Email confirmation required — no session yet; signup event is not recorded until login.
     setSubmittedEmail(values.email);
     setConfirmationSent(true);
   });
