@@ -49,4 +49,7 @@ next-env.d.ts
 supabase/.branches
 supabase/.temp
 
+# Browser Use screenshots (generated, never commit)
+scripts/browser-use/screenshots/
+
 cursor-prompts/

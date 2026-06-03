@@ -13,6 +13,9 @@ const TASKS: Record<string, () => Promise<{ default: SmokeTaskFn }>> = {
   "voice-profile": () => import("./tasks/voice-profile"),
   calendar: () => import("./tasks/calendar"),
   "m8-source-quality": () => import("./tasks/m8-source-quality"),
+  tags: () => import("./tasks/tags"),
+  "saved-views": () => import("./tasks/saved-views"),
+  "content-detail": () => import("./tasks/content-detail"),
 };
 
 const ALL_TASKS = Object.keys(TASKS);

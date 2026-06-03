@@ -27,17 +27,17 @@ export default async function runAuth(context: SmokeContext): Promise<SmokeResul
   try {
     await step("Navigate /login", async () => {
       await page.goto(c.baseUrl + "/login", { waitUntil: "networkidle" });
-      await page.waitForSelector('[data-testid="login-email"]', { timeout: 10_000 });
+      await page.waitForSelector('input[type="email"]', { timeout: 10_000 });
     });
 
     await step("Fill credentials", async () => {
-      await page.fill('[data-testid="login-email"]', c.testEmail);
-      await page.fill('[data-testid="login-password"]', c.testPassword);
+      await page.fill('input[type="email"]', c.testEmail);
+      await page.fill('input[type="password"]', c.testPassword);
     });
 
     await step("Submit login", async () => {
-      await page.click('[data-testid="login-submit"]');
-      await page.waitForURL(/\/(dashboard|dashboards)/, { timeout: 15_000 });
+      await page.click('button:has-text("Đăng nhập")');
+      await page.waitForURL(/\/(dashboard|boards)/, { timeout: 15_000 });
     });
 
     await step("Verify session", async () => {
