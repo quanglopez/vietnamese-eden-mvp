@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, CalendarPlus, Link2, Sparkles, Wand2 } from "lucide-react";
 
 import { AppShell } from "@/components/custom/app/app-shell";
+import { FetchErrorBanner } from "@/components/custom/app/fetch-error-banner";
 import { ContentMediaCover } from "@/components/custom/content/content-media-cover";
 import { AddToCalendarDialog } from "@/components/custom/calendar/add-to-calendar-dialog";
 import {
@@ -118,9 +119,7 @@ export function BreakdownView({
       </Link>
 
       {fetchError ? (
-        <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
-          {fetchError}
-        </div>
+        <FetchErrorBanner message={`Không tải được dữ liệu: ${fetchError}`} />
       ) : null}
 
       <div className="grid lg:grid-cols-[360px_1fr] gap-8">

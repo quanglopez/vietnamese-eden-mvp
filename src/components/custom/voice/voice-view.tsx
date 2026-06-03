@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Mic } from "lucide-react";
 
 import { AppShell } from "@/components/custom/app/app-shell";
+import { FetchErrorBanner } from "@/components/custom/app/fetch-error-banner";
 import { VoiceProfileDetail } from "@/components/custom/voice/voice-profile-detail";
 import { VoiceProfileForm } from "@/components/custom/voice/voice-profile-form";
 import type { VoiceProfileView } from "@/types/voice";
@@ -28,9 +29,7 @@ export function VoiceView({ profiles: initialProfiles, fetchError }: VoiceViewPr
       subtitle="Huấn luyện AI học phong cách viết của bạn"
     >
       {fetchError ? (
-        <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
-          {fetchError}
-        </div>
+        <FetchErrorBanner message={`Không tải được voice profiles: ${fetchError}`} />
       ) : null}
 
       <div className="grid lg:grid-cols-[380px_1fr] gap-8">

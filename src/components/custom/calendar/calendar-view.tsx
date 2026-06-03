@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { CalendarDays, Info, LayoutGrid, List } from "lucide-react";
 
 import { AppShell } from "@/components/custom/app/app-shell";
+import { FetchErrorBanner } from "@/components/custom/app/fetch-error-banner";
 import { CalendarItemCard } from "@/components/custom/calendar/calendar-item-card";
 import {
   CalendarWeeklyDetailList,
@@ -40,9 +41,7 @@ export function CalendarView({ items, fetchError }: CalendarViewProps) {
       subtitle="Lên lịch đăng nội dung — bạn vẫn tự đăng thủ công trên MXH"
     >
       {fetchError ? (
-        <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
-          {fetchError}
-        </div>
+        <FetchErrorBanner message={`Không tải được lịch: ${fetchError}`} />
       ) : null}
 
       {items.length === 0 ? (
