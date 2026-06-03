@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
+import { trackEvent } from "@/lib/analytics/tracker";
 import { analyzeContentText, getActiveAiModelLabel } from "@/lib/ai/client";
 import { AiProviderError, BreakdownContentError } from "@/lib/ai/errors";
 import type { ActionResult } from "@/lib/boards/actions";
@@ -114,6 +115,11 @@ export async function runContentAnalysisAction(
     }
 
     revalidateBreakdownPaths(contentItemId, item.boardId);
+    await trackEvent(
+      "breakdown_run",
+      { content_id: contentItemId, model: aiModel },
+      { workspaceId: item.workspaceId },
+    );
     return { success: true, data: { analysisId: data.id } };
   }
 
@@ -139,6 +145,11 @@ export async function runContentAnalysisAction(
   }
 
   revalidateBreakdownPaths(contentItemId, item.boardId);
+  await trackEvent(
+    "breakdown_run",
+    { content_id: contentItemId, model: aiModel },
+    { workspaceId: item.workspaceId },
+  );
   return { success: true, data: { analysisId: data.id } };
 }
 

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
+import { trackEvent } from "@/lib/analytics/tracker";
 import { getBoardGradient, slugifyWorkspaceName } from "@/lib/boards/constants";
 import { createClient } from "@/lib/supabase/server";
 
@@ -55,6 +56,8 @@ export async function createBoardAction(input: {
 
   revalidatePath("/boards");
   revalidatePath("/dashboard");
+
+  await trackEvent("board_create", { board_id: data.id }, { workspaceId: input.workspaceId });
 
   return { success: true, data: { id: data.id } };
 }

@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { trackEvent } from "@/lib/analytics/tracker";
 import { createClient } from "@/lib/supabase/client";
 import {
   isGoogleOAuthEnabled,
@@ -61,6 +62,9 @@ export function LoginForm() {
       setFormError(error.message);
       return;
     }
+
+    // Best-effort: void avoids blocking navigation; workspace_id stays null (Option A).
+    void trackEvent("login", { method: "email" });
 
     const next = searchParams.get("next") ?? "/dashboard";
     router.push(next);

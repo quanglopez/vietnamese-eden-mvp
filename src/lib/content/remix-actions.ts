@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
+import { trackEvent } from "@/lib/analytics/tracker";
 import { generateRemixVariants } from "@/lib/ai/client";
 import { AiProviderError } from "@/lib/ai/errors";
 import type { ActionResult } from "@/lib/boards/actions";
@@ -170,6 +171,16 @@ export async function generateRemixAction(input: {
   }
 
   revalidateRemixPaths(contentItemId, item.boardId);
+  await trackEvent(
+    "remix_run",
+    {
+      content_id: contentItemId,
+      variant_count: data.length,
+      format,
+      tone,
+    },
+    { workspaceId: item.workspaceId },
+  );
   return { success: true, data: { outputIds: data.map((row) => row.id) } };
 }
 

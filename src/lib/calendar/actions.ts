@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
+import { trackEvent } from "@/lib/analytics/tracker";
 import type { ActionResult } from "@/lib/boards/actions";
 import { isValidUuid } from "@/lib/boards/utils";
 import {
@@ -122,6 +123,11 @@ export async function addToCalendarAction(input: {
   }
 
   revalidateCalendarPaths(contentItemId);
+  await trackEvent(
+    "calendar_add",
+    { calendar_item_id: data.id, channel },
+    { workspaceId: workspace.id },
+  );
   return { success: true, data: { calendarItemId: data.id } };
 }
 
