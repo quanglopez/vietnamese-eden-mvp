@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type MouseEvent } from "react";
 import { Bookmark, Plus, Sparkles, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ import type { ManualTag } from "@/types/tags";
 
 type ContentItemCardProps = {
   item: BoardContentItem;
+  selectionIndex: number;
   tags: ManualTag[];
   workspaceTags: ManualTag[];
   selected: boolean;
@@ -32,6 +33,7 @@ type ContentItemCardProps = {
 
 export function ContentItemCard({
   item,
+  selectionIndex,
   tags,
   workspaceTags,
   selected,
@@ -50,8 +52,19 @@ export function ContentItemCard({
   const displayedTags = useMemo(() => tags.slice(0, 3), [tags]);
   const remainingTagCount = Math.max(tags.length - displayedTags.length, 0);
 
+  const handleSelectControl = (
+    event: MouseEvent<HTMLElement>,
+    mode: "single" | "range",
+  ) => {
+    event.preventDefault();
+    event.stopPropagation();
+    onSelectToggle(item.id, mode);
+  };
+
   return (
     <article
+      data-content-id={item.id}
+      data-index={selectionIndex}
       className={`group rounded-2xl border border-border/60 bg-surface-elev overflow-hidden hover:shadow-card transition flex flex-col ${
         selected ? "ring-2 ring-brand bg-brand/5" : ""
       }`}
@@ -62,22 +75,30 @@ export function ContentItemCard({
             type="checkbox"
             checked={selected}
             data-testid="content-select-checkbox"
+            data-content-id={item.id}
+            data-index={selectionIndex}
             className="h-4 w-4 rounded border-border accent-brand cursor-pointer"
+            onClick={(event) => {
+              if (event.shiftKey) {
+                handleSelectControl(event, "range");
+                return;
+              }
+              handleSelectControl(event, "single");
+            }}
             onChange={(event) => {
               event.stopPropagation();
-              onSelectToggle(item.id, "single");
             }}
-            onClick={(event) => event.stopPropagation()}
             aria-label={`Chọn ${item.title}`}
           />
         </label>
         <Link
           href={breakdownHref}
           className="block flex-1"
+          data-content-id={item.id}
+          data-index={selectionIndex}
           onClick={(event) => {
             if (event.shiftKey) {
-              event.preventDefault();
-              onSelectToggle(item.id, "range");
+              handleSelectControl(event, "range");
             }
           }}
         >

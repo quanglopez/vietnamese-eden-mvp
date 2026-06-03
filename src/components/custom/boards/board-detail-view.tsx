@@ -135,7 +135,7 @@ export function BoardDetailView({
   const [bulkUnlinkOpen, setBulkUnlinkOpen] = useState(false);
   const [bulkFeedback, setBulkFeedback] = useState<string | null>(null);
   const [isBulkPending, startBulkTransition] = useTransition();
-  const lastClickedIndexRef = useRef<number | null>(null);
+  const lastSelectedContentIdRef = useRef<string | null>(null);
 
   const subtitle = `${board.contentCount} nội dung đã lưu · Cập nhật ${formatBoardUpdatedAt(board.updatedAt)}`;
   const otherBoards = useMemo(
@@ -444,20 +444,29 @@ export function BoardDetailView({
 
   const clearSelection = () => {
     setSelectedIds(new Set());
-    lastClickedIndexRef.current = null;
+    lastSelectedContentIdRef.current = null;
   };
 
   const handleSelectToggle = (id: string, mode: "single" | "range", index: number) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
-      if (mode === "range" && lastClickedIndexRef.current !== null) {
-        const start = Math.min(lastClickedIndexRef.current, index);
-        const end = Math.max(lastClickedIndexRef.current, index);
-        for (let i = start; i <= end; i++) {
-          const item = filteredItems[i];
-          if (item) {
-            next.add(item.id);
+      if (mode === "range") {
+        const anchorId = lastSelectedContentIdRef.current;
+        const anchorIndex =
+          anchorId !== null
+            ? filteredItems.findIndex((item) => item.id === anchorId)
+            : -1;
+        if (anchorIndex >= 0) {
+          const start = Math.min(anchorIndex, index);
+          const end = Math.max(anchorIndex, index);
+          for (let i = start; i <= end; i++) {
+            const item = filteredItems[i];
+            if (item) {
+              next.add(item.id);
+            }
           }
+        } else {
+          next.add(id);
         }
       } else if (next.has(id)) {
         next.delete(id);
@@ -466,7 +475,7 @@ export function BoardDetailView({
       }
       return next;
     });
-    lastClickedIndexRef.current = index;
+    lastSelectedContentIdRef.current = id;
   };
 
   const handleBulkAddTag = (tagId: string, tagName: string) => {
@@ -811,6 +820,7 @@ export function BoardDetailView({
             <ContentItemCard
               key={item.id}
               item={item}
+              selectionIndex={index}
               tags={item.tags}
               workspaceTags={workspaceTags}
               selected={selectedIds.has(item.id)}
