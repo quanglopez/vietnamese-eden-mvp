@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
 
 import { DashboardView } from "@/components/custom/app/dashboard-view";
-import { listBoardsForWorkspace } from "@/lib/boards/queries";
+import type { OnboardingChecklistProgress } from "@/components/custom/dashboard/onboarding-checklist";
+import { listBoardsForWorkspace, getWorkspaceContentCount } from "@/lib/boards/queries";
+import { getWorkspaceAnalysisCount } from "@/lib/content/analysis-queries";
+import { getWorkspaceRemixCount } from "@/lib/content/remix-queries";
 import { createClient } from "@/lib/supabase/server";
+import { listVoiceProfilesForUser } from "@/lib/voice/queries";
 import { getCurrentWorkspace } from "@/lib/workspaces/queries";
 
 export const metadata: Metadata = {
@@ -38,11 +42,65 @@ export default async function DashboardPage() {
   const greetingName = getGreetingName(fullName);
 
   let boards: Awaited<ReturnType<typeof listBoardsForWorkspace>>["boards"] = [];
+  let checklistProgress: OnboardingChecklistProgress | null = null;
+
   if (user) {
     const { workspace } = await getCurrentWorkspace(supabase, user.id);
     if (workspace) {
-      const result = await listBoardsForWorkspace(supabase, workspace.id);
-      boards = result.boards;
+      const [
+        boardsResult,
+        voiceResult,
+        contentCount,
+        analysisCount,
+        remixCount,
+      ] = await Promise.all([
+        listBoardsForWorkspace(supabase, workspace.id),
+        listVoiceProfilesForUser(supabase, workspace.id, user.id),
+        getWorkspaceContentCount(supabase, workspace.id),
+        getWorkspaceAnalysisCount(supabase, workspace.id),
+        getWorkspaceRemixCount(supabase, workspace.id),
+      ]);
+
+      boards = boardsResult.boards;
+      const hasBoard = boards.length > 0;
+      const hasVoiceProfile = (voiceResult.profiles?.length ?? 0) > 0;
+
+      checklistProgress = {
+        userId: user.id,
+        workspaceId: workspace.id,
+        steps: [
+          {
+            id: "board",
+            label: "Tạo board đầu tiên",
+            href: "/boards",
+            done: hasBoard,
+          },
+          {
+            id: "content",
+            label: "Thêm content đầu tiên",
+            href: "/boards",
+            done: contentCount > 0,
+          },
+          {
+            id: "breakdown",
+            label: "Chạy phân tích AI",
+            href: "/boards",
+            done: analysisCount > 0,
+          },
+          {
+            id: "remix",
+            label: "Tạo remix đầu tiên",
+            href: "/boards",
+            done: remixCount > 0,
+          },
+          {
+            id: "voice",
+            label: "Thiết lập giọng văn",
+            href: "/voice",
+            done: hasVoiceProfile,
+          },
+        ],
+      };
     }
   }
 
@@ -51,6 +109,7 @@ export default async function DashboardPage() {
       title={`Chào ${greetingName} 👋`}
       subtitle="Workspace AI content — beta MVP"
       boards={boards}
+      checklistProgress={checklistProgress}
     />
   );
 }

@@ -188,3 +188,19 @@ export function buildSummaryPayload(result: {
   };
   return JSON.stringify(payload);
 }
+
+export async function getWorkspaceAnalysisCount(
+  supabase: SupabaseClient<Database>,
+  workspaceId: string,
+): Promise<number> {
+  const { count, error } = await supabase
+    .from("content_analyses")
+    .select("id", { count: "exact", head: true })
+    .eq("workspace_id", workspaceId)
+    .eq("status", "completed");
+
+  if (error) {
+    return 0;
+  }
+  return count ?? 0;
+}
