@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 
 import { AppShell } from "@/components/custom/app/app-shell";
+import { FetchErrorBanner } from "@/components/custom/app/fetch-error-banner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -558,9 +559,7 @@ export function BoardDetailView({
       </div>
 
       {fetchError ? (
-        <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
-          Không tải được nội dung: {fetchError}
-        </div>
+        <FetchErrorBanner message={`Không tải được nội dung: ${fetchError}`} />
       ) : null}
 
       {successMessage ? (

@@ -43,10 +43,13 @@ export default async function DashboardPage() {
 
   let boards: Awaited<ReturnType<typeof listBoardsForWorkspace>>["boards"] = [];
   let checklistProgress: OnboardingChecklistProgress | null = null;
+  let fetchError: string | null = null;
 
   if (user) {
-    const { workspace } = await getCurrentWorkspace(supabase, user.id);
-    if (workspace) {
+    const { workspace, error: workspaceError } = await getCurrentWorkspace(supabase, user.id);
+    if (workspaceError) {
+      fetchError = workspaceError;
+    } else if (workspace) {
       const [
         boardsResult,
         voiceResult,
@@ -60,6 +63,13 @@ export default async function DashboardPage() {
         getWorkspaceAnalysisCount(supabase, workspace.id),
         getWorkspaceRemixCount(supabase, workspace.id),
       ]);
+
+      const queryErrors = [boardsResult.error, voiceResult.error].filter(
+        (message): message is string => Boolean(message),
+      );
+      if (queryErrors.length > 0) {
+        fetchError = queryErrors.join(" · ");
+      }
 
       boards = boardsResult.boards;
       const hasBoard = boards.length > 0;
@@ -110,6 +120,7 @@ export default async function DashboardPage() {
       subtitle="Workspace AI content — beta MVP"
       boards={boards}
       checklistProgress={checklistProgress}
+      fetchError={fetchError}
     />
   );
 }

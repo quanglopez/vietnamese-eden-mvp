@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { FolderHeart, Loader2, Plus, Search, Sparkles } from "lucide-react";
 
 import { AppShell } from "@/components/custom/app/app-shell";
+import { FetchErrorBanner } from "@/components/custom/app/fetch-error-banner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createDefaultWorkspaceAction } from "@/lib/boards/actions";
@@ -99,9 +100,7 @@ export function BoardsListView({
       subtitle={`${workspace.name} · Tổ chức ý tưởng viral theo niche, client, campaign.`}
     >
       {fetchError ? (
-        <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
-          Không tải được danh sách bảng: {fetchError}
-        </div>
+        <FetchErrorBanner message={`Không tải được danh sách bảng: ${fetchError}`} />
       ) : null}
 
       <div className="flex flex-wrap items-center gap-3 mb-8">

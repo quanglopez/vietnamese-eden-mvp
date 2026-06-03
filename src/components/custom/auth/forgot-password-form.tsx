@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -103,7 +104,14 @@ export function ForgotPasswordForm() {
           ) : null}
 
           <Button className="w-full" type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Đang gửi..." : "Gửi link đặt lại mật khẩu"}
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Đang gửi…
+              </>
+            ) : (
+              "Gửi link đặt lại mật khẩu"
+            )}
           </Button>
         </form>
 

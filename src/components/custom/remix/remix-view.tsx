@@ -6,6 +6,7 @@ import { useCallback, useRef, useState } from "react";
 import { ArrowLeft, Wand2 } from "lucide-react";
 
 import { AppShell } from "@/components/custom/app/app-shell";
+import { FetchErrorBanner } from "@/components/custom/app/fetch-error-banner";
 import { RemixActionToast, type RemixToast } from "@/components/custom/remix/remix-action-toast";
 import { RemixForm } from "@/components/custom/remix/remix-form";
 import { RemixOutputList } from "@/components/custom/remix/remix-output-list";
@@ -62,9 +63,7 @@ export function RemixView({ context, outputs, voiceProfiles, fetchError }: Remix
       </div>
 
       {fetchError ? (
-        <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
-          Không tải được outputs: {fetchError}
-        </div>
+        <FetchErrorBanner message={`Không tải được outputs: ${fetchError}`} />
       ) : null}
 
       {!context.hasRawContent && !context.hasAnalysis ? (

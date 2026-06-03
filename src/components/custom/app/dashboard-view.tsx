@@ -16,6 +16,7 @@ import type { OnboardingChecklistProgress } from "@/components/custom/dashboard/
 import { OnboardingChecklist } from "@/components/custom/dashboard/onboarding-checklist";
 import type { BoardListItem } from "@/types/boards";
 
+import { FetchErrorBanner } from "./fetch-error-banner";
 import { AppShell } from "./app-shell";
 
 type DashboardViewProps = {
@@ -23,6 +24,7 @@ type DashboardViewProps = {
   subtitle: string;
   boards: BoardListItem[];
   checklistProgress: OnboardingChecklistProgress | null;
+  fetchError?: string | null;
 };
 
 const quickLinks = [
@@ -68,9 +70,18 @@ function DashboardHeroCard() {
   );
 }
 
-export function DashboardView({ title, subtitle, boards, checklistProgress }: DashboardViewProps) {
+export function DashboardView({
+  title,
+  subtitle,
+  boards,
+  checklistProgress,
+  fetchError,
+}: DashboardViewProps) {
   return (
     <AppShell title={title} subtitle={subtitle}>
+      {fetchError ? (
+        <FetchErrorBanner message={`Không tải được dữ liệu tổng quan: ${fetchError}`} />
+      ) : null}
       {checklistProgress ? (
         <OnboardingChecklist progress={checklistProgress} fallback={<DashboardHeroCard />} />
       ) : (
