@@ -1410,3 +1410,21 @@ Browser automation consumed ~85 % of context during login + board navigate + cre
 
 - If full smoke is required before next saved-views feature (e.g., re-open if ALE-163 is closed and someone needs proof), record 4 missing rows in a follow-up entry here and post a Linear comment with the matrix.
 - No follow-up issue needed at this time — feature is shipped, partial smoke acknowledged.
+
+---
+
+## M9 — Content Library & Search — Milestone Summary (2026-06-03)
+
+| Issue | Title | PR/Commit | Smoke | Verdict |
+|-------|-------|-----------|-------|--------|
+| ALE-161 | Board search + platform filter + empty states | PR #9 merge | 7/7 PASS | ✅ |
+| ALE-162 | Manual content tags | PR #10 + hotfix `855a837` | PASS (dialog fix verified) | ✅ |
+| ALE-163 | Saved board views | PR #12 merge `633b2f3` | 7/11 PASS, 4/11 PARTIAL (user-claimed) | ✅ (partial acknowledged) |
+| ALE-164 | Bulk content actions | PR #13 merge `91ea180` | PASS | ✅ |
+| ALE-165 | Content detail page polish | commit `af0eae9` | PASS | ✅ |
+
+**Total:** 5/5 issues Done, production smoke PASS
+**Milestone:** M9 COMPLETE ✅
+**Latest deploy:** PR #13 merge `91ea180` on `main`
+**Known limitations:** See `project-status.md` § M9 known limitations
+**Next:** M10 — Beta QA & Activation (proposed)

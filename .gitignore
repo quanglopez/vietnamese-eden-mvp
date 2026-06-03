@@ -36,7 +36,7 @@ yarn-error.log*
 
 # local smoke env files (ALE-163/164)
 .env.smoke-test
-.env.local.backup
+.env.local.backup*
 
 # vercel
 .vercel

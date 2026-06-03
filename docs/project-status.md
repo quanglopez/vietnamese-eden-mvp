@@ -1,9 +1,9 @@
 # Project status — Vietnamese Eden MVP
 
-**Cập nhật:** 2026-06-02 (ALE-162 **REOPENED** — tag dialog blocked, hotfix required)
+**Cap nhat:** 2026-06-03 (M9 **COMPLETE** — all 5 issues Done, production smoke PASS)
 **Production:** [https://vietnamese-eden-mvp.vercel.app/](https://vietnamese-eden-mvp.vercel.app/)
-**Latest deploy:** PR #10 merge to `main` (ALE-162 partial — 5/12 smoke verifiable)
-**Mục tiêu tiếp theo:** [ALE-162](https://linear.app/alexgpt/issue/ALE-162) Manual content tags **IN REVIEW** — tag manager dialog fix
+**Latest deploy:** PR #13 merge to `main` (ALE-164 bulk content actions, commit `91ea180`)
+**Muc tiep tiep theo:** M10 — Beta QA & Activation (proposed)
 Feedback source of truth:
 
 [https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/](https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/)
@@ -44,7 +44,9 @@ Feedback source of truth:
 | Cohort 2 feedback tracking | [beta-feedback-round-2.md](./beta-feedback-round-2.md) |
 | **Next decision point** | **After 5 completed tests OR 7–10 days** (whichever first) |
 | **M8 milestone** | **COMPLETE** — pipeline shipped (ALE-154, ALE-155, ALE-156, ALE-157, ALE-158, ALE-159) | [social-url-importer-plan.md](./social-url-importer-plan.md) |
-| **Next recommended** | [ALE-162](https://linear.app/alexgpt/issue/ALE-162) Manual content tags (P1) |
+| **M9 milestone** | **COMPLETE** — Content Library & Search (ALE-161, ALE-162, ALE-163, ALE-164, ALE-165) |
+| **M9 progress** | ALE-161 ✅ Done · ALE-162 ✅ Done · ALE-163 ✅ Done · ALE-164 ✅ Done · ALE-165 ✅ Done |
+| **Next recommended** | M10 — Beta QA & Activation (proposed) |
 | **ALE-153 prerequisite** | ✅ [ALE-153](https://linear.app/alexgpt/issue/ALE-153) Done (commit `736ed99`, PR #2) — M8 importers unblocked |
 | **M8 progress** | ALE-154 ✅ Done · ALE-155 ✅ Done · ALE-156 ✅ Done · ALE-157 ✅ Done · ALE-158 ✅ Done · ALE-159 ✅ Done |
 
@@ -59,6 +61,16 @@ Feedback source of truth:
 
 **Policy:** Không tạo P0/P1 issue code mới cho M8 — chỉ sửa khi Cohort 2 feedback chỉ ra lỗi nghiêm trọng.
 
+### M9 known limitations
+
+| # | Limitation | Notes |
+|---|-----------|-------|
+| 1 | **ALE-163 saved views smoke PARTIAL** — 4/11 tests user-claimed but no recorded log | Feature shipped + functional; follow-up smoke if re-open needed |
+| 2 | **ALE-161–165 smoke not all individually documented in production-smoke-test.md** | Changelog-level PASS; full per-issue smoke matrix deferred |
+| 3 | **Browser Use smoke suite (ALE-160) has modified + untracked files** | Cleanup tracked as M10 candidate issue |
+
+**Policy:** M9 feature code complete. Focus shifts to QA, analytics, onboarding polish for M10.
+
 ### Cohort 2 current status
 
 | Item | Status |
@@ -66,7 +78,7 @@ Feedback source of truth:
 | **Recruiting** | `beta-feedback-round-2.md` tracker active — inviting creators |
 | **Decision gate** | After **5 completed tests** OR **7–10 days** (whichever first) |
 | **Expected signal** | TikTok/Instagram feedback quality; Paste text vs URL confusion |
-| **Do NOT start** | M9 feature, ALE-160 Browser Use implementation, hay code PR mới |
+| **Do NOT start** | New feature code until M10 plan is confirmed |
 
 
 ---
@@ -129,10 +141,13 @@ Feedback source of truth:
 ## Changelog
 | Date | Summary |
 |------|---------|
+| 2026-06-03 | **M9 COMPLETE** — Content Library & Search. All 5 issues Done (ALE-161→165). Production smoke PASS. Latest deploy: PR #13 merge `91ea180`. |
+| 2026-06-03 | **ALE-165** — Content detail page polish (commit `af0eae9`). No separate PR — committed directly. Smoke PASS. |
+| 2026-06-03 | **ALE-164** — Bulk content actions (PR #13 merge `91ea180`). Shift range selection, safe unlink + move rollback. Smoke PASS. |
 | 2026-06-02 | **ALE-160** — Browser Use QA smoke runner (commit `293ebc2`, PR #9). Local Playwright smoke tests. 7 tasks. No production code changes. lint/build/type-check PASS. |
 | 2026-06-02 | **ALE-163** — Saved board views (PR #12 merge `633b2f3`). New `board_saved_views` table (migration applied to prod). Production smoke 7/11 verifiable (Hermes), 4/11 PARTIAL (user manual verify claimed 2026-06-02). Linear auto-closed at merge. Docs: `docs/database/ale163-migration-apply-checklist.md`. State: **Done**. |
 | 2026-06-02 | **ALE-161** — Board search + platform filter + empty states (PR #9 merge). Board detail page có search (title, raw_content, source_url), platform filter (TikTok, Instagram, YouTube, Facebook, LinkedIn, Other), empty state rõ ràng không fallback, preserve add/breakdown/remix links. Smoke 7/7 PASS. Next: ALE-162. |
-| 2026-06-02 | **ALE-162** — Manual content tags **REOPENED** (PR #10 merge, then hotfix required). Tag manager button visible but dialog does not open via click. Production smoke **5/12 verifiable, 7/12 blocked**. Board infrastructure OK, search OK, platform badges OK. Tag create/assign/remove/filter CANNOT VERIFY until dialog fix. State: **In Review**. |
+| 2026-06-02 | **ALE-162** — Manual content tags Done (PR #10 merge `10ab23e` + hotfix `855a837`). Tag manager dialog fix (controlled component). Smoke PASS. |
 | 2026-06-02 | **ALE-156** — TikTok metadata importer Done (commit `02f0928`, PR #7). `TikTokImporter` with oEmbed + blocked fallback. Production smoke 5/5 PASS. |
 | 2026-06-02 | **ALE-157** — Instagram oEmbed best-effort Done (commit PR #8 merge). `InstagramImporter` oEmbed best-effort, graceful fallback to `sourceQuality: "blocked"` khi oEmbed trả về login page. No crash, no HTML scraping. Unit tests 40/40 PASS (10 suites). **M8 COMPLETE** |
 | 2026-06-02 | **ALE-158** — M8 source quality badges Done (commit `f452acd`, PR #5). Badge component extends `shadcn/ui` cva. `getSourceQualityFromItem()` pure helper. Hiển thị trên BreakdownView và ContentItemCard. Smoke 4/4 PASS: paste text, YouTube metadata, TikTok/Instagram blocked, URL thumbnail regression. **M8 COMPLETE** |
