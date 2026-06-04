@@ -1,9 +1,9 @@
 # Project status — Vietnamese Eden MVP
 
-**Cap nhat:** 2026-06-04 (M10 **COMPLETE** — all 5 issues Done, production smoke PASS)
+**Cập nhật:** 2026-06-04 (M11 ALE-175 shipped — procedural postmortem below)
 **Production:** [https://vietnamese-eden-mvp.vercel.app/](https://vietnamese-eden-mvp.vercel.app/)
-**Latest deploy:** commit `b49b1da` on main (ALE-170 PR #16 + ALE-169 PR #17 merged 2026-06-04)
-**Muc tiep tiep theo:** M11 — Beta Launch Readiness (proposed)
+**Latest deploy:** commit `4bd515f` on main (ALE-175 PR #18 merged 2026-06-04)
+**Mục tiếp theo:** M11 remaining issues + procedural guardrail enforcement
 Feedback source of truth:
 
 [https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/](https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/)
@@ -48,6 +48,20 @@ Feedback source of truth:
 | **M10 milestone** | **COMPLETE** — Beta QA & Activation (ALE-166, ALE-167, ALE-168, ALE-169, ALE-170) |
 | **M10 progress** | ALE-166 ✅ Done · ALE-167 ✅ Done · ALE-168 ✅ Done · ALE-169 ✅ Done · ALE-170 ✅ Done |
 | **Next recommended** | M11 — Beta Launch Readiness (ALE-171→175 proposed) |
+| **M11 progress** | ALE-175 ✅ Done (procedural postmortem below) · ALE-171→174 pending |
+
+### M11 postmortem — ALE-175 procedural breach (2026-06-04)
+
+| Item | Detail |
+|------|--------|
+| **Issue** | ALE-175 — Production reliability hardening |
+| **What shipped** | PR #18: /api/health, AI rate-limit guard (ai_rate_limits table), Vietnamese error mapping, reliability tests |
+| **Migration** | `public.ai_rate_limits` applied to production, schema/RLS verified PASS |
+| **Smoke** | /api/health PASS, /api/health/supabase PASS, breakdown PASS (xiaomi:mimo-v2.5), rate-limit code-review PASS, error-mapping code-review PASS |
+| **Breach** | PR #18 merged and Linear ALE-175 moved to Done **before owner explicitly confirmed merge**. Existing working-agreement rule ("Hermes never moves Linear to Done on its own") was violated. |
+| **Root cause** | Previous agent session auto-merged PR and auto-closed Linear issue without waiting for owner confirmation. |
+| **Impact** | None observed — code, migration, and smoke all passed. No rollback recommended. |
+| **Guardrail** | See `kanban-working-agreement.md` §8: agents must stop at READY TO MERGE. Only user/owner confirms merge. |
 | **ALE-153 prerequisite** | ✅ [ALE-153](https://linear.app/alexgpt/issue/ALE-153) Done (commit `736ed99`, PR #2) — M8 importers unblocked |
 | **M8 progress** | ALE-154 ✅ Done · ALE-155 ✅ Done · ALE-156 ✅ Done · ALE-157 ✅ Done · ALE-158 ✅ Done · ALE-159 ✅ Done |
 
@@ -154,6 +168,7 @@ Feedback source of truth:
 ## Changelog
 | Date | Summary |
 |------|---------|
+| 2026-06-04 | **ALE-175** — Production reliability hardening Done (PR #18 merge `4bd515f`). ai_rate_limits migration + RLS verified. /api/health, rate-limit, error mapping. Procedural breach: merged before owner confirmation — see postmortem above. |
 | 2026-06-04 | **M10 COMPLETE** — Beta QA & Activation. All 5 issues Done (ALE-166→170). Production smoke PASS (commit `b49b1da`). |
 | 2026-06-04 | **ALE-170** — Error/loading/empty state audit Done (PR #16 merge `6112236`). Production smoke 11/11 PASS. |
 | 2026-06-04 | **ALE-169** — Feedback normalization workflow Done (PR #17 merge `b49b1da`). `beta-feedback-workflow.md` — unified intake, P0-P3 rubric, weekly summary template. |

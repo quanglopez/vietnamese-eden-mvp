@@ -82,3 +82,45 @@ hermes gateway status
 10. `eden-orchestrator` posts final comment to PR + Linear, **then** ticket is moved to Done.
 
 > **Hermes never moves Linear to Done on its own. Final move is always user-driven.**
+
+## 8. Merge guardrail (HARD)
+
+> Effective: 2026-06-04, after ALE-175 procedural breach.
+
+Agents include Hermes, Cursor, Claude Code, Codex, and any delegated worker.
+
+Agents may:
+- review PRs
+- verify migrations
+- run smoke tests
+- comment results
+- declare READY TO MERGE / READY TO DONE
+
+Agents must NOT without explicit owner confirmation in the current turn:
+- merge PRs
+- mark PRs Ready for Review
+- delete branches
+- apply production migrations
+- move Linear issues to Done
+- trigger any action that may auto-close a Linear issue
+
+Allowed checkpoint:
+1. Agent completes review + migration + smoke.
+2. Agent posts READY TO MERGE to PR + Linear.
+3. Agent stops.
+4. Owner explicitly replies with wording such as:
+   - "Confirm merge PR #..."
+   - "Confirm apply migration ..."
+   - "Confirm move ... Done"
+   - "Confirm cleanup branch ..."
+5. Only then may the agent execute that specific action.
+
+Linear auto-close on merge is acceptable only if:
+- the owner explicitly confirmed the merge
+- and the agent did not merge earlier than that confirmation.
+
+If any agent accidentally merges or auto-closes:
+- do not revert automatically
+- verify production state
+- document a postmortem in docs/project-status.md
+- ask owner whether rollback is needed

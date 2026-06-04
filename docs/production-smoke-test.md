@@ -1448,3 +1448,29 @@ All 5 issues Done. Combined production smoke PASS on commit `b49b1da`.
 **Latest deploy:** commit `b49b1da` on `main` (ALE-170 PR #16 + ALE-169 PR #17)
 **Known limitations:** See `project-status.md` § M10 known limitations
 **Next:** M11 — Beta Launch Readiness (proposed)
+
+---
+
+## ALE-175 — Production reliability smoke (2026-06-04)
+
+| Field | Value |
+|-------|-------|
+| **Test date** | 2026-06-04 |
+| **Environment** | Production `https://vietnamese-eden-mvp.vercel.app/` |
+| **Commit tested** | `4bd515f` (PR #18 merge) |
+| **Account** | `ggonevn@gmail.com` |
+| **AI provider** | `xiaomi:mimo-v2.5` |
+| **Smoke type** | Production smoke (code already deployed at test time) |
+
+| # | Step | Result | Notes |
+|---|------|--------|-------|
+| 1 | `GET /api/health` | **PASS** | 200, app ok, supabase ok, ai ok (xiaomi, mimo-v2.5). No secrets exposed. |
+| 2 | `GET /api/health/supabase` | **PASS** | 200, status ok, rowCount 1. |
+| 3 | Login (Playwright) | **PASS** | ggonevn@gmail.com → /dashboard, 1 auth cookie. |
+| 4 | Breakdown: navigate to content | **PASS** | `/breakdown/65b6ff01-…` loads, shows existing analysis (mock-dev). |
+| 5 | Breakdown: "Phân tích AI" button | **PASS** | Re-analysis with xiaomi:mimo-v2.5. Vietnamese output. Hook/Angle/Structure/CTA/Emotion/Audience. |
+| 6 | Rate-limit code review | **PASS** | breakdown: 10/5min, remix: 5/5min, voice: 3/10min. Vietnamese messages. Fails closed on DB error. |
+| 7 | Error mapping code review | **PASS** | No raw provider body. Vietnamese messages for rate-limit/timeout/5xx/missing-key/invalid-response. |
+| 8 | ai_rate_limits migration verify | **PASS** | Table exists. Columns: id, user_id, action, requested_at. CHECK IN breakdown/remix/voice. FK → auth.users CASCADE. Index (user_id, action, requested_at DESC). RLS enabled. 3 policies (insert/select/delete own). |
+| 9 | Supabase security advisor | **PASS** | No ai_rate_limits-specific security warnings. Existing warnings (SECURITY DEFINER functions, mutable search_path) pre-date ALE-175. |
+| 10 | Supabase performance advisor | **WARN** | ai_rate_limits: auth.uid() not wrapped in (select …) — performance at scale. Non-blocking. Pre-existing unindexed FKs on other tables. |
