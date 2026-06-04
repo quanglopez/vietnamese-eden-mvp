@@ -1,12 +1,140 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import type { Database } from "@/types/database";
+import { ANALYTICS_EVENT_TYPES } from "@/types/analytics";
 import type { AnalyticsEventType } from "@/types/analytics";
+import type { Database } from "@/types/database";
 
 export type AnalyticsEventCountRow = {
   event_type: AnalyticsEventType;
   count: number;
 };
+
+export type AnalyticsEventCounts = Record<AnalyticsEventType, number>;
+
+export type AnalyticsActivityRow = {
+  date: string;
+  total: number;
+  events: AnalyticsEventCounts;
+};
+
+export type AnalyticsFunnelStep = {
+  eventType: AnalyticsEventType;
+  label: string;
+  count: number;
+  conversionRate: number;
+  dropOffFromPrevious: number;
+};
+
+type AnalyticsCountInput = {
+  event_type: AnalyticsEventType;
+};
+
+type AnalyticsActivityInput = AnalyticsCountInput & {
+  created_at: string;
+};
+
+const DASHBOARD_FUNNEL: Array<{ eventType: AnalyticsEventType; label: string }> = [
+  { eventType: "login", label: "Đăng nhập" },
+  { eventType: "board_create", label: "Tạo board" },
+  { eventType: "content_add", label: "Thêm content" },
+  { eventType: "breakdown_run", label: "Chạy breakdown" },
+  { eventType: "remix_run", label: "Tạo remix" },
+  { eventType: "calendar_add", label: "Lên lịch" },
+];
+
+export function createEmptyAnalyticsCounts(): AnalyticsEventCounts {
+  return ANALYTICS_EVENT_TYPES.reduce((counts, eventType) => {
+    counts[eventType] = 0;
+    return counts;
+  }, {} as AnalyticsEventCounts);
+}
+
+export function countAnalyticsEvents(rows: AnalyticsCountInput[]): AnalyticsEventCounts {
+  const counts = createEmptyAnalyticsCounts();
+
+  for (const row of rows) {
+    if (row.event_type in counts) {
+      counts[row.event_type] += 1;
+    }
+  }
+
+  return counts;
+}
+
+export function mergeAnalyticsCounts(
+  ...countsList: Partial<AnalyticsEventCounts>[]
+): AnalyticsEventCounts {
+  const merged = createEmptyAnalyticsCounts();
+
+  for (const counts of countsList) {
+    for (const eventType of ANALYTICS_EVENT_TYPES) {
+      merged[eventType] += counts[eventType] ?? 0;
+    }
+  }
+
+  return merged;
+}
+
+export function countRowsToAnalyticsCounts(
+  rows: AnalyticsEventCountRow[],
+): AnalyticsEventCounts {
+  const counts = createEmptyAnalyticsCounts();
+
+  for (const row of rows) {
+    counts[row.event_type] = row.count;
+  }
+
+  return counts;
+}
+
+function toDateKey(date: Date): string {
+  return date.toISOString().slice(0, 10);
+}
+
+export function buildDailyActivity(
+  rows: AnalyticsActivityInput[],
+  days: number,
+  now = new Date(),
+): AnalyticsActivityRow[] {
+  const safeDays = Math.max(1, Math.min(days, 30));
+  const buckets = new Map<string, AnalyticsActivityRow>();
+
+  for (let index = safeDays - 1; index >= 0; index -= 1) {
+    const date = new Date(now);
+    date.setUTCHours(0, 0, 0, 0);
+    date.setUTCDate(date.getUTCDate() - index);
+    const key = toDateKey(date);
+    buckets.set(key, { date: key, total: 0, events: createEmptyAnalyticsCounts() });
+  }
+
+  for (const row of rows) {
+    const key = toDateKey(new Date(row.created_at));
+    const bucket = buckets.get(key);
+    if (!bucket || !(row.event_type in bucket.events)) continue;
+
+    bucket.events[row.event_type] += 1;
+    bucket.total += 1;
+  }
+
+  return Array.from(buckets.values());
+}
+
+export function buildAnalyticsFunnel(counts: AnalyticsEventCounts): AnalyticsFunnelStep[] {
+  const firstCount = counts.login;
+  let previousCount = firstCount;
+
+  return DASHBOARD_FUNNEL.map(({ eventType, label }, index) => {
+    const count = counts[eventType] ?? 0;
+    const conversionRate = firstCount > 0 ? Math.round((count / firstCount) * 100) : 0;
+    const dropOffFromPrevious =
+      index === 0 || previousCount === 0
+        ? 0
+        : Math.max(0, Math.round(((previousCount - count) / previousCount) * 100));
+    previousCount = count;
+
+    return { eventType, label, count, conversionRate, dropOffFromPrevious };
+  });
+}
 
 /**
  * Workspace-scoped event counts (last N days). Requires migration applied and
@@ -35,16 +163,35 @@ export async function getWorkspaceAnalyticsCounts(
     return { rows: [], error: error.message };
   }
 
-  const counts = new Map<AnalyticsEventType, number>();
-  for (const row of data ?? []) {
-    const type = row.event_type as AnalyticsEventType;
-    counts.set(type, (counts.get(type) ?? 0) + 1);
-  }
-
-  const rows = Array.from(counts.entries()).map(([event_type, count]) => ({
-    event_type,
-    count,
-  }));
+  const counts = countAnalyticsEvents((data ?? []) as AnalyticsCountInput[]);
+  const rows = ANALYTICS_EVENT_TYPES.filter((eventType) => counts[eventType] > 0).map(
+    (event_type) => ({ event_type, count: counts[event_type] }),
+  );
 
   return { rows, error: null };
+}
+
+export async function getWorkspaceAnalyticsActivity(
+  supabase: SupabaseClient<Database>,
+  workspaceId: string,
+  days = 30,
+): Promise<{ rows: AnalyticsActivityRow[]; error: string | null }> {
+  const since = new Date();
+  since.setDate(since.getDate() - days + 1);
+  since.setUTCHours(0, 0, 0, 0);
+
+  const { data, error } = await supabase
+    .from("analytics_events")
+    .select("event_type, created_at")
+    .eq("workspace_id", workspaceId)
+    .gte("created_at", since.toISOString());
+
+  if (error) {
+    return { rows: buildDailyActivity([], days), error: error.message };
+  }
+
+  return {
+    rows: buildDailyActivity((data ?? []) as AnalyticsActivityInput[], days),
+    error: null,
+  };
 }

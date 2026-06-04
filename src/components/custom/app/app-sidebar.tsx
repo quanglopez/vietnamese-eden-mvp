@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  BarChart3,
   CalendarDays,
   FolderHeart,
   LayoutDashboard,
@@ -26,6 +27,7 @@ const nav = [
   { href: "/remix", label: "Remix AI", icon: Wand2, exact: false as const },
   { href: "/calendar", label: "Lịch 30 ngày", icon: CalendarDays, exact: false as const },
   { href: "/pricing", label: "Gói cước", icon: Tag, exact: false as const },
+  { href: "/admin/analytics", label: "Thống kê", icon: BarChart3, exact: false as const },
 ] as const;
 
 function getInitials(fullName: string | null, email: string | undefined) {
