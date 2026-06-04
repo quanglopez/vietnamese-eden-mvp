@@ -107,6 +107,81 @@ export type Database = {
         };
         Relationships: [];
       };
+      beta_testers: {
+        Row: {
+          id: string;
+          workspace_id: string;
+          email: string;
+          full_name: string | null;
+          persona: Database["public"]["Enums"]["beta_persona"];
+          invite_status: Database["public"]["Enums"]["beta_invite_status"];
+          signup_status: Database["public"]["Enums"]["beta_signup_status"];
+          core_flow_status: Database["public"]["Enums"]["beta_core_flow_status"];
+          feedback_status: Database["public"]["Enums"]["beta_feedback_status"];
+          user_id: string | null;
+          notes: string | null;
+          invited_at: string | null;
+          signed_up_at: string | null;
+          completed_at: string | null;
+          feedback_received_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          workspace_id: string;
+          email: string;
+          full_name?: string | null;
+          persona?: Database["public"]["Enums"]["beta_persona"];
+          invite_status?: Database["public"]["Enums"]["beta_invite_status"];
+          signup_status?: Database["public"]["Enums"]["beta_signup_status"];
+          core_flow_status?: Database["public"]["Enums"]["beta_core_flow_status"];
+          feedback_status?: Database["public"]["Enums"]["beta_feedback_status"];
+          user_id?: string | null;
+          notes?: string | null;
+          invited_at?: string | null;
+          signed_up_at?: string | null;
+          completed_at?: string | null;
+          feedback_received_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          workspace_id?: string;
+          email?: string;
+          full_name?: string | null;
+          persona?: Database["public"]["Enums"]["beta_persona"];
+          invite_status?: Database["public"]["Enums"]["beta_invite_status"];
+          signup_status?: Database["public"]["Enums"]["beta_signup_status"];
+          core_flow_status?: Database["public"]["Enums"]["beta_core_flow_status"];
+          feedback_status?: Database["public"]["Enums"]["beta_feedback_status"];
+          user_id?: string | null;
+          notes?: string | null;
+          invited_at?: string | null;
+          signed_up_at?: string | null;
+          completed_at?: string | null;
+          feedback_received_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "beta_testers_workspace_id_fkey";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "beta_testers_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       health_check: {
         Row: {
           id: number;
@@ -554,6 +629,29 @@ export type Database = {
         | "breakdown_run"
         | "remix_run"
         | "calendar_add";
+      beta_persona:
+        | "creator"
+        | "agency"
+        | "beauty_lifestyle"
+        | "educator_coach"
+        | "other";
+      beta_invite_status:
+        | "pending"
+        | "invited"
+        | "accepted"
+        | "declined"
+        | "expired";
+      beta_signup_status: "not_signed_up" | "signed_up" | "onboarded";
+      beta_core_flow_status:
+        | "not_started"
+        | "in_progress"
+        | "completed"
+        | "partial";
+      beta_feedback_status:
+        | "not_requested"
+        | "requested"
+        | "received"
+        | "n/a";
       workspace_role: "owner" | "admin" | "member" | "viewer";
       platform_type: "tiktok" | "facebook" | "instagram" | "youtube" | "other";
       analysis_status: "pending" | "completed" | "failed";

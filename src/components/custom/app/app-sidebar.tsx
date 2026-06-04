@@ -11,6 +11,7 @@ import {
   Plus,
   Sparkles,
   Tag,
+  UserRoundCog,
   Wand2,
 } from "lucide-react";
 
@@ -28,6 +29,7 @@ const nav = [
   { href: "/calendar", label: "Lịch 30 ngày", icon: CalendarDays, exact: false as const },
   { href: "/pricing", label: "Gói cước", icon: Tag, exact: false as const },
   { href: "/admin/analytics", label: "Thống kê", icon: BarChart3, exact: false as const },
+  { href: "/admin/beta-testers", label: "Quản tester", icon: UserRoundCog, exact: false as const },
 ] as const;
 
 function getInitials(fullName: string | null, email: string | undefined) {
