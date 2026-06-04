@@ -1474,3 +1474,30 @@ All 5 issues Done. Combined production smoke PASS on commit `b49b1da`.
 | 8 | ai_rate_limits migration verify | **PASS** | Table exists. Columns: id, user_id, action, requested_at. CHECK IN breakdown/remix/voice. FK → auth.users CASCADE. Index (user_id, action, requested_at DESC). RLS enabled. 3 policies (insert/select/delete own). |
 | 9 | Supabase security advisor | **PASS** | No ai_rate_limits-specific security warnings. Existing warnings (SECURITY DEFINER functions, mutable search_path) pre-date ALE-175. |
 | 10 | Supabase performance advisor | **WARN** | ai_rate_limits: auth.uid() not wrapped in (select …) — performance at scale. Non-blocking. Pre-existing unindexed FKs on other tables. |
+
+## ALE-171 — Analytics Dashboard MVP — Production Smoke Re-run (2026-06-04)
+
+**Context:** PR #19 merged (commit 07688ea). First smoke was PARTIAL — SUPABASE_SERVICE_ROLE_KEY missing from Vercel production env. Owner added key + redeployed. This is the re-smoke.
+
+**Account:** ggonevn@gmail.com (workspace admin)
+
+| # | Test | Result | Notes |
+|---|------|--------|-------|
+| 1 | /admin/analytics loads | **PASS** | Title "Thống kê · Vietnamese Eden" |
+| 2 | Error card "Thiếu SUPABASE_SERVICE_ROLE_KEY" gone | **PASS** | No error card visible |
+| 3 | Login/auth count > 0 | **PASS** | Login count = 41 |
+| 4 | Auth label "Platform-wide auth aggregate" | **PASS** | Label + workspace_id=null note visible |
+| 5 | Workspace counts render | **PASS** | board:2, content:3, breakdown:4, remix:2, calendar:1 |
+| 6 | 7d/30d toggle | **PASS** | Both buttons render, data switches |
+| 7 | Funnel no NaN/Infinity | **PASS** | 100%→5%→7%→10%→5%→2% |
+| 8 | Activity chart | **PASS** | Daily bars 05-29 to 06-04, valid numbers |
+| 9 | No private data | **PASS** | Email only in AppSidebar (app shell). Privacy note present. |
+| 10 | /dashboard regression | **PASS** | "Chào Quang 👋", boards visible |
+| 11 | /boards regression | **PASS** | 6 boards listed |
+| 12 | /api/health regression | **PASS** | 200, app+supabase+ai ok |
+| 13 | Console errors | **PASS** | Zero JS errors |
+
+### Verdict
+- [x] ALL PASS → ALE-171 Done. Env fix resolved auth aggregate issue.
+- PR #19 comment: https://github.com/quanglopez/vietnamese-eden-mvp/pull/19#issuecomment-4619851594
+- Linear comment: 28c81d8b-…
