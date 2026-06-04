@@ -4,7 +4,9 @@ import { revalidatePath } from "next/cache";
 
 import { trackEvent } from "@/lib/analytics/tracker";
 import { analyzeContentText, getActiveAiModelLabel } from "@/lib/ai/client";
-import { AiProviderError, BreakdownContentError } from "@/lib/ai/errors";
+import { getSafeAiErrorLog, mapAiProviderError } from "@/lib/ai/error-messages";
+import { BreakdownContentError } from "@/lib/ai/errors";
+import { checkAiRateLimit } from "@/lib/ai/rate-limit";
 import type { ActionResult } from "@/lib/boards/actions";
 import {
   buildSummaryPayload,
@@ -59,6 +61,11 @@ export async function runContentAnalysisAction(
     };
   }
 
+  const rateLimit = await checkAiRateLimit(supabase, user.id, "breakdown");
+  if (!rateLimit.allowed) {
+    return { success: false, error: rateLimit.message };
+  }
+
   let analysisResult;
   let aiModel: string;
 
@@ -74,15 +81,10 @@ export async function runContentAnalysisAction(
     aiModel = getActiveAiModelLabel();
   } catch (error) {
     if (error instanceof BreakdownContentError) {
-      return { success: false, error: error.message };
+      return { success: false, error: mapAiProviderError(error, "phân tích") };
     }
-    if (error instanceof AiProviderError) {
-      return { success: false, error: error.message };
-    }
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Phân tích AI thất bại.",
-    };
+    console.warn("AI breakdown failed", getSafeAiErrorLog(error));
+    return { success: false, error: mapAiProviderError(error, "phân tích") };
   }
 
   const summary = buildSummaryPayload(analysisResult);

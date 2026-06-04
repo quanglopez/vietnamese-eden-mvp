@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache";
 
 import { trackEvent } from "@/lib/analytics/tracker";
 import { generateRemixVariants } from "@/lib/ai/client";
-import { AiProviderError } from "@/lib/ai/errors";
+import { getSafeAiErrorLog, mapAiProviderError } from "@/lib/ai/error-messages";
+import { checkAiRateLimit } from "@/lib/ai/rate-limit";
 import type { ActionResult } from "@/lib/boards/actions";
 import { isValidUuid } from "@/lib/boards/utils";
 import {
@@ -108,6 +109,11 @@ export async function generateRemixAction(input: {
     };
   }
 
+  const rateLimit = await checkAiRateLimit(supabase, user.id, "remix");
+  if (!rateLimit.allowed) {
+    return { success: false, error: rateLimit.message };
+  }
+
   let voiceProfile = null;
   if (voiceProfileId) {
     if (!isValidUuid(voiceProfileId)) {
@@ -140,13 +146,8 @@ export async function generateRemixAction(input: {
       voiceProfile,
     });
   } catch (error) {
-    if (error instanceof AiProviderError) {
-      return { success: false, error: error.message };
-    }
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Tạo remix thất bại.",
-    };
+    console.warn("AI remix failed", getSafeAiErrorLog(error));
+    return { success: false, error: mapAiProviderError(error, "remix") };
   }
 
   const rows = remixResult.variants.map((variant, index) => ({
