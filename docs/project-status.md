@@ -1,9 +1,9 @@
 # Project status — Vietnamese Eden MVP
 
-**Cap nhat:** 2026-06-03 (M9 **COMPLETE** — all 5 issues Done, production smoke PASS)
+**Cap nhat:** 2026-06-04 (M10 **COMPLETE** — all 5 issues Done, production smoke PASS)
 **Production:** [https://vietnamese-eden-mvp.vercel.app/](https://vietnamese-eden-mvp.vercel.app/)
-**Latest deploy:** PR #13 merge to `main` (ALE-164 bulk content actions, commit `91ea180`)
-**Muc tiep tiep theo:** M10 — Beta QA & Activation (proposed)
+**Latest deploy:** commit `b49b1da` on main (ALE-170 PR #16 + ALE-169 PR #17 merged 2026-06-04)
+**Muc tiep tiep theo:** M11 — Beta Launch Readiness (proposed)
 Feedback source of truth:
 
 [https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/](https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/)
@@ -45,8 +45,9 @@ Feedback source of truth:
 | **Next decision point** | **After 5 completed tests OR 7–10 days** (whichever first) |
 | **M8 milestone** | **COMPLETE** — pipeline shipped (ALE-154, ALE-155, ALE-156, ALE-157, ALE-158, ALE-159) | [social-url-importer-plan.md](./social-url-importer-plan.md) |
 | **M9 milestone** | **COMPLETE** — Content Library & Search (ALE-161, ALE-162, ALE-163, ALE-164, ALE-165) |
-| **M9 progress** | ALE-161 ✅ Done · ALE-162 ✅ Done · ALE-163 ✅ Done · ALE-164 ✅ Done · ALE-165 ✅ Done |
-| **Next recommended** | M10 — Beta QA & Activation (proposed) |
+| **M10 milestone** | **COMPLETE** — Beta QA & Activation (ALE-166, ALE-167, ALE-168, ALE-169, ALE-170) |
+| **M10 progress** | ALE-166 ✅ Done · ALE-167 ✅ Done · ALE-168 ✅ Done · ALE-169 ✅ Done · ALE-170 ✅ Done |
+| **Next recommended** | M11 — Beta Launch Readiness (ALE-171→175 proposed) |
 | **ALE-153 prerequisite** | ✅ [ALE-153](https://linear.app/alexgpt/issue/ALE-153) Done (commit `736ed99`, PR #2) — M8 importers unblocked |
 | **M8 progress** | ALE-154 ✅ Done · ALE-155 ✅ Done · ALE-156 ✅ Done · ALE-157 ✅ Done · ALE-158 ✅ Done · ALE-159 ✅ Done |
 
@@ -70,6 +71,18 @@ Feedback source of truth:
 | 3 | **Browser Use smoke suite (ALE-160) has modified + untracked files** | Cleanup tracked as M10 candidate issue |
 
 **Policy:** M9 feature code complete. Focus shifts to QA, analytics, onboarding polish for M10.
+
+### M10 known limitations
+
+| # | Limitation | Notes |
+|---|-----------|-------|
+| 1 | **ALE-167 analytics: workspace_id=null** on signup/login events — not in workspace admin counts | Schema allows null; fix tracked for analytics dashboard |
+| 2 | **ALE-167 analytics: no UI dashboard** — events fire to DB but no admin-facing summary | Requires M11 analytics dashboard |
+| 3 | **ALE-169 feedback: docs-only** — workflow defined but no auto-ingest from Google Form/Sheet | Manual triage step needed; auto-ingest is M11 candidate |
+| 4 | **ALE-170 error-state audit: P3 items deferred** — cosmetic issues documented but not fixed | Low priority; no beta blocker |
+| 5 | **ALE-166 Browser smoke suite: credentials required** — Playwright smoke can't full-run without real Supabase credentials | Documented in `scripts/browser-use/README.md` |
+
+**Policy:** M10 shipped complete. All known limitations are non-blocking for beta launch. Tracked for M11.
 
 ### Cohort 2 current status
 
@@ -141,7 +154,12 @@ Feedback source of truth:
 ## Changelog
 | Date | Summary |
 |------|---------|
-| 2026-06-04 | **ALE-169** — Feedback normalization workflow started (docs only, no app code). Created `beta-feedback-workflow.md` — unified intake, P0-P3 rubric, weekly summary template, positive signal category. |
+| 2026-06-04 | **M10 COMPLETE** — Beta QA & Activation. All 5 issues Done (ALE-166→170). Production smoke PASS (commit `b49b1da`). |
+| 2026-06-04 | **ALE-170** — Error/loading/empty state audit Done (PR #16 merge `6112236`). Production smoke 11/11 PASS. |
+| 2026-06-04 | **ALE-169** — Feedback normalization workflow Done (PR #17 merge `b49b1da`). `beta-feedback-workflow.md` — unified intake, P0-P3 rubric, weekly summary template. |
+| 2026-06-04 | **ALE-168** — Onboarding checklist polish Done (PR #15). First-login checklist widget, Vietnamese copy, mobile responsive. |
+| 2026-06-03 | **ALE-167** — Beta analytics events Done (PR #14). 7 event types, privacy-safe, Supabase insert. Production smoke PASS. |
+| 2026-06-03 | **ALE-166** — Production smoke suite cleanup Done. Browser Use scripts consolidated, documented in README.
 | 2026-06-03 | **M9 COMPLETE** — Content Library & Search. All 5 issues Done (ALE-161→165). Production smoke PASS. Latest deploy: PR #13 merge `91ea180`. |
 | 2026-06-03 | **ALE-165** — Content detail page polish (commit `af0eae9`). No separate PR — committed directly. Smoke PASS. |
 | 2026-06-03 | **ALE-164** — Bulk content actions (PR #13 merge `91ea180`). Shift range selection, safe unlink + move rollback. Smoke PASS. |

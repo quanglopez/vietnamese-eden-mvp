@@ -1428,3 +1428,23 @@ Browser automation consumed ~85 % of context during login + board navigate + cre
 **Latest deploy:** PR #13 merge `91ea180` on `main`
 **Known limitations:** See `project-status.md` § M9 known limitations
 **Next:** M10 — Beta QA & Activation (proposed)
+
+---
+
+## M10 — Beta QA & Activation (2026-06-03 to 2026-06-04)
+
+All 5 issues Done. Combined production smoke PASS on commit `b49b1da`.
+
+| Issue | Title | PR/Commit | Smoke Result | Verdict |
+|-------|-------|-----------|-------------|---------|
+| ALE-166 | Production smoke suite cleanup | (docs) | PASS | ✅ |
+| ALE-167 | Beta analytics events | PR #14 | PASS (lint/build/type-check) | ✅ |
+| ALE-168 | Onboarding checklist polish | PR #15 | PASS (lint/build/type-check) | ✅ |
+| ALE-169 | Feedback normalization workflow | PR #17 | PASS (docs-only) | ✅ |
+| ALE-170 | Error/loading/empty state audit | PR #16 merge `6112236` | 11/11 PASS (zero console errors) | ✅ |
+
+**Total:** 5/5 issues Done, production smoke PASS
+**Milestone:** M10 COMPLETE ✅
+**Latest deploy:** commit `b49b1da` on `main` (ALE-170 PR #16 + ALE-169 PR #17)
+**Known limitations:** See `project-status.md` § M10 known limitations
+**Next:** M11 — Beta Launch Readiness (proposed)
