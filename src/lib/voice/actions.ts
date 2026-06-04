@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 
 import { analyzeVoiceProfile } from "@/lib/ai/client";
+import { getSafeAiErrorLog, mapAiProviderError } from "@/lib/ai/error-messages";
+import { checkAiRateLimit } from "@/lib/ai/rate-limit";
 import type { ActionResult } from "@/lib/boards/actions";
 import { isValidUuid } from "@/lib/boards/utils";
 import {
@@ -10,7 +12,6 @@ import {
   MAX_VOICE_SAMPLE_CHARS,
   MIN_VOICE_SAMPLE_CHARS,
 } from "@/lib/voice/constants";
-import { mapVoiceAnalysisError } from "@/lib/voice/error-messages";
 import { buildStyleNotesPayload } from "@/lib/voice/style-notes";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/workspaces/queries";
@@ -58,6 +59,11 @@ export async function createVoiceProfileAction(input: {
     return { success: false, error: "Không tìm thấy workspace. Hãy tạo workspace trước." };
   }
 
+  const rateLimit = await checkAiRateLimit(supabase, user.id, "voice");
+  if (!rateLimit.allowed) {
+    return { success: false, error: rateLimit.message };
+  }
+
   let analysis;
   try {
     analysis = await analyzeVoiceProfile({
@@ -66,7 +72,8 @@ export async function createVoiceProfileAction(input: {
       description: description || null,
     });
   } catch (error) {
-    return { success: false, error: mapVoiceAnalysisError(error) };
+    console.warn("AI voice analysis failed", getSafeAiErrorLog(error));
+    return { success: false, error: mapAiProviderError(error, "giọng văn") };
   }
 
   const { count: existingCount } = await supabase

@@ -51,6 +51,35 @@ export type Database = {
           },
         ];
       };
+      ai_rate_limits: {
+        Row: {
+          id: string;
+          user_id: string;
+          action: "breakdown" | "remix" | "voice";
+          requested_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          action: "breakdown" | "remix" | "voice";
+          requested_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          action?: "breakdown" | "remix" | "voice";
+          requested_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ai_rate_limits_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       beta_waitlist: {
         Row: {
           id: string;
