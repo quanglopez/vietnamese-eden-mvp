@@ -141,6 +141,7 @@ Feedback source of truth:
 ## Changelog
 | Date | Summary |
 |------|---------|
+| 2026-06-04 | **ALE-169** — Feedback normalization workflow started (docs only, no app code). Created `beta-feedback-workflow.md` — unified intake, P0-P3 rubric, weekly summary template, positive signal category. |
 | 2026-06-03 | **M9 COMPLETE** — Content Library & Search. All 5 issues Done (ALE-161→165). Production smoke PASS. Latest deploy: PR #13 merge `91ea180`. |
 | 2026-06-03 | **ALE-165** — Content detail page polish (commit `af0eae9`). No separate PR — committed directly. Smoke PASS. |
 | 2026-06-03 | **ALE-164** — Bulk content actions (PR #13 merge `91ea180`). Shift range selection, safe unlink + move rollback. Smoke PASS. |

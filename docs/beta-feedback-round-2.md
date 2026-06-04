@@ -112,7 +112,7 @@ _Phân loại feedback theo category. Mỗi entry: severity, summary, evidence q
 
 | # | User | Category | Severity (P0/P1/P2/P3) | Summary | Evidence (verbatim) |
 |---|------|----------|------------------------|---------|---------------------|
-| 1 | _TBD_ | _Bug / UX / AI Quality / Pricing / Feature_ | _P0/P1/P2/P3_ | _TBD_ | > _TBD_ |
+| 1 | _TBD_ | _Bug / UX / AI Quality / Pricing / Feature / Positive signal_ | _P0/P1/P2/P3_ | _TBD_ | > _TBD_ |
 | 2 | _TBD_ | _…_ | _…_ | _…_ | > _…_ |
 | 3 | _TBD_ | _…_ | _…_ | _…_ | > _…_ |
 
