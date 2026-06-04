@@ -182,6 +182,142 @@ export type Database = {
           },
         ];
       };
+      feedback_entries: {
+        Row: {
+          id: string;
+          workspace_id: string;
+          beta_tester_id: string | null;
+          created_by: string | null;
+          source:
+            | "google_form"
+            | "manual_chat"
+            | "email"
+            | "dogfood"
+            | "other";
+          source_ref: string | null;
+          reporter_name: string | null;
+          reporter_persona:
+            | "creator"
+            | "freelancer"
+            | "agency"
+            | "educator"
+            | "beauty_lifestyle"
+            | "other"
+            | null;
+          cohort: string;
+          raw_summary: string;
+          verbatim_quotes: string[];
+          category: "bug" | "ux" | "fr" | "ai" | "price" | "positive";
+          priority: "p0" | "p1" | "p2" | "p3" | null;
+          status: "untriaged" | "triaged" | "actioned" | "closed";
+          linear_issue_id: string | null;
+          action_notes: string | null;
+          replied_to_user: boolean;
+          device: "desktop" | "mobile" | "both" | "unknown" | null;
+          reproducible: "yes" | "no" | "not_tried" | null;
+          notes: string | null;
+          triaged_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          workspace_id: string;
+          beta_tester_id?: string | null;
+          created_by?: string | null;
+          source:
+            | "google_form"
+            | "manual_chat"
+            | "email"
+            | "dogfood"
+            | "other";
+          source_ref?: string | null;
+          reporter_name?: string | null;
+          reporter_persona?:
+            | "creator"
+            | "freelancer"
+            | "agency"
+            | "educator"
+            | "beauty_lifestyle"
+            | "other"
+            | null;
+          cohort?: string;
+          raw_summary: string;
+          verbatim_quotes?: string[];
+          category: "bug" | "ux" | "fr" | "ai" | "price" | "positive";
+          priority?: "p0" | "p1" | "p2" | "p3" | null;
+          status?: "untriaged" | "triaged" | "actioned" | "closed";
+          linear_issue_id?: string | null;
+          action_notes?: string | null;
+          replied_to_user?: boolean;
+          device?: "desktop" | "mobile" | "both" | "unknown" | null;
+          reproducible?: "yes" | "no" | "not_tried" | null;
+          notes?: string | null;
+          triaged_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          workspace_id?: string;
+          beta_tester_id?: string | null;
+          created_by?: string | null;
+          source?:
+            | "google_form"
+            | "manual_chat"
+            | "email"
+            | "dogfood"
+            | "other";
+          source_ref?: string | null;
+          reporter_name?: string | null;
+          reporter_persona?:
+            | "creator"
+            | "freelancer"
+            | "agency"
+            | "educator"
+            | "beauty_lifestyle"
+            | "other"
+            | null;
+          cohort?: string;
+          raw_summary?: string;
+          verbatim_quotes?: string[];
+          category?: "bug" | "ux" | "fr" | "ai" | "price" | "positive";
+          priority?: "p0" | "p1" | "p2" | "p3" | null;
+          status?: "untriaged" | "triaged" | "actioned" | "closed";
+          linear_issue_id?: string | null;
+          action_notes?: string | null;
+          replied_to_user?: boolean;
+          device?: "desktop" | "mobile" | "both" | "unknown" | null;
+          reproducible?: "yes" | "no" | "not_tried" | null;
+          notes?: string | null;
+          triaged_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "feedback_entries_workspace_id_fkey";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "feedback_entries_beta_tester_id_fkey";
+            columns: ["beta_tester_id"];
+            isOneToOne: false;
+            referencedRelation: "beta_testers";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "feedback_entries_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       health_check: {
         Row: {
           id: number;
