@@ -10,6 +10,7 @@ import {
   MessageSquare,
   Mic,
   Plus,
+  Rocket,
   Sparkles,
   Tag,
   UserRoundCog,
@@ -32,6 +33,7 @@ const nav = [
   { href: "/admin/analytics", label: "Thống kê", icon: BarChart3, exact: false as const },
   { href: "/admin/beta-testers", label: "Quản tester", icon: UserRoundCog, exact: false as const },
   { href: "/admin/feedback", label: "Phản hồi", icon: MessageSquare, exact: false as const },
+  { href: "/admin/beta-launch", label: "Beta Launch", icon: Rocket, exact: false as const },
 ] as const;
 
 function getInitials(fullName: string | null, email: string | undefined) {
