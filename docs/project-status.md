@@ -1,9 +1,9 @@
 # Project status — Vietnamese Eden MVP
 
-**Cập nhật:** 2026-06-05 (M12 — ALE-179 Done, M12 IN PROGRESS)
+**Cập nhật:** 2026-06-06 (M12 — ALE-180 Done, M12 IN PROGRESS)
 **Production:** [https://vietnamese-eden-mvp.vercel.app/](https://vietnamese-eden-mvp.vercel.app/)
-**Latest deploy:** commit `3553fcc` on main (ALE-179 PR #26 squashed 2026-06-05)
-**Tiếp theo:** ALE-180 — First-run activation improvements
+**Latest deploy:** commit `3ff6328` on main (ALE-180 PR #27 merged 2026-06-05)
+**Tiếp theo:** ALE-181 — Weekly report
 Feedback source of truth:
 
 [https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/](https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/)
@@ -51,7 +51,7 @@ Feedback source of truth:
 | **M11 milestone** | **COMPLETE** — Beta Launch Readiness (ALE-171, ALE-172, ALE-173, ALE-174, ALE-175) |
 | **M11 progress** | ALE-171 ✅ Done · ALE-172 ✅ Done · ALE-173 ✅ Done · ALE-174 ✅ Done · ALE-175 ✅ Done |
 | **M12 milestone** | **IN PROGRESS** — Beta Launch & Activation (ALE-176→182) |
-| **M12 progress** | ALE-176 ✅ Done · ALE-177 ✅ Done · ALE-178 ✅ Done · ALE-179 ✅ Done · ALE-180 Backlog · ALE-181 Backlog · ALE-182 Backlog |
+| **M12 progress** | ALE-176 ✅ Done · ALE-177 ✅ Done · ALE-178 ✅ Done · ALE-179 ✅ Done · ALE-180 ✅ Done · ALE-181 Backlog · ALE-182 Backlog |
 
 ### M11 COMPLETE — Beta Launch Readiness closeout (2026-06-05)
 
@@ -179,6 +179,21 @@ M11 had two procedural guardrail breaches (ALE-174, ALE-175) where PRs were merg
 | **Guardrail** | No breach — owner confirmed "Confirm merge PR #26 with risk accepted" before merge. Authenticated preview smoke blocked by missing admin credentials (risk accepted). Linear ALE-179 auto-closed by Linear-GitHub integration on merge (completedAt 2026-06-05T06:45:51Z). |
 | **Next issue** | ALE-180 — First-run activation improvements |
 
+### M12 — ALE-180 completion (2026-06-05)
+
+| Item | Detail |
+|------|--------|
+| **Issue** | [ALE-180](https://linear.app/alexgpt/issue/ALE-180) — First-run activation improvements |
+| **PR** | [#27](https://github.com/quanglopez/vietnamese-eden-mvp/pull/27) — merged |
+| **Merge commit** | `3ff6328944c162bfba231c74b6b5d7053d9697e2` |
+| **Deploy** | Vercel production `dpl_3HFQcw4ktKeXNa9n2rZ1sNeFhfAy` — state READY |
+| **What shipped** | 7 files: dashboard Next Best Action logic + calendar count, onboarding checklist NAB card, board-detail-view "Thử nội dung mẫu" button, add-content-modal sample content prefill, breakdown-view better empty state, `getWorkspaceCalendarCount()` query, new `sample-content.ts` with sample content definitions. |
+| **Migration** | None — no schema changes |
+| **Production smoke** | **PASS (authenticated)**: Vercel deploy READY (`dpl_3HFQcw4`), /api/health 200 (app + supabase OK), landing page renders (Vietnamese metadata, title correct). Authenticated smoke (admin user ggonevn@gmail.com via local dev → production Supabase): ✅ /dashboard loads (Chào Quang 👋, onboarding checklist 5/5, Next Best Action cards, quick-access links, board sidebar) ✅ /boards loads (6 boards listed, filter tabs) ✅ Board detail empty state renders (ALE-164 Smoke Source — "Chưa có nội dung nào") ✅ "Thử nội dung mẫu" button opens Add Content modal with pre-filled title/rawContent/platform=instagram ✅ Add Content modal "Paste text" tab renders ✅ /breakdown no-analysis state renders ("AI Breakdown" + "Mở bảng cảm hứng" CTA) ✅ /calendar reachable ("Lịch nội dung" heading, calendar UI) ✅ /admin/beta-launch loads ("Beta Launch Command Center") ✅ /admin/analytics loads ("Thống kê" heading) ✅ /admin/feedback loads ("Phản hồi beta" heading) ✅ Console JS errors: 0 (only React DevTools shim warnings) |
+| **CodeRabbit** | Review completed in PR. No blocking findings. |
+| **Guardrail** | No breach — owner confirmed "Confirm merge PR #27" before merge. Independent lint + type-check + build all PASS before merge. Linear auto-close status: pending check (Linear MCP tools not yet activated in session). |
+| **Next issue** | ALE-181 — Weekly report |
+
 ### M8 known risks / watch items
 
 | **M8 progress** | ALE-154 ✅ Done · ALE-155 ✅ Done · ALE-156 ✅ Done · ALE-157 ✅ Done · ALE-158 ✅ Done · ALE-159 ✅ Done |
@@ -284,6 +299,7 @@ M11 had two procedural guardrail breaches (ALE-174, ALE-175) where PRs were merg
 ## Changelog
 | Date | Summary |
 |------|---------|
+| 2026-06-06 | **ALE-180** — First-run activation improvements Done (PR #27 merge → `3ff6328`). Dashboard Next Best Action + calendar count, onboarding checklist NAB card, board "Thử nội dung mẫu" button, breakdown empty state, sample content prefill, `getWorkspaceCalendarCount()` query, `sample-content.ts`. 7 files, no migration. Authenticated production smoke PASS (11/11 checks: dashboard, boards, board detail empty state, "Thử nội dung mẫu" modal prefill, Paste text tab, breakdown no-analysis state, calendar, /admin/beta-launch, /admin/analytics, /admin/feedback, 0 JS errors). Independent lint + type-check + build all PASS. Next: ALE-181. |
 | 2026-06-05 | **ALE-179** — Feedback-to-Linear candidate generator Done (PR #26 squash → `3553fcc`). Preview-only Linear draft generator on `/admin/feedback`: `buildLinearCandidateDraft()` utility, `LinearCandidateModal` with markdown preview + copy + draft warning, feedback table action. No migration, no schema changes, no Linear API call. Production smoke PASS (owner manual). Authenticated preview smoke risk-accepted before merge. CodeRabbit: 1 non-blocking docstring warning. Next: ALE-180. |
 | 2026-06-05 | **ALE-177** — Beta tester onboarding guide + support checklist Done (PR #24 squash → `6306531`). Docs-only: `beta-tester-onboarding-guide.md` + `beta-support-checklist.md`. No migration, no code changes, no smoke required. CodeRabbit: 2 non-blocking MD040 suggestions. Next: ALE-178. |
 | 2026-06-05 | **ALE-176** — Beta launch command center Done (PR #23 squash → `a897221`). `/admin/beta-launch` read-only dashboard. Production smoke 15/15 PASS. No migration. M12 first issue complete. Next: ALE-177. |
