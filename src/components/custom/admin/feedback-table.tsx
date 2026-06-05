@@ -1,9 +1,10 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-import { FileInput, Pencil, Plus, Trash2 } from "lucide-react";
+import { FileInput, FileText, Pencil, Plus, Trash2 } from "lucide-react";
 
 import { FeedbackForm } from "@/components/custom/admin/feedback-form";
+import { LinearCandidateModal } from "@/components/custom/admin/linear-candidate-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -79,6 +80,8 @@ export function FeedbackTable({
   const [editingEntry, setEditingEntry] = useState<FeedbackEntryRow | undefined>();
   const [importOpen, setImportOpen] = useState(false);
   const [importText, setImportText] = useState("");
+  const [candidateEntry, setCandidateEntry] = useState<FeedbackEntryRow | null>(null);
+  const [candidateOpen, setCandidateOpen] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const [importMessage, setImportMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -109,6 +112,11 @@ export function FeedbackTable({
     setFormMode("edit");
     setEditingEntry(entry);
     setFormOpen(true);
+  }
+
+  function openLinearCandidate(entry: FeedbackEntryRow) {
+    setCandidateEntry(entry);
+    setCandidateOpen(true);
   }
 
   function handleDelete(entry: FeedbackEntryRow) {
@@ -251,7 +259,7 @@ export function FeedbackTable({
                 <TableHead>Trạng thái</TableHead>
                 <TableHead className="hidden md:table-cell">Nguồn</TableHead>
                 <TableHead className="hidden lg:table-cell">Ngày</TableHead>
-                <TableHead className="w-[100px]">Thao tác</TableHead>
+                <TableHead className="w-[140px]">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -293,6 +301,17 @@ export function FeedbackTable({
                         type="button"
                         variant="ghost"
                         size="icon"
+                        aria-label="Tạo nháp Linear"
+                        title="Tạo nháp Linear"
+                        onClick={() => openLinearCandidate(entry)}
+                        disabled={isPending}
+                      >
+                        <FileText className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
                         aria-label="Sửa phản hồi"
                         onClick={() => openEdit(entry)}
                         disabled={isPending}
@@ -330,6 +349,13 @@ export function FeedbackTable({
         mode={formMode}
         entry={editingEntry}
         betaTesters={betaTesters}
+      />
+
+      <LinearCandidateModal
+        open={candidateOpen}
+        onOpenChange={setCandidateOpen}
+        entry={candidateEntry}
+        allEntries={entries}
       />
 
       <Dialog open={importOpen} onOpenChange={setImportOpen}>
