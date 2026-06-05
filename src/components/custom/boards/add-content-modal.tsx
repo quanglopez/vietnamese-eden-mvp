@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { ClipboardPaste, Link2, Loader2, Plus } from "lucide-react";
+import { ClipboardPaste, Link2, Loader2, PenLine, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +24,8 @@ import {
 } from "@/lib/content/platform-detect";
 import { PLATFORM_OPTIONS } from "@/lib/validations/content";
 import type { PlatformType } from "@/types/content";
+import { SAMPLE_CONTENTS } from "@/lib/content/sample-content";
+import type { SampleContent } from "@/lib/content/sample-content";
 
 type AddContentModalProps = {
   boardId: string;
@@ -31,6 +33,7 @@ type AddContentModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: (message: string) => void;
+  defaultFillSample?: boolean;
 };
 
 type FieldErrors = {
@@ -43,6 +46,7 @@ export function AddContentModal({
   open,
   onOpenChange,
   onSuccess,
+  defaultFillSample = false,
 }: AddContentModalProps) {
   const [activeTab, setActiveTab] = useState<"url" | "text">("url");
   const [title, setTitle] = useState("");
@@ -55,6 +59,33 @@ export function AddContentModal({
   const [detectedLabel, setDetectedLabel] = useState("Website");
   const [errors, setErrors] = useState<FieldErrors>({});
   const [isPending, startTransition] = useTransition();
+  const [sampleIndex, setSampleIndex] = useState(0);
+
+  // Auto-fill sample once when modal opens with defaultFillSample
+  useEffect(() => {
+    if (!open || !defaultFillSample) return;
+    // Only prefill when form is still empty (first open, not after user started typing)
+    if (title || rawContent) return;
+    const sample = SAMPLE_CONTENTS[sampleIndex % SAMPLE_CONTENTS.length];
+    if (!sample) return;
+    setTitle(sample.title);
+    setRawContent(sample.rawContent);
+    setPlatform(sample.platform as PlatformType);
+    setActiveTab("text");
+    setSampleIndex((prev) => (prev + 1) % SAMPLE_CONTENTS.length);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, defaultFillSample]);
+
+  const handleFillSample = (sample?: SampleContent) => {
+    const picked = sample ?? SAMPLE_CONTENTS[sampleIndex % SAMPLE_CONTENTS.length];
+    if (!picked) return;
+    setTitle(picked.title);
+    setRawContent(picked.rawContent);
+    setPlatform(picked.platform as PlatformType);
+    setActiveTab("text");
+    // Rotate sample index so next click gives a different one
+    setSampleIndex((prev) => (prev + 1) % SAMPLE_CONTENTS.length);
+  };
 
   useEffect(() => {
     if (!sourceUrl.trim()) {
@@ -247,6 +278,25 @@ export function AddContentModal({
 
           <TabsContent value="text">
             <form onSubmit={handleTextSubmit} className="space-y-4 pt-4">
+              {SAMPLE_CONTENTS.length > 0 ? (
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="gap-1.5"
+                    disabled={isPending}
+                    onClick={() => handleFillSample()}
+                    data-testid="sample-content-fill-button"
+                  >
+                    <PenLine className="h-3.5 w-3.5" />
+                    Nội dung mẫu
+                  </Button>
+                  <span className="text-xs text-muted-foreground">
+                    Điền sẵn caption mẫu Việt Nam để test nhanh
+                  </span>
+                </div>
+              ) : null}
               <div className="space-y-2">
                 <Label htmlFor="content-title">Tiêu đề</Label>
                 <Input

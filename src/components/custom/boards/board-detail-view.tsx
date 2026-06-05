@@ -120,6 +120,7 @@ export function BoardDetailView({
 }: BoardDetailViewProps) {
   const router = useRouter();
   const [addOpen, setAddOpen] = useState(false);
+  const [prefillSample, setPrefillSample] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [tagFeedback, setTagFeedback] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -804,12 +805,29 @@ export function BoardDetailView({
           <p className="mt-2 text-sm text-muted-foreground">
             Thêm link hoặc caption đầu tiên vào bảng này để bắt đầu phân tích và remix.
           </p>
-          <Button
-            onClick={() => setAddOpen(true)}
-            className="mt-6 bg-gradient-brand text-white shadow-glow gap-2"
-          >
-            <Sparkles className="h-4 w-4" /> Thêm content
-          </Button>
+          <div className="flex flex-wrap items-center justify-center gap-3 mt-6">
+            <Button
+              onClick={() => setAddOpen(true)}
+              className="bg-gradient-brand text-white shadow-glow gap-2"
+            >
+              <Sparkles className="h-4 w-4" /> Thêm content
+            </Button>
+            <span className="text-xs text-muted-foreground">hoặc</span>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setPrefillSample(true);
+                setAddOpen(true);
+              }}
+              className="gap-2"
+              data-testid="try-sample-content-button"
+            >
+              Thử nội dung mẫu
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-4">
+            Chưa có content? Dùng nội dung mẫu Việt Nam có sẵn để trải nghiệm nhanh.
+          </p>
         </div>
       ) : filteredItems.length > 0 ? (
         <div
@@ -893,8 +911,12 @@ export function BoardDetailView({
         boardId={board.id}
         boardName={board.name}
         open={addOpen}
-        onOpenChange={setAddOpen}
+        onOpenChange={(open) => {
+          setAddOpen(open);
+          if (!open) setPrefillSample(false);
+        }}
         onSuccess={handleAddSuccess}
+        defaultFillSample={prefillSample}
       />
 
       {selectedCount > 0 ? (

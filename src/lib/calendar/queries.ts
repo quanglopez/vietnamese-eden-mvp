@@ -154,3 +154,18 @@ export function getWeekStartMonday(reference: Date = new Date()): Date {
   d.setDate(d.getDate() + diff);
   return d;
 }
+
+export async function getWorkspaceCalendarCount(
+  supabase: SupabaseClient<Database>,
+  workspaceId: string,
+): Promise<number> {
+  const { count, error } = await supabase
+    .from("content_calendar_items")
+    .select("*", { count: "exact", head: true })
+    .eq("workspace_id", workspaceId);
+
+  if (error) {
+    return 0;
+  }
+  return count ?? 0;
+}
