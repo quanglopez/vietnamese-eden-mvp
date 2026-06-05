@@ -1,9 +1,9 @@
 # Project status — Vietnamese Eden MVP
 
-**Cập nhật:** 2026-06-05 (M11 ALE-174, ALE-175 shipped — procedural postmortems below)
+**Cập nhật:** 2026-06-05 (M11 COMPLETE — all 5 issues Done, closeout below)
 **Production:** [https://vietnamese-eden-mvp.vercel.app/](https://vietnamese-eden-mvp.vercel.app/)
-**Latest deploy:** commit `3017dbc` on main (ALE-174 PR #22 squashed 2026-06-05; prior: ALE-175 `4bd515f`)
-**Mục tiếp theo:** M11 closeout + procedural guardrail enforcement
+**Latest deploy:** commit `3017dbc` on main (ALE-174 PR #22 squashed 2026-06-05)
+**Tiếp theo:** Beta launch decision + M12 planning
 Feedback source of truth:
 
 [https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/](https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/)
@@ -48,8 +48,51 @@ Feedback source of truth:
 | **M10 milestone** | **COMPLETE** — Beta QA & Activation (ALE-166, ALE-167, ALE-168, ALE-169, ALE-170) |
 | **M10 progress** | ALE-166 ✅ Done · ALE-167 ✅ Done · ALE-168 ✅ Done · ALE-169 ✅ Done · ALE-170 ✅ Done |
 | **Next recommended** | M11 — Beta Launch Readiness (ALE-171→175 proposed) |
+| **M11 milestone** | **COMPLETE** — Beta Launch Readiness (ALE-171, ALE-172, ALE-173, ALE-174, ALE-175) |
 | **M11 progress** | ALE-171 ✅ Done · ALE-172 ✅ Done · ALE-173 ✅ Done · ALE-174 ✅ Done · ALE-175 ✅ Done |
-| **M11 closeout** | Pending |
+
+### M11 COMPLETE — Beta Launch Readiness closeout (2026-06-05)
+
+All 5 M11 issues shipped to production.
+
+| Issue | Title | PR | Commit | Completed | Breach? |
+|-------|-------|----|--------|-----------|---------|
+| [ALE-171](https://linear.app/alexgpt/issue/ALE-171) | Analytics dashboard MVP | [#19](https://github.com/quanglopez/vietnamese-eden-mvp/pull/19) | `07688ea` | 2026-06-04 | No |
+| [ALE-172](https://linear.app/alexgpt/issue/ALE-172) | Beta tester invite + cohort tracker | [#20](https://github.com/quanglopez/vietnamese-eden-mvp/pull/20) | `c48695b` | 2026-06-04 | No |
+| [ALE-173](https://linear.app/alexgpt/issue/ALE-173) | Feedback inbox automation | [#21](https://github.com/quanglopez/vietnamese-eden-mvp/pull/21) | `743ddd1` | 2026-06-04 | No |
+| [ALE-174](https://linear.app/alexgpt/issue/ALE-174) | Pricing/paywall readiness | [#22](https://github.com/quanglopez/vietnamese-eden-mvp/pull/22) | `3017dbc` (squash) | 2026-06-04 | Yes — see postmortem |
+| [ALE-175](https://linear.app/alexgpt/issue/ALE-175) | Production reliability hardening | [#18](https://github.com/quanglopez/vietnamese-eden-mvp/pull/18) | `4bd515f` | 2026-06-04 | Yes — see postmortem |
+
+#### Production readiness checklist
+
+| # | Check | Result |
+|---|-------|--------|
+| 1 | All 5 issues Done in Linear | ✅ PASS |
+| 2 | All 5 PRs merged to main | ✅ PASS |
+| 3 | Production smoke full suite | ✅ PASS (ALE-174: 15/15) |
+| 4 | /api/health (app + Supabase) responsive | ✅ PASS (ALE-175) |
+| 5 | AI breakdown functional (xiaomi:mimo-v2.5) | ✅ PASS (ALE-175) |
+| 6 | AI rate-limit guard active | ✅ PASS (ALE-175) |
+| 7 | Analytics dashboard accessible (admin-only) | ✅ PASS (ALE-171) |
+| 8 | Beta tester tracker functional (admin-only) | ✅ PASS (ALE-172) |
+| 9 | Feedback inbox functional (admin-only) | ✅ PASS (ALE-173) |
+| 10 | Pricing feature-flagged off by default | ✅ PASS (ALE-174) |
+| 11 | No Stripe dependency in production | ✅ PASS (ALE-174) |
+| 12 | Working tree clean | ✅ Yes |
+
+#### Guardrail note
+
+M11 had two procedural guardrail breaches (ALE-174, ALE-175) where PRs were merged and Linear auto-closed without explicit owner confirmation. No technical impact from either breach. See postmortems below. Corrective action per `kanban-working-agreement.md` §8: agents must stop at READY TO MERGE and wait for exact owner confirmation before merge.
+
+#### M11 closeout actions
+
+- [x] All 5 issues Done in Linear
+- [x] All 5 PRs merged to main
+- [x] Production smoke PASS (15/15)
+- [x] Postmortems recorded for ALE-174, ALE-175
+- [x] project-status.md updated with closeout
+- [ ] Linear "M11 — Beta Launch Readiness" project archived (manual — Linear API no-op for project state)
+- [ ] Beta launch decision + M12 planning
 
 ### M11 postmortem — ALE-174 procedural breach (2026-06-05)
 
@@ -183,8 +226,12 @@ Feedback source of truth:
 ## Changelog
 | Date | Summary |
 |------|---------|
+| 2026-06-05 | **M11 COMPLETE** — Beta Launch Readiness. All 5 issues shipped (ALE-171→175). See closeout section above. |
 | 2026-06-05 | **ALE-174** — Pricing/paywall feature flag + guardrails Done (PR #22 squash → `3017dbc`). `NEXT_PUBLIC_PRICING_ENABLED=false` default, no Stripe dependency. Production smoke 15/15 PASS. Procedural breach: squash-merged before owner confirmation — see postmortem above. |
 | 2026-06-04 | **ALE-175** — Production reliability hardening Done (PR #18 merge `4bd515f`). ai_rate_limits migration + RLS verified. /api/health, rate-limit, error mapping. Procedural breach: merged before owner confirmation — see postmortem above. |
+| 2026-06-04 | **ALE-173** — Feedback inbox automation Done (PR #21 merge `743ddd1`). feedback_entries table + admin CRUD + manual paste import + keyword category suggestion. Migration applied to production. |
+| 2026-06-04 | **ALE-172** — Beta tester cohort tracker Done (PR #20 merge `c48695b`). beta_testers table + admin CRUD + persona/status tracking. Migration applied to production. |
+| 2026-06-04 | **ALE-171** — Analytics dashboard MVP Done (PR #19 merge `07688ea`). Admin /admin/analytics with event counts, funnel, 7d/30d toggle. No migration. |
 | 2026-06-04 | **M10 COMPLETE** — Beta QA & Activation. All 5 issues Done (ALE-166→170). Production smoke PASS (commit `b49b1da`). |
 | 2026-06-04 | **ALE-170** — Error/loading/empty state audit Done (PR #16 merge `6112236`). Production smoke 11/11 PASS. |
 | 2026-06-04 | **ALE-169** — Feedback normalization workflow Done (PR #17 merge `b49b1da`). `beta-feedback-workflow.md` — unified intake, P0-P3 rubric, weekly summary template. |
