@@ -118,10 +118,10 @@ export function AnalyticsDashboard({
   const funnel = useMemo(() => buildAnalyticsFunnel(combinedCounts), [combinedCounts]);
   const maxActivity = getMaxActivity(activityRows);
 
-  // Cohort / persona funnels
+  // Cohort / persona funnels — workspace-scoped events only (no platform auth merge)
   const personaFunnels = useMemo(
-    () => buildPersonaFunnels(cohortRows, authCounts),
-    [cohortRows, authCounts],
+    () => buildPersonaFunnels(cohortRows),
+    [cohortRows],
   );
   const [selectedPersona, setSelectedPersona] = useState<string | null>(null);
 
@@ -287,7 +287,7 @@ export function AnalyticsDashboard({
           </CardTitle>
           <p className="text-sm text-muted-foreground">
             Funnel kích hoạt phân theo persona tester. Chỉ hiển thị khi tester đã được liên kết
-            user_id với analytics events.
+            user_id với analytics events. Cohort hiện dùng cửa sổ 30 ngày.
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -368,7 +368,7 @@ export function AnalyticsDashboard({
 
                       {personaFunnel.steps.map((step) => {
                         const width =
-                          combinedCounts.login > 0
+                          personaFunnel.totalEvents > 0
                             ? Math.max(4, step.conversionRate)
                             : 0;
                         return (

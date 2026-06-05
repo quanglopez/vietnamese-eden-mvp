@@ -121,11 +121,16 @@ export function buildDailyActivity(
   return Array.from(buckets.values());
 }
 
-export function buildAnalyticsFunnel(counts: AnalyticsEventCounts): AnalyticsFunnelStep[] {
-  const firstCount = counts.login;
+function buildFunnel(
+  steps: Array<{ eventType: AnalyticsEventType; label: string }>,
+  counts: AnalyticsEventCounts,
+): AnalyticsFunnelStep[] {
+  const firstStep = steps[0];
+  if (!firstStep) return [];
+  const firstCount = counts[firstStep.eventType] ?? 0;
   let previousCount = firstCount;
 
-  return DASHBOARD_FUNNEL.map(({ eventType, label }, index) => {
+  return steps.map(({ eventType, label }, index) => {
     const count = counts[eventType] ?? 0;
     const conversionRate = firstCount > 0 ? Math.round((count / firstCount) * 100) : 0;
     const dropOffFromPrevious =
@@ -136,6 +141,10 @@ export function buildAnalyticsFunnel(counts: AnalyticsEventCounts): AnalyticsFun
 
     return { eventType, label, count, conversionRate, dropOffFromPrevious };
   });
+}
+
+export function buildAnalyticsFunnel(counts: AnalyticsEventCounts): AnalyticsFunnelStep[] {
+  return buildFunnel(DASHBOARD_FUNNEL, counts);
 }
 
 /**
@@ -221,6 +230,14 @@ export async function getWorkspaceAnalyticsActivity(
 
 // ── Cohort / Persona helpers ──────────────────────────────────────────────
 
+const PERSONA_FUNNEL: Array<{ eventType: AnalyticsEventType; label: string }> = [
+  { eventType: "board_create", label: "Tạo board" },
+  { eventType: "content_add", label: "Thêm content" },
+  { eventType: "breakdown_run", label: "Breakdown" },
+  { eventType: "remix_run", label: "Remix" },
+  { eventType: "calendar_add", label: "Lên lịch" },
+];
+
 export type PersonaFunnel = {
   persona: string;
   steps: AnalyticsFunnelStep[];
@@ -238,13 +255,17 @@ function confidenceFromEvents(total: number, attributed: number): ConfidenceLeve
 /**
  * Build per-persona funnels from cohort event rows.
  *
- * Each persona gets its own funnel with platform-auth counts merged in.
- * Confidence: High (>10 events, >5 attributed), Medium (3-10), Low (<3).
+ * Persona funnels cover workspace-scoped activation steps only:
+ * board_create → content_add → breakdown_run → remix_run → calendar_add.
+ *
+ * Platform-wide signup/login are NOT merged in — they are shown separately
+ * in the main analytics area. Persona data starts from workspace events.
+ *
+ * Confidence: High (≥10 events, ≥5 attributed), Medium (3–10), Low (<3).
  * Unattributed events become a "Không xác định" persona group.
  */
 export function buildPersonaFunnels(
   cohortRows: CohortEventRow[],
-  platformAuth: Pick<AnalyticsEventCounts, "login" | "signup">,
 ): PersonaFunnel[] {
   // Group by persona
   const byPersona = new Map<string, AnalyticsEventCounts>();
@@ -262,10 +283,7 @@ export function buildPersonaFunnels(
   const funnels: PersonaFunnel[] = [];
 
   Array.from(byPersona.entries()).forEach(([persona, counts]) => {
-    // Merge with platform auth counts
-    const merged = mergeAnalyticsCounts(counts, platformAuth);
-
-    const steps = buildAnalyticsFunnel(merged);
+    const steps = buildFunnel(PERSONA_FUNNEL, counts);
     const totalEvents = Object.values(counts).reduce((sum, c) => sum + c, 0);
     const attributed = persona === "unattributed" ? 0 : totalEvents;
 
