@@ -253,8 +253,16 @@ export function BreakdownView({
                   {analysis && !isPending ? <BreakdownSections analysis={analysis} /> : null}
 
                   {!analysis && !isPending && !formError ? (
-                    <div className="rounded-2xl border border-dashed border-border/80 p-8 text-center text-muted-foreground">
-                      Bấm &quot;Phân tích AI&quot; để tạo breakdown cho nội dung này.
+                    <div className="rounded-2xl border border-dashed border-border/80 p-8 text-center">
+                      <p className="text-muted-foreground mb-4">
+                        Bấm &quot;Phân tích AI&quot; để tạo breakdown cho nội dung này.
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Chưa có nội dung để phân tích?{" "}
+                        <Link href="/boards" className="text-brand hover:underline font-medium">
+                          Thêm content hoặc dùng nội dung mẫu →
+                        </Link>
+                      </p>
                     </div>
                   ) : null}
                 </div>

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { ArrowRight, CheckCircle2, Circle, PartyPopper, X } from "lucide-react";
+import { ArrowRight, CheckCircle2, Circle, PartyPopper, Star, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -17,6 +17,7 @@ export type OnboardingChecklistProgress = {
   userId: string;
   workspaceId: string;
   steps: OnboardingChecklistStep[];
+  nextBestAction?: { label: string; href: string } | null;
 };
 
 function getDismissStorageKey(userId: string, workspaceId: string): string {
@@ -138,6 +139,23 @@ export function OnboardingChecklist({ progress, fallback = null }: OnboardingChe
           Remix → Giọng văn.
         </p>
       )}
+
+      {!allDone && progress.nextBestAction ? (
+        <Link
+          href={progress.nextBestAction.href}
+          className="flex items-center gap-3 rounded-xl border border-brand/50 bg-brand/10 px-4 py-3 mb-4 hover:border-brand hover:bg-brand/15 transition group"
+          data-testid="next-best-action-card"
+        >
+          <div className="h-8 w-8 rounded-lg bg-brand grid place-items-center shrink-0">
+            <Star className="h-4 w-4 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs text-muted-foreground">Bước tiếp theo</p>
+            <p className="text-sm font-semibold">{progress.nextBestAction.label}</p>
+          </div>
+          <ArrowRight className="h-4 w-4 text-brand shrink-0 opacity-0 group-hover:opacity-100 transition" />
+        </Link>
+      ) : null}
 
       <ol className="space-y-2 min-w-0">
         {progress.steps.map((step, index) => (
