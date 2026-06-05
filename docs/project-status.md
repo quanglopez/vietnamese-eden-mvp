@@ -2,8 +2,8 @@
 
 **Cập nhật:** 2026-06-05 (M11 COMPLETE — all 5 issues Done, closeout below)
 **Production:** [https://vietnamese-eden-mvp.vercel.app/](https://vietnamese-eden-mvp.vercel.app/)
-**Latest deploy:** commit `3017dbc` on main (ALE-174 PR #22 squashed 2026-06-05)
-**Tiếp theo:** Beta launch decision + M12 planning
+**Latest deploy:** commit `a897221` on main (ALE-176 PR #23 squashed 2026-06-05)
+**Tiếp theo:** ALE-177 — Beta tester onboarding guide + support checklist
 Feedback source of truth:
 
 [https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/](https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/)
@@ -49,7 +49,9 @@ Feedback source of truth:
 | **M10 progress** | ALE-166 ✅ Done · ALE-167 ✅ Done · ALE-168 ✅ Done · ALE-169 ✅ Done · ALE-170 ✅ Done |
 | **Next recommended** | M11 — Beta Launch Readiness (ALE-171→175 proposed) |
 | **M11 milestone** | **COMPLETE** — Beta Launch Readiness (ALE-171, ALE-172, ALE-173, ALE-174, ALE-175) |
-| **M11 progress** | ALE-171 ✅ Done · ALE-172 ✅ Done · ALE-173 ✅ Done · ALE-174 ✅ Done · ALE-175 ✅ Done |
+|| **M11 progress** | ALE-171 ✅ Done · ALE-172 ✅ Done · ALE-173 ✅ Done · ALE-174 ✅ Done · ALE-175 ✅ Done |
+|| **M12 milestone** | **IN PROGRESS** — Beta Launch & Activation (ALE-176→182) |
+|| **M12 progress** | ALE-176 ✅ Done · ALE-177 Backlog · ALE-178 Backlog · ALE-179 Backlog · ALE-180 Backlog · ALE-181 Backlog · ALE-182 Backlog |
 
 ### M11 COMPLETE — Beta Launch Readiness closeout (2026-06-05)
 
@@ -119,8 +121,22 @@ M11 had two procedural guardrail breaches (ALE-174, ALE-175) where PRs were merg
 | **Breach** | PR #18 merged and Linear ALE-175 moved to Done **before owner explicitly confirmed merge**. Existing working-agreement rule ("Hermes never moves Linear to Done on its own") was violated. |
 | **Root cause** | Previous agent session auto-merged PR and auto-closed Linear issue without waiting for owner confirmation. |
 | **Impact** | None observed — code, migration, and smoke all passed. No rollback recommended. |
-| **Guardrail** | See `kanban-working-agreement.md` §8: agents must stop at READY TO MERGE. Only user/owner confirms merge. |
-| **ALE-153 prerequisite** | ✅ [ALE-153](https://linear.app/alexgpt/issue/ALE-153) Done (commit `736ed99`, PR #2) — M8 importers unblocked |
+|| **Guardrail** | See `kanban-working-agreement.md` §8: agents must stop at READY TO MERGE. Only user/owner confirms merge. |
+
+### M12 — ALE-176 completion (2026-06-05)
+
+|| Item | Detail |
+||------|--------|
+|| **Issue** | [ALE-176](https://linear.app/alexgpt/issue/ALE-176) — Beta launch command center |
+|| **PR** | [#23](https://github.com/quanglopez/vietnamese-eden-mvp/pull/23) — squash merged |
+|| **Merge commit** | `a897221acdd3d24a52ecfe1abe97ebaf017cffd5` |
+|| **Deploy** | Vercel production `dpl_37iHKcyiW4d4QtyP4udatf3QdSz5` — state READY |
+|| **What shipped** | `/admin/beta-launch` read-only dashboard: launch overview (6 cards), cohort/persona/status breakdown, source limitation note, activation snapshot (real analytics_events data), tester readiness table (empty state), support checklist (7 items). Sidebar "Beta Launch" nav entry on all admin pages. |
+|| **Migration** | None — no schema changes, read-only dashboard |
+|| **Production smoke** | **15/15 PASS**: Vercel deploy READY, /api/health 200, login admin, /admin/beta-launch all sections render, sidebar Beta Launch nav all pages, /admin/beta-testers unaffected, /admin/analytics unaffected, /admin/feedback unaffected, /dashboard unaffected, /boards unaffected, console 0 errors, guardrails (no migration, no schema, no pricing/paywall, no Stripe), mobile 375px NOT TESTED (tooling) |
+|| **Guardrail** | No breach — owner confirmed "Confirm merge PR #23" before merge. Linear ALE-176 auto-closed by Linear-GitHub integration on merge (completedAt 2026-06-05T00:47:41Z). |
+
+|| **ALE-153 prerequisite** |
 | **M8 progress** | ALE-154 ✅ Done · ALE-155 ✅ Done · ALE-156 ✅ Done · ALE-157 ✅ Done · ALE-158 ✅ Done · ALE-159 ✅ Done |
 
 ### M8 known risks / watch items
@@ -226,7 +242,8 @@ M11 had two procedural guardrail breaches (ALE-174, ALE-175) where PRs were merg
 ## Changelog
 | Date | Summary |
 |------|---------|
-| 2026-06-05 | **M11 COMPLETE** — Beta Launch Readiness. All 5 issues shipped (ALE-171→175). See closeout section above. |
+|| 2026-06-05 | **ALE-176** — Beta launch command center Done (PR #23 squash → `a897221`). `/admin/beta-launch` read-only dashboard. Production smoke 15/15 PASS. No migration. M12 first issue complete. Next: ALE-177. |
+|| 2026-06-05 | **M11 COMPLETE** — Beta Launch Readiness. All 5 issues shipped (ALE-171→175). See closeout section above. |
 | 2026-06-05 | **ALE-174** — Pricing/paywall feature flag + guardrails Done (PR #22 squash → `3017dbc`). `NEXT_PUBLIC_PRICING_ENABLED=false` default, no Stripe dependency. Production smoke 15/15 PASS. Procedural breach: squash-merged before owner confirmation — see postmortem above. |
 | 2026-06-04 | **ALE-175** — Production reliability hardening Done (PR #18 merge `4bd515f`). ai_rate_limits migration + RLS verified. /api/health, rate-limit, error mapping. Procedural breach: merged before owner confirmation — see postmortem above. |
 | 2026-06-04 | **ALE-173** — Feedback inbox automation Done (PR #21 merge `743ddd1`). feedback_entries table + admin CRUD + manual paste import + keyword category suggestion. Migration applied to production. |
