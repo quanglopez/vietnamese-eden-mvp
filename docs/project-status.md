@@ -1,9 +1,9 @@
 # Project status — Vietnamese Eden MVP
 
-**Cập nhật:** 2026-06-05 (M11 COMPLETE — all 5 issues Done, closeout below)
+**Cập nhật:** 2026-06-05 (M12 — ALE-178 shipped to production)
 **Production:** [https://vietnamese-eden-mvp.vercel.app/](https://vietnamese-eden-mvp.vercel.app/)
-**Latest deploy:** commit `6306531` on main (ALE-177 PR #24 squashed 2026-06-05)
-**Tiếp theo:** ALE-178 — Cohort activation analytics planning
+**Latest deploy:** commit `28b33ec` on main (ALE-178 PR #25 squashed 2026-06-05)
+**Tiếp theo:** ALE-179 — Feedback-to-Linear candidate generator
 Feedback source of truth:
 
 [https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/](https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/)
@@ -51,7 +51,7 @@ Feedback source of truth:
 | **M11 milestone** | **COMPLETE** — Beta Launch Readiness (ALE-171, ALE-172, ALE-173, ALE-174, ALE-175) |
 | **M11 progress** | ALE-171 ✅ Done · ALE-172 ✅ Done · ALE-173 ✅ Done · ALE-174 ✅ Done · ALE-175 ✅ Done |
 | **M12 milestone** | **IN PROGRESS** — Beta Launch & Activation (ALE-176→182) |
-| **M12 progress** | ALE-176 ✅ Done · ALE-177 ✅ Done · ALE-178 Backlog · ALE-179 Backlog · ALE-180 Backlog · ALE-181 Backlog · ALE-182 Backlog |
+| **M12 progress** | ALE-176 ✅ Done · ALE-177 ✅ Done · ALE-178 ✅ Done · ALE-179 Backlog · ALE-180 Backlog · ALE-181 Backlog · ALE-182 Backlog |
 
 ### M11 COMPLETE — Beta Launch Readiness closeout (2026-06-05)
 
@@ -148,6 +148,21 @@ M11 had two procedural guardrail breaches (ALE-174, ALE-175) where PRs were merg
 | **Migration** | None — docs-only |
 | **Smoke** | Not required — no app code changes |
 | **Guardrail** | No breach — owner confirmed "Confirm merge PR #24" before merge. CodeRabbit: 2 non-blocking MD040 suggestions (fenced code block language tokens). Linear ALE-177 auto-closed by Linear-GitHub integration on merge (completedAt 2026-06-05T02:08:06Z). |
+
+### M12 — ALE-178 completion (2026-06-05)
+
+| Item | Detail |
+|------|--------|
+| **Issue** | [ALE-178](https://linear.app/alexgpt/issue/ALE-178) — Cohort activation analytics |
+| **PR** | [#25](https://github.com/quanglopez/vietnamese-eden-mvp/pull/25) — squash merged |
+| **Merge commit** | `28b33ec369114369f9de41f047dedcb2f955553c` |
+| **Deploy** | Vercel production `dpl_Dy7fB4av8jYiibHFW8111K5MKuwk` — state READY |
+| **What shipped** | Cohort/persona activation analytics on `/admin/analytics`: `cohort-queries.ts` (JS merge of beta_testers + analytics_events by user_id), persona funnels (board_create → content_add → breakdown_run → remix_run → calendar_add, no login/signup), unattributed grouping ("Không xác định"), owner-friendly interpretation, data confidence (high/medium/low), limitation notes (auth platform-wide, tester-user linking nullable, source unavailable). `buildFunnel()` extracted as reusable helper. `PERSONA_FUNNEL` separated from `DASHBOARD_FUNNEL` — platform auth not attributed to personas. |
+| **Migration** | None — read-only queries on existing `analytics_events` + `beta_testers`. No schema changes. |
+| **Production smoke** | **PASS**: Vercel deploy READY, /api/health 200, login admin, /admin/analytics loads, existing overview/funnel/activity chart preserved, cohort section renders ("Phân tích theo cohort"), 30-day window note ("Cohort hiện dùng cửa sổ 30 ngày"), persona funnel confirmed no login/signup, auth platform-wide limitation note visible, /admin/beta-launch loads, /admin/beta-testers loads, /admin/feedback loads, /dashboard loads, /boards loads, console 0 errors, mobile 375px NOT TESTED |
+| **CodeRabbit** | 4 non-blocking findings: 1 🟠 major (string delimiter fragility in `cohort-queries.ts` — `::` could conflict if enum values contain `::`), 1 🟡 minor (unused `CohortEvent` type in `analytics.ts`), 2 🧹 nitpicks (extract shared helper in `platform-queries.ts`, missing language identifiers in `cursor-prompt-ale-178.md`). All optional, no changes requested. |
+| **Guardrail** | No breach — owner confirmed "Confirm mark PR #25 ready for review" and "Confirm merge PR #25" before merge. Linear ALE-178 auto-closed by Linear-GitHub integration on merge (completedAt 2026-06-05T03:55:08Z). |
+| **Next issue** | ALE-179 — Feedback-to-Linear candidate generator |
 
 | **ALE-153 prerequisite** | ✅ [ALE-153](https://linear.app/alexgpt/issue/ALE-153) Done (commit `736ed99`, PR #2) — M8 importers unblocked |
 | **M8 progress** | ALE-154 ✅ Done · ALE-155 ✅ Done · ALE-156 ✅ Done · ALE-157 ✅ Done · ALE-158 ✅ Done · ALE-159 ✅ Done |
