@@ -1,9 +1,9 @@
 # Project status — Vietnamese Eden MVP
 
-**Cập nhật:** 2026-06-05 (M12 — ALE-178 shipped to production)
+**Cập nhật:** 2026-06-05 (M12 — ALE-179 Done, M12 IN PROGRESS)
 **Production:** [https://vietnamese-eden-mvp.vercel.app/](https://vietnamese-eden-mvp.vercel.app/)
-**Latest deploy:** commit `28b33ec` on main (ALE-178 PR #25 squashed 2026-06-05)
-**Tiếp theo:** ALE-179 — Feedback-to-Linear candidate generator
+**Latest deploy:** commit `3553fcc` on main (ALE-179 PR #26 squashed 2026-06-05)
+**Tiếp theo:** ALE-180 — First-run activation improvements
 Feedback source of truth:
 
 [https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/](https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/)
@@ -51,7 +51,7 @@ Feedback source of truth:
 | **M11 milestone** | **COMPLETE** — Beta Launch Readiness (ALE-171, ALE-172, ALE-173, ALE-174, ALE-175) |
 | **M11 progress** | ALE-171 ✅ Done · ALE-172 ✅ Done · ALE-173 ✅ Done · ALE-174 ✅ Done · ALE-175 ✅ Done |
 | **M12 milestone** | **IN PROGRESS** — Beta Launch & Activation (ALE-176→182) |
-| **M12 progress** | ALE-176 ✅ Done · ALE-177 ✅ Done · ALE-178 ✅ Done · ALE-179 Backlog · ALE-180 Backlog · ALE-181 Backlog · ALE-182 Backlog |
+| **M12 progress** | ALE-176 ✅ Done · ALE-177 ✅ Done · ALE-178 ✅ Done · ALE-179 ✅ Done · ALE-180 Backlog · ALE-181 Backlog · ALE-182 Backlog |
 
 ### M11 COMPLETE — Beta Launch Readiness closeout (2026-06-05)
 
@@ -164,10 +164,24 @@ M11 had two procedural guardrail breaches (ALE-174, ALE-175) where PRs were merg
 | **Guardrail** | No breach — owner confirmed "Confirm mark PR #25 ready for review" and "Confirm merge PR #25" before merge. Linear ALE-178 auto-closed by Linear-GitHub integration on merge (completedAt 2026-06-05T03:55:08Z). |
 | **Next issue** | ALE-179 — Feedback-to-Linear candidate generator |
 
-| **ALE-153 prerequisite** | ✅ [ALE-153](https://linear.app/alexgpt/issue/ALE-153) Done (commit `736ed99`, PR #2) — M8 importers unblocked |
-| **M8 progress** | ALE-154 ✅ Done · ALE-155 ✅ Done · ALE-156 ✅ Done · ALE-157 ✅ Done · ALE-158 ✅ Done · ALE-159 ✅ Done |
+### M12 — ALE-179 completion (2026-06-05)
+
+| Item | Detail |
+|------|--------|
+| **Issue** | [ALE-179](https://linear.app/alexgpt/issue/ALE-179/m12-feedback-to-linear-candidate-generator) — M12 Feedback-to-Linear candidate generator |
+| **PR** | [#26](https://github.com/quanglopez/vietnamese-eden-mvp/pull/26) — squash merged |
+| **Merge commit** | `3553fcc921e70f6fd11e4e47194e43ccd6b5355f` |
+| **Deploy** | Vercel production `dpl_DjVdN3cUjuSTcssVnbXb954MuFxV` — state READY |
+| **What shipped** | Preview-only Linear issue candidate draft generator on `/admin/feedback`: `buildLinearCandidateDraft()` utility (`src/lib/feedback/linear-candidate.ts`), unit tests (`linear-candidate.test.ts`), `LinearCandidateModal` component with markdown preview + copy-to-clipboard + draft warning, feedback table action button "Tạo nháp Linear" opening modal. Candidate includes title, severity/category/priority badges, raw summary, analyst notes, evidence, acceptance criteria, duplicate hints. **No Linear API call**. |
+| **Migration** | None — preview-only, no schema changes, no Linear integration |
+| **Production smoke** | **PASS** (owner manual): /admin/feedback loads, "Tạo nháp Linear" appears, candidate modal opens, draft warning visible ("Đây chỉ là bản nháp. Chưa tạo Linear issue."), markdown preview renders, copy markdown works, no Linear issue auto-created, no Linear API/network request observed, console errors 0. Authenticated preview smoke was risk-accepted before merge (no admin credentials for preview). |
+| **CodeRabbit** | 1 non-blocking warning: docstring coverage 0% vs 80% threshold (no actionable comments). No blocking findings. |
+| **Guardrail** | No breach — owner confirmed "Confirm merge PR #26 with risk accepted" before merge. Authenticated preview smoke blocked by missing admin credentials (risk accepted). Linear ALE-179 auto-closed by Linear-GitHub integration on merge (completedAt 2026-06-05T06:45:51Z). |
+| **Next issue** | ALE-180 — First-run activation improvements |
 
 ### M8 known risks / watch items
+
+| **M8 progress** | ALE-154 ✅ Done · ALE-155 ✅ Done · ALE-156 ✅ Done · ALE-157 ✅ Done · ALE-158 ✅ Done · ALE-159 ✅ Done |
 
 | # | Risk | Mitigation | Severity |
 |---|------|-----------|----------|
@@ -270,6 +284,7 @@ M11 had two procedural guardrail breaches (ALE-174, ALE-175) where PRs were merg
 ## Changelog
 | Date | Summary |
 |------|---------|
+| 2026-06-05 | **ALE-179** — Feedback-to-Linear candidate generator Done (PR #26 squash → `3553fcc`). Preview-only Linear draft generator on `/admin/feedback`: `buildLinearCandidateDraft()` utility, `LinearCandidateModal` with markdown preview + copy + draft warning, feedback table action. No migration, no schema changes, no Linear API call. Production smoke PASS (owner manual). Authenticated preview smoke risk-accepted before merge. CodeRabbit: 1 non-blocking docstring warning. Next: ALE-180. |
 | 2026-06-05 | **ALE-177** — Beta tester onboarding guide + support checklist Done (PR #24 squash → `6306531`). Docs-only: `beta-tester-onboarding-guide.md` + `beta-support-checklist.md`. No migration, no code changes, no smoke required. CodeRabbit: 2 non-blocking MD040 suggestions. Next: ALE-178. |
 | 2026-06-05 | **ALE-176** — Beta launch command center Done (PR #23 squash → `a897221`). `/admin/beta-launch` read-only dashboard. Production smoke 15/15 PASS. No migration. M12 first issue complete. Next: ALE-177. |
 | 2026-06-05 | **M11 COMPLETE** — Beta Launch Readiness. All 5 issues shipped (ALE-171→175). See closeout section above. |
