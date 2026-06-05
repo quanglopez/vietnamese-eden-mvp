@@ -4,10 +4,15 @@ import { redirect } from "next/navigation";
 import { AnalyticsDashboard } from "@/components/custom/admin/analytics-dashboard";
 import { AppShell } from "@/components/custom/app/app-shell";
 import {
+  getAllTimeWorkspaceAnalyticsCounts,
   getWorkspaceAnalyticsActivity,
   getWorkspaceAnalyticsCounts,
 } from "@/lib/analytics/queries";
-import { getPlatformAuthCounts } from "@/lib/analytics/platform-queries";
+import { getCohortAnalytics } from "@/lib/analytics/cohort-queries";
+import {
+  getAllTimePlatformAuthCounts,
+  getPlatformAuthCounts,
+} from "@/lib/analytics/platform-queries";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/workspaces/queries";
 
@@ -44,26 +49,35 @@ export default async function AnalyticsPage() {
   const [
     workspaceCounts7d,
     workspaceCounts30d,
+    workspaceCountsAll,
     activity7d,
     activity30d,
     authCounts7d,
     authCounts30d,
+    authCountsAll,
+    cohortResult,
   ] = await Promise.all([
     getWorkspaceAnalyticsCounts(supabase, workspace.id, 7),
     getWorkspaceAnalyticsCounts(supabase, workspace.id, 30),
+    getAllTimeWorkspaceAnalyticsCounts(supabase, workspace.id),
     getWorkspaceAnalyticsActivity(supabase, workspace.id, 7),
     getWorkspaceAnalyticsActivity(supabase, workspace.id, 30),
     getPlatformAuthCounts(7),
     getPlatformAuthCounts(30),
+    getAllTimePlatformAuthCounts(),
+    getCohortAnalytics(supabase, workspace.id, 30),
   ]);
 
   const errors = [
     workspaceCounts7d.error,
     workspaceCounts30d.error,
+    workspaceCountsAll.error,
     activity7d.error,
     activity30d.error,
     authCounts7d.error,
     authCounts30d.error,
+    authCountsAll.error,
+    cohortResult.error,
   ].filter((error): error is string => Boolean(error));
 
   return (
@@ -75,10 +89,15 @@ export default async function AnalyticsPage() {
         workspaceName={workspace.name}
         workspaceCounts7d={workspaceCounts7d.rows}
         workspaceCounts30d={workspaceCounts30d.rows}
+        workspaceCountsAll={workspaceCountsAll.rows}
         activity7d={activity7d.rows}
         activity30d={activity30d.rows}
         platformAuthCounts7d={authCounts7d.counts}
         platformAuthCounts30d={authCounts30d.counts}
+        platformAuthCountsAll={authCountsAll.counts}
+        cohortRows={cohortResult.rows}
+        cohortTotalAttributed={cohortResult.totalAttributed}
+        cohortTotalUnattributed={cohortResult.totalUnattributed}
         errors={errors}
       />
     </AppShell>

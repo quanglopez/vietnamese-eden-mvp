@@ -2,6 +2,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { ANALYTICS_EVENT_TYPES } from "@/types/analytics";
 import type { AnalyticsEventType } from "@/types/analytics";
+import type { CohortEventRow } from "./cohort-queries";
+import type { ConfidenceLevel } from "@/types/analytics";
 import type { Database } from "@/types/database";
 
 export type AnalyticsEventCountRow = {
@@ -119,11 +121,16 @@ export function buildDailyActivity(
   return Array.from(buckets.values());
 }
 
-export function buildAnalyticsFunnel(counts: AnalyticsEventCounts): AnalyticsFunnelStep[] {
-  const firstCount = counts.login;
+function buildFunnel(
+  steps: Array<{ eventType: AnalyticsEventType; label: string }>,
+  counts: AnalyticsEventCounts,
+): AnalyticsFunnelStep[] {
+  const firstStep = steps[0];
+  if (!firstStep) return [];
+  const firstCount = counts[firstStep.eventType] ?? 0;
   let previousCount = firstCount;
 
-  return DASHBOARD_FUNNEL.map(({ eventType, label }, index) => {
+  return steps.map(({ eventType, label }, index) => {
     const count = counts[eventType] ?? 0;
     const conversionRate = firstCount > 0 ? Math.round((count / firstCount) * 100) : 0;
     const dropOffFromPrevious =
@@ -134,6 +141,10 @@ export function buildAnalyticsFunnel(counts: AnalyticsEventCounts): AnalyticsFun
 
     return { eventType, label, count, conversionRate, dropOffFromPrevious };
   });
+}
+
+export function buildAnalyticsFunnel(counts: AnalyticsEventCounts): AnalyticsFunnelStep[] {
+  return buildFunnel(DASHBOARD_FUNNEL, counts);
 }
 
 /**
@@ -171,6 +182,27 @@ export async function getWorkspaceAnalyticsCounts(
   return { rows, error: null };
 }
 
+export async function getAllTimeWorkspaceAnalyticsCounts(
+  supabase: SupabaseClient<Database>,
+  workspaceId: string,
+): Promise<{ rows: AnalyticsEventCountRow[]; error: string | null }> {
+  const { data, error } = await supabase
+    .from("analytics_events")
+    .select("event_type")
+    .eq("workspace_id", workspaceId);
+
+  if (error) {
+    return { rows: [], error: error.message };
+  }
+
+  const counts = countAnalyticsEvents((data ?? []) as AnalyticsCountInput[]);
+  const rows = ANALYTICS_EVENT_TYPES.filter((eventType) => counts[eventType] > 0).map(
+    (event_type) => ({ event_type, count: counts[event_type] }),
+  );
+
+  return { rows, error: null };
+}
+
 export async function getWorkspaceAnalyticsActivity(
   supabase: SupabaseClient<Database>,
   workspaceId: string,
@@ -194,4 +226,79 @@ export async function getWorkspaceAnalyticsActivity(
     rows: buildDailyActivity((data ?? []) as AnalyticsActivityInput[], days),
     error: null,
   };
+}
+
+// ── Cohort / Persona helpers ──────────────────────────────────────────────
+
+const PERSONA_FUNNEL: Array<{ eventType: AnalyticsEventType; label: string }> = [
+  { eventType: "board_create", label: "Tạo board" },
+  { eventType: "content_add", label: "Thêm content" },
+  { eventType: "breakdown_run", label: "Breakdown" },
+  { eventType: "remix_run", label: "Remix" },
+  { eventType: "calendar_add", label: "Lên lịch" },
+];
+
+export type PersonaFunnel = {
+  persona: string;
+  steps: AnalyticsFunnelStep[];
+  totalEvents: number;
+  confidence: ConfidenceLevel;
+};
+
+function confidenceFromEvents(total: number, attributed: number): ConfidenceLevel {
+  if (total === 0) return "low";
+  if (total >= 10 && attributed >= 5) return "high";
+  if (total >= 3) return "medium";
+  return "low";
+}
+
+/**
+ * Build per-persona funnels from cohort event rows.
+ *
+ * Persona funnels cover workspace-scoped activation steps only:
+ * board_create → content_add → breakdown_run → remix_run → calendar_add.
+ *
+ * Platform-wide signup/login are NOT merged in — they are shown separately
+ * in the main analytics area. Persona data starts from workspace events.
+ *
+ * Confidence: High (≥10 events, ≥5 attributed), Medium (3–10), Low (<3).
+ * Unattributed events become a "Không xác định" persona group.
+ */
+export function buildPersonaFunnels(
+  cohortRows: CohortEventRow[],
+): PersonaFunnel[] {
+  // Group by persona
+  const byPersona = new Map<string, AnalyticsEventCounts>();
+
+  for (const row of cohortRows) {
+    const persona = row.persona ?? "unattributed";
+    let counts = byPersona.get(persona);
+    if (!counts) {
+      counts = createEmptyAnalyticsCounts();
+      byPersona.set(persona, counts);
+    }
+    counts[row.event_type] = (counts[row.event_type] ?? 0) + row.count;
+  }
+
+  const funnels: PersonaFunnel[] = [];
+
+  Array.from(byPersona.entries()).forEach(([persona, counts]) => {
+    const steps = buildFunnel(PERSONA_FUNNEL, counts);
+    const totalEvents = Object.values(counts).reduce((sum, c) => sum + c, 0);
+    const attributed = persona === "unattributed" ? 0 : totalEvents;
+
+    funnels.push({
+      persona: persona === "unattributed" ? "Không xác định" : persona,
+      steps,
+      totalEvents,
+      confidence: confidenceFromEvents(totalEvents, attributed),
+    });
+  });
+
+  // Sort: attributed personas first, then unattributed
+  return funnels.sort((a, b) => {
+    if (a.persona === "Không xác định") return 1;
+    if (b.persona === "Không xác định") return -1;
+    return b.totalEvents - a.totalEvents;
+  });
 }
