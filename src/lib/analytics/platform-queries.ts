@@ -51,3 +51,36 @@ export async function getPlatformAuthCounts(days = 30): Promise<PlatformAuthAnal
     return { counts: { login: 0, signup: 0 }, error: message };
   }
 }
+
+export async function getAllTimePlatformAuthCounts(): Promise<PlatformAuthAnalytics> {
+  const counts = createEmptyAnalyticsCounts();
+
+  try {
+    const supabase = createAdminClient();
+    const [loginResult, signupResult] = await Promise.all([
+      supabase
+        .from("analytics_events")
+        .select("id", { count: "exact", head: true })
+        .eq("event_type", "login")
+        .is("workspace_id", null),
+      supabase
+        .from("analytics_events")
+        .select("id", { count: "exact", head: true })
+        .eq("event_type", "signup")
+        .is("workspace_id", null),
+    ]);
+
+    const error = loginResult.error?.message ?? signupResult.error?.message ?? null;
+    if (error) {
+      return { counts: { login: 0, signup: 0 }, error };
+    }
+
+    counts.login = loginResult.count ?? 0;
+    counts.signup = signupResult.count ?? 0;
+
+    return { counts: { login: counts.login, signup: counts.signup }, error: null };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Không đọc được thống kê đăng nhập.";
+    return { counts: { login: 0, signup: 0 }, error: message };
+  }
+}

@@ -19,3 +19,11 @@ export const AUTH_ANALYTICS_EVENT_TYPES = ["signup", "login"] as const;
 
 /** Scalar metadata only — never raw content, titles, AI text, or credentials. */
 export type AnalyticsMetadata = Record<string, string | number | boolean>;
+
+export type CohortEvent = {
+  persona: string; // BetaPersona or "unattributed"
+  eventType: AnalyticsEventType;
+  count: number;
+};
+
+export type ConfidenceLevel = "high" | "medium" | "low";
