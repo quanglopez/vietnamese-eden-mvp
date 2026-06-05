@@ -3,7 +3,7 @@
 **Cập nhật:** 2026-06-05 (M11 COMPLETE — all 5 issues Done, closeout below)
 **Production:** [https://vietnamese-eden-mvp.vercel.app/](https://vietnamese-eden-mvp.vercel.app/)
 **Latest deploy:** commit `a897221` on main (ALE-176 PR #23 squashed 2026-06-05)
-**Tiếp theo:** ALE-177 — Beta tester onboarding guide + support checklist
+**Tiếp theo:** ALE-177 docs review + PR
 Feedback source of truth:
 
 [https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/](https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/)
@@ -51,7 +51,7 @@ Feedback source of truth:
 | **M11 milestone** | **COMPLETE** — Beta Launch Readiness (ALE-171, ALE-172, ALE-173, ALE-174, ALE-175) |
 | **M11 progress** | ALE-171 ✅ Done · ALE-172 ✅ Done · ALE-173 ✅ Done · ALE-174 ✅ Done · ALE-175 ✅ Done |
 | **M12 milestone** | **IN PROGRESS** — Beta Launch & Activation (ALE-176→182) |
-| **M12 progress** | ALE-176 ✅ Done · ALE-177 Backlog · ALE-178 Backlog · ALE-179 Backlog · ALE-180 Backlog · ALE-181 Backlog · ALE-182 Backlog |
+| **M12 progress** | ALE-176 ✅ Done · ALE-177 **In Progress** · ALE-178 Backlog · ALE-179 Backlog · ALE-180 Backlog · ALE-181 Backlog · ALE-182 Backlog |
 
 ### M11 COMPLETE — Beta Launch Readiness closeout (2026-06-05)
 
@@ -242,6 +242,7 @@ M11 had two procedural guardrail breaches (ALE-174, ALE-175) where PRs were merg
 ## Changelog
 | Date | Summary |
 |------|---------|
+| 2026-06-05 | **ALE-177** — Beta tester onboarding guide + support checklist **In Progress** (docs-only). Created `docs/beta-tester-onboarding-guide.md` (tester-facing guide with invite, 8-step flow, FAQ, limitations) and `docs/beta-support-checklist.md` (owner tracking sheet with per-tester checkboxes, triage, follow-up triggers). No migration, no code changes, no build. Waiting for owner review. |
 | 2026-06-05 | **ALE-176** — Beta launch command center Done (PR #23 squash → `a897221`). `/admin/beta-launch` read-only dashboard. Production smoke 15/15 PASS. No migration. M12 first issue complete. Next: ALE-177. |
 | 2026-06-05 | **M11 COMPLETE** — Beta Launch Readiness. All 5 issues shipped (ALE-171→175). See closeout section above. |
 | 2026-06-05 | **ALE-174** — Pricing/paywall feature flag + guardrails Done (PR #22 squash → `3017dbc`). `NEXT_PUBLIC_PRICING_ENABLED=false` default, no Stripe dependency. Production smoke 15/15 PASS. Procedural breach: squash-merged before owner confirmation — see postmortem above. |
