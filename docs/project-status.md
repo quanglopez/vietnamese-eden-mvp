@@ -1,9 +1,9 @@
 # Project status — Vietnamese Eden MVP
 
-**Cập nhật:** 2026-06-06 (M13 — ALE-184 Done)
+**Cập nhật:** 2026-06-06 (M13 — ALE-187 Done)
 **Production:** [https://vietnamese-eden-mvp.vercel.app/](https://vietnamese-eden-mvp.vercel.app/)
-**Latest deploy:** commit `cf3fe8a` on main (ALE-184 PR #31 merged 2026-06-06)
-**Tiếp theo:** M13 — ALE-185 (Baseline retention measurement), ALE-186 (First weekly beta report).
+**Latest deploy:** commit `e837b8a` on main (ALE-187 PR #32 merged 2026-06-06)
+**Tiếp theo:** M13 — ALE-183 (Continue-where-you-left-off component), ALE-185 (Baseline retention measurement — NOTE: now ALE-187 completed), ALE-186 (First weekly beta report).
 Feedback source of truth:
 
 [https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/](https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/)
@@ -53,7 +53,7 @@ Feedback source of truth:
 || **M12 milestone** | **COMPLETE** — Beta Launch & Activation (ALE-176→182) |
 || **M12 progress** | ALE-176 ✅ Done · ALE-177 ✅ Done · ALE-178 ✅ Done · ALE-179 ✅ Done · ALE-180 ✅ Done · ALE-181 ✅ Done · ALE-182 ✅ Done |
 || **M13 milestone** | In Progress — Retention & Iteration (ALE-183→189 proposed) |
-|| **M13 progress** | ALE-184 ✅ Done · ALE-183 ⏳ Todo · ALE-185 ⏳ Todo · ALE-186 ⏳ Todo |
+|| **M13 progress** | ALE-184 ✅ Done · ALE-187 ✅ Done · ALE-183 ⏳ Todo · ALE-185 ⏳ Todo · ALE-186 ⏳ Todo |
 
 ### M11 COMPLETE
 
@@ -226,6 +226,20 @@ M11 had two procedural guardrail breaches (ALE-174, ALE-175) where PRs were merg
 | **CodeRabbit** | N/A — reviewed via Hermes subagent (APPROVE) |
 | **Guardrail** | No breach — owner confirmed task scope. No migration, no schema change, no payment change, no automation, no secrets. Low-risk app code, existing data only. |
 
+### M13 — ALE-187 completion (2026-06-06)
+
+| Item | Detail |
+|------|--------|
+| **Issue** | [ALE-187](https://linear.app/alexgpt/issue/ALE-187/m13-baseline-retention-measurement) — Baseline retention measurement |
+| **PR** | [#32](https://github.com/quanglopez/vietnamese-eden-mvp/pull/32) — squash merged |
+| **Merge commit** | `e837b8a` |
+| **Deploy** | Docs-only — no Vercel deploy needed |
+| **What shipped** | `docs/baseline-retention-measurement.md` (278 lines): read-only Supabase SQL queries, event summary (71 events / 5 users), per-user activity breakdown, content creation stats, Day-1 return rate (insufficient data — n=1), Day-7 return rate (cannot measure — 3-day window), signup-to-login gap analysis (4 signup-only users with 0 login events), beta_testers table empty, known limitations (7 items), re-measurement SQL guide for Day-1/Day-7 after June 10, weekly report recommendations for ALE-186. |
+| **Migration** | None — docs-only, read-only SQL queries |
+| **Smoke** | Not required — docs-only, no app code changes |
+| **CodeRabbit** | N/A — reviewed via Hermes subagent (APPROVE) |
+| **Guardrail** | No breach — docs-only, no migration, no schema change, no app code, no automation, no secrets, no destructive SQL (read-only SELECT only), missing data clearly marked Unknown/Insufficient. |
+
 | Issue | Title | PR | Commit | Completed | Breach? |
 |-------|-------|----|--------|-----------|---------|
 | [ALE-176](https://linear.app/alexgpt/issue/ALE-176) | Beta launch command center | [#23](https://github.com/quanglopez/vietnamese-eden-mvp/pull/23) | `a897221` | 2026-06-05 | No |
@@ -237,6 +251,8 @@ M11 had two procedural guardrail breaches (ALE-174, ALE-175) where PRs were merg
 | [ALE-182](https://linear.app/alexgpt/issue/ALE-182) | Retention nudges v1 | [#30](https://github.com/quanglopez/vietnamese-eden-mvp/pull/30) | `df13ba1` | 2026-06-06 | No |
 
 | [ALE-184](https://linear.app/alexgpt/issue/ALE-184) | Continue-where-you-left-off dashboard component | [#31](https://github.com/quanglopez/vietnamese-eden-mvp/pull/31) | `cf3fe8a` | 2026-06-06 | No |
+
+| [ALE-187](https://linear.app/alexgpt/issue/ALE-187) | Baseline retention measurement | [#32](https://github.com/quanglopez/vietnamese-eden-mvp/pull/32) | `e837b8a` | 2026-06-06 | No |
 
 ### M12 — ALE-181 completion (2026-06-06)
 
@@ -357,6 +373,7 @@ M11 had two procedural guardrail breaches (ALE-174, ALE-175) where PRs were merg
 ## Changelog
 | Date | Summary |
 |------|---------|
+| 2026-06-06 | **ALE-187** — Baseline retention measurement Done (PR #32 squash → `e837b8a`). `docs/baseline-retention-measurement.md` (278 lines): read-only Supabase SQL queries, event summary (71 events / 5 users), Day-1 return rate (insufficient data — n=1), Day-7 (cannot measure — 3-day window), signup-to-login gap (4 signup-only users with 0 login events), workspace funnel stats, known limitations (7 items), re-measurement SQL guide, weekly report recommendations for ALE-186. Docs-only, no migration, no app code, no destructive SQL, missing data clearly marked. |
 | 2026-06-06 | **ALE-184** — Continue-where-you-left-off dashboard component Done (PR #31 merge → `cf3fe8a`). 4 files: `continue-queries.ts` batch query (3 boards + funnel status), `continue-where-you-left-off.tsx` client component (Vietnamese copy §5.4), dashboard `page.tsx` parallel fetch, `dashboard-view.tsx` nudge rendering below onboarding checklist. Funnel: board → content → analysis → remix → calendar. No migration, no schema change, no raw content exposure, ALE-180 preserved. Production smoke PASS. M13 first issue. |
 | 2026-06-06 | **ALE-182** — Retention nudges v1 Done (PR #30 merge → `df13ba1`). `docs/retention-nudges-v1.md` (379 lines): retention problem definition (Day-1/Day-7 drop-off, funnel gaps), user segments (5 tiers), trigger rules, in-app nudge proposal ("Tiếp tục từ lần trước"), Vietnamese copy variants, 4 follow-up templates (7d/14d/post-core/post-feedback), measurement plan with SQL baseline queries, guardrails (no automation, no migration, owner review, opt-out required), future M13+ implementation notes. Docs-only, no migration, no schema change, no app code, no automation. **M12 COMPLETE.** |
 | 2026-06-06 | **ALE-181** — Weekly beta report template Done (PR #29 squash → `d3bb887`). `docs/weekly-beta-report-template.md` (345 lines): activation metrics funnel, feedback patterns, top bugs/risks, WTP signals, product learnings, next actions, decision gate, data pull checklist + SQL, Hermes generation prompt, Vietnamese section headers. Docs-only, no migration, no schema change, no app code, no automation. Smoke not required. Next: ALE-182. |
