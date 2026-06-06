@@ -1,9 +1,9 @@
 # Project status — Vietnamese Eden MVP
 
-**Cập nhật:** 2026-06-06 (M13 — ALE-187 Done)
+**Cập nhật:** 2026-06-06 (M13 — ALE-183 + ALE-185 Done)
 **Production:** [https://vietnamese-eden-mvp.vercel.app/](https://vietnamese-eden-mvp.vercel.app/)
-**Latest deploy:** commit `e837b8a` on main (ALE-187 PR #32 merged 2026-06-06)
-**Tiếp theo:** M13 — ALE-183 (Continue-where-you-left-off component), ALE-185 (Baseline retention measurement — NOTE: now ALE-187 completed), ALE-186 (First weekly beta report).
+**Latest deploy:** commit `ad77bc0` on main (ALE-183+185 PR #33 merged 2026-06-06, ENUM migration applied)
+**Tiếp theo:** M13 — ALE-186 (First weekly beta report with real data).
 Feedback source of truth:
 
 [https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/](https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/)
@@ -53,7 +53,7 @@ Feedback source of truth:
 || **M12 milestone** | **COMPLETE** — Beta Launch & Activation (ALE-176→182) |
 || **M12 progress** | ALE-176 ✅ Done · ALE-177 ✅ Done · ALE-178 ✅ Done · ALE-179 ✅ Done · ALE-180 ✅ Done · ALE-181 ✅ Done · ALE-182 ✅ Done |
 || **M13 milestone** | In Progress — Retention & Iteration (ALE-183→189 proposed) |
-|| **M13 progress** | ALE-184 ✅ Done · ALE-187 ✅ Done · ALE-183 ⏳ Todo · ALE-185 ⏳ Todo · ALE-186 ⏳ Todo |
+|| **M13 progress** | ALE-183 ✅ Done · ALE-185 ✅ Done · ALE-187 ✅ Done · ALE-186 ⏳ Todo |
 
 ### M11 COMPLETE
 
