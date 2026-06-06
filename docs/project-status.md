@@ -7,6 +7,7 @@
 **M13 closeout:** [m13-closeout-and-m14-recommendation.md](./m13-closeout-and-m14-recommendation.md) — COMPLETE, 7/7 canonical issues Done
 **Decision memo:** [cohort-2-decision-gate-2026-06-06.md](./cohort-2-decision-gate-2026-06-06.md) — Verdict: **WAIT** (3 ✅ / 3 ⬜ / 5 ❌ / 1 N/A)
 **P1 triage:** [docs/triage/ale-190-slow-login-triage.md](./triage/ale-190-slow-login-triage.md) — Fixed: Vercel syd1 colocated with Supabase ap-southeast-2
+**Architecture spike:** [composio-inngest-architecture.md](./composio-inngest-architecture.md) — ALE-191 In Progress: Composio + Inngest evaluation. Verdict: **WAIT** — no integration before M15 (post-public-beta + post-paywall). Safe pilot = Notion/Sheets export only.
 **⚡ Production state (2026-06-06 03:12 UTC):** `analytics_event_type` ENUM in production Postgres now includes `nudge_shown` and `nudge_clicked` (verified via `pg_enum` query). Nudge telemetry unblocked; no events recorded yet.
 Feedback source of truth:
 
