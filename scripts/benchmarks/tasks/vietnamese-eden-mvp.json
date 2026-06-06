@@ -34,5 +34,19 @@
     "category": "Voice Profile",
     "systemPrompt": "Bạn là chuyên gia phân tích phong cách viết tiếng Việt. Trả lời bằng tiếng Việt.",
     "userPrompt": "Phân tích phong cách viết của đoạn văn sau. Trả lời JSON với các trường: tone (trang_trong/suong_sa/hai_huoc/chuyen_nghiep/tam_tinh), audience (hoc_sinh/sinh_vien/nguoi_di_lam/doanh_nhan), signature_phrases (mảng các cụm từ đặc trưng), avg_sentence_length (số từ trung bình mỗi câu), emoji_density (số emoji trên 100 từ).\n\nBài viết: \"Mình là một đứa cực kỳ thích viết. Thích đến nỗi hồi cấp 3 tuần nào cũng viết nhật ký bằng tay, xong còn trang trí sticker các kiểu. Lên đại học cũng viết, mà chuyển sang blog. Đi làm rồi vẫn viết, nhưng toàn viết báo cáo với email. Cho đến một ngày mình nhận ra: đời mình toàn viết cho người khác đọc. Chưa bao giờ viết cho chính mình. Nên hôm nay mình viết cái post này. Không để bán gì cả. Chỉ để nói là: nếu bạn đang đọc đến đây, có lẽ bạn cũng giống mình. Một đứa mê viết, nhưng lâu rồi chưa viết cho chính mình. Thử viết gì đó hôm nay đi. Một dòng thôi cũng được.\""
+  },
+  {
+    "id": "wtp-extraction",
+    "category": "Paid Signal",
+    "requiresJson": true,
+    "systemPrompt": "Bạn là trợ lý phân tích phản hồi người dùng. Chỉ trả lời bằng JSON hợp lệ. Không thêm văn bản ngoài JSON.",
+    "userPrompt": "Phân tích phản hồi sau đây và xác định tín hiệu sẵn sàng trả tiền (WTP — Willingness To Pay).\n\nQUAN TRỌNG:\n- Chỉ phát hiện WTP RÕ RÀNG (người dùng nói \"sẵn sàng trả\", \"đáng tiền\", \"mua ngay\", mức giá cụ thể)\n- KHÔNG suy diễn WTP từ cảm xúc tích cực (\"thích\", \"hay\", \"tuyệt vời\" không phải là WTP)\n- KHÔNG suy diễn WTP từ việc người dùng dùng nhiều\n- Trả lời JSON: { \"hasWtp\": true|false, \"confidence\": \"high\"|\"medium\"|\"low\", \"evidence\": \"trích dẫn chính xác\", \"verdict\": \"YES\"|\"NO\"|\"MAYBE\" }\n\nPhản hồi cần phân tích:\n\"App này xịn thật sự. Mình dùng thử 2 tuần rồi, giao diện mượt, AI breakdown chất lượng. Nói chung là hay. Chưa thấy app nào ngon như này. Mà phiên bản beta free hết đúng không? Thấy bảo sau này có phí hả? Để xem giá bao nhiêu đã. Chứ giờ chưa sẵn sàng trả tiền đâu, đang sinh viên mà.\""
+  },
+  {
+    "id": "strict-json-hallucination",
+    "category": "Reliability",
+    "requiresJson": true,
+    "systemPrompt": "Bạn là trợ lý phân tích dữ liệu. Chỉ trả lời bằng JSON hợp lệ. Không thêm văn bản ngoài JSON. Nếu thiếu dữ liệu, ghi \"Unknown\" hoặc null — KHÔNG được bịa số.",
+    "userPrompt": "Phân tích bài viết sau và trả về JSON với các trường bên dưới.\n\nQUAN TRỌNG:\n- Nếu một chỉ số không có dữ liệu để tính, ghi \"Unknown\" (cho string) hoặc null (cho number)\n- KHÔNG được bịa số, không được ước lượng, không được suy đoán\n- KHÔNG được dùng giá trị mặc định (như 0) cho dữ liệu thiếu — 0 khác với \"không có dữ liệu\"\n\nTrường cần trả về:\n{\n  \"engagement\": { \"likes\": number|null, \"comments\": number|null, \"shares\": number|null },\n  \"sentiment\": \"positive\"|\"negative\"|\"neutral\"|\"Unknown\",\n  \"hasWtp\": true|false|null,\n  \"viralityScore\": number|null,\n  \"topics\": string[]\n}\n\nBài viết:\n\"Hôm nay trời đẹp. Mình vừa đi cà phê với bạn. Nói chuyện vui lắm. À mà app các bạn làm cũng hay phết. Giao diện sạch sẽ. Mình không rành công nghệ lắm nhưng xài cũng được.\""
   }
 ]
