@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { DashboardView } from "@/components/custom/app/dashboard-view";
 import type { OnboardingChecklistProgress } from "@/components/custom/dashboard/onboarding-checklist";
 import { listBoardsForWorkspace, getWorkspaceContentCount } from "@/lib/boards/queries";
+import { getContinueWhereYouLeftOff } from "@/lib/boards/continue-queries";
 import { getWorkspaceAnalysisCount } from "@/lib/content/analysis-queries";
 import { getWorkspaceRemixCount } from "@/lib/content/remix-queries";
 import { createClient } from "@/lib/supabase/server";
@@ -41,10 +42,10 @@ export default async function DashboardPage() {
   const metadata = (user?.user_metadata ?? {}) as Record<string, unknown>;
   const fullName = getUserDisplayName(metadata);
   const greetingName = getGreetingName(fullName);
-
   let boards: Awaited<ReturnType<typeof listBoardsForWorkspace>>["boards"] = [];
   let checklistProgress: OnboardingChecklistProgress | null = null;
   let fetchError: string | null = null;
+  let continueData: Awaited<ReturnType<typeof getContinueWhereYouLeftOff>>["data"] = { boards: [] };
 
   if (user) {
     const { workspace, error: workspaceError } = await getCurrentWorkspace(supabase, user.id);
@@ -58,6 +59,7 @@ export default async function DashboardPage() {
         analysisCount,
         remixCount,
         calendarCount,
+        continueResult,
       ] = await Promise.all([
         listBoardsForWorkspace(supabase, workspace.id),
         listVoiceProfilesForUser(supabase, workspace.id, user.id),
@@ -65,8 +67,8 @@ export default async function DashboardPage() {
         getWorkspaceAnalysisCount(supabase, workspace.id),
         getWorkspaceRemixCount(supabase, workspace.id),
         getWorkspaceCalendarCount(supabase, workspace.id),
+        getContinueWhereYouLeftOff(supabase, workspace.id),
       ]);
-
       const queryErrors = [boardsResult.error, voiceResult.error].filter(
         (message): message is string => Boolean(message),
       );
@@ -142,6 +144,14 @@ export default async function DashboardPage() {
           ? { label: nextBestAction, href: nextBestActionHref }
           : null,
       };
+
+      // Only show continue nudge for returning users with boards
+      if (continueResult.error) {
+        // Non-blocking: log and skip
+        console.error("[ContinueWhereYouLeftOff] query error:", continueResult.error);
+      } else {
+        continueData = continueResult.data;
+      }
     }
   }
 
@@ -151,6 +161,7 @@ export default async function DashboardPage() {
       subtitle="Workspace AI content — beta MVP"
       boards={boards}
       checklistProgress={checklistProgress}
+      continueData={continueData}
       fetchError={fetchError}
     />
   );
