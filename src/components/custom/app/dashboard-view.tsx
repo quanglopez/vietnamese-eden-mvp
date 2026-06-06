@@ -14,6 +14,8 @@ import {
 import { Button } from "@/components/ui/button";
 import type { OnboardingChecklistProgress } from "@/components/custom/dashboard/onboarding-checklist";
 import { OnboardingChecklist } from "@/components/custom/dashboard/onboarding-checklist";
+import { ContinueWhereYouLeftOff } from "@/components/custom/dashboard/continue-where-you-left-off";
+import type { ContinueWhereYouLeftOffData } from "@/lib/boards/continue-queries";
 import type { BoardListItem } from "@/types/boards";
 
 import { FetchErrorBanner } from "./fetch-error-banner";
@@ -24,6 +26,7 @@ type DashboardViewProps = {
   subtitle: string;
   boards: BoardListItem[];
   checklistProgress: OnboardingChecklistProgress | null;
+  continueData?: ContinueWhereYouLeftOffData;
   fetchError?: string | null;
 };
 
@@ -75,8 +78,11 @@ export function DashboardView({
   subtitle,
   boards,
   checklistProgress,
+  continueData,
   fetchError,
 }: DashboardViewProps) {
+  const hasContinueNudge = continueData && continueData.boards.length > 0;
+
   return (
     <AppShell title={title} subtitle={subtitle}>
       {fetchError ? (
@@ -87,6 +93,11 @@ export function DashboardView({
       ) : (
         <DashboardHeroCard />
       )}
+
+      {/* Continue where you left off — shown for returning users with boards */}
+      {hasContinueNudge ? (
+        <ContinueWhereYouLeftOff boards={continueData.boards} />
+      ) : null}
 
       <div className="grid lg:grid-cols-4 gap-4 mb-8">
         {[
