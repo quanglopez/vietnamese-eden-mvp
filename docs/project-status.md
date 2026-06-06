@@ -1,10 +1,12 @@
 # Project status — Vietnamese Eden MVP
 
-**Cập nhật:** 2026-06-06 (M13 — ALE-186 Done)
+**Cập nhật:** 2026-06-06 (M13 — ALE-189 Done, ENUM migration applied)
 **Production:** [https://vietnamese-eden-mvp.vercel.app/](https://vietnamese-eden-mvp.vercel.app/)
-**Latest deploy:** commit `ad77bc0` on main (ALE-183+185 PR #33 merged 2026-06-06, ENUM migration pending)
-**Tiếp theo:** Owner review of weekly report; M14 scoping after decision gate evaluation.
+**Latest deploy:** commit `e315c15` on main (ALE-186 doc fixes merged 2026-06-06)
+**Tiếp theo:** Owner populates beta_testers, triages P1 bug, prompts tester-01 to revisit /dashboard. Decision gate re-evaluation 2026-06-13.
 **First weekly report:** [weekly-report-2026-06-06.md](./weekly-reports/weekly-report-2026-06-06.md) — Gate: WAITING
+**Decision memo:** [cohort-2-decision-gate-2026-06-06.md](./cohort-2-decision-gate-2026-06-06.md) — Verdict: **WAIT** (12-criterion assessment; 3 ✅ / 3 ⬜ / 5 ❌ / 1 N/A)
+**⚡ Production state (2026-06-06 03:12 UTC):** `analytics_event_type` ENUM in production Postgres now includes `nudge_shown` and `nudge_clicked` (verified via `pg_enum` query). Nudge telemetry unblocked; no events recorded yet.
 Feedback source of truth:
 
 [https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/](https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/)
@@ -54,7 +56,7 @@ Feedback source of truth:
 || **M12 milestone** | **COMPLETE** — Beta Launch & Activation (ALE-176→182) |
 || **M12 progress** | ALE-176 ✅ Done · ALE-177 ✅ Done · ALE-178 ✅ Done · ALE-179 ✅ Done · ALE-180 ✅ Done · ALE-181 ✅ Done · ALE-182 ✅ Done |
 || **M13 milestone** | In Progress — Retention & Iteration (ALE-183→189 proposed) |
-|| **M13 progress** | ALE-183 ✅ Done · ALE-185 ✅ Done · ALE-186 ✅ Done · ALE-187 ✅ Done |
+|| **M13 progress** | ALE-183 ✅ Done · ALE-185 ✅ Done · ALE-186 ✅ Done · ALE-187 ✅ Done · ALE-189 ✅ Done |
 
 ### M11 COMPLETE
 
@@ -253,6 +255,17 @@ M11 had two procedural guardrail breaches (ALE-174, ALE-175) where PRs were merg
 | **Smoke** | Not required — docs-only, no app code changes |
 | **Guardrail** | No breach — docs-only, no migration, no schema change, no app code, no automation, no secrets, no destructive SQL, missing data marked "Chưa có data" or "N/A" with reason, no PII leaked. |
 
+### M13 — ALE-189 completion (2026-06-06)
+
+| Item | Detail |
+|------|--------|
+| **Issue** | [ALE-189](https://linear.app/alexgpt/issue/ALE-189/m13-cohort-2-decision-gate-evaluation) — Cohort 2 decision gate evaluation |
+| **PR** | [#35](https://github.com/quanglopez/vietnamese-eden-mvp/pull/35) — squash merge (pending) |
+| **What shipped** | `docs/cohort-2-decision-gate-2026-06-06.md` (~280 lines, 8 sections): current verdict **WAIT**, 12-criterion assessment table (3 ✅ / 3 ⬜ / 5 ❌ / 1 N/A), what changed since ALE-186 (production ENUM migration applied 2026-06-06 03:12 UTC verified via `pg_enum`), remaining blockers ranked by impact, next actions in priority order. Includes specific milestones to revisit verdict (2026-06-10, 2026-06-13). Also adds §6.5 WTP question template to `retention-nudges-v1.md` to fix missing-template citation. |
+| **Verdict rationale** | ENUM migration unblocks nudge telemetry (1 criterion upgraded), but 6 of 12 criteria still unmet (no Day-7 data, no beta_testers, no WTP, low sample size, P1 untriaged, no nudge events yet). Verdict stays WAIT. |
+| **Migration** | None — docs-only, read-only SQL queries |
+| **Guardrail** | No breach — docs-only, no migration, no app code, no automation, no secrets, no destructive SQL (read-only `pg_enum` query only), no PII. Production state verified via read-only. |
+
 | Issue | Title | PR | Commit | Completed | Breach? |
 |-------|-------|----|--------|-----------|---------|
 | [ALE-176](https://linear.app/alexgpt/issue/ALE-176) | Beta launch command center | [#23](https://github.com/quanglopez/vietnamese-eden-mvp/pull/23) | `a897221` | 2026-06-05 | No |
@@ -387,6 +400,7 @@ M11 had two procedural guardrail breaches (ALE-174, ALE-175) where PRs were merg
 ## Changelog
 | Date | Summary |
 |------|---------|
+| 2026-06-06 | **ALE-189** — Cohort 2 decision gate evaluation Done. `docs/cohort-2-decision-gate-2026-06-06.md` (~280 lines, 8 sections): verdict **WAIT** (12-criterion assessment: 3 ✅ / 3 ⬜ / 5 ❌ / 1 N/A). Production ENUM migration applied 2026-06-06 03:12 UTC — nudge telemetry unblocked but no events yet. Verdict stays WAIT because: no Day-7 data, no beta_testers, no WTP, low sample size, P1 untriaged. Next milestones: 2026-06-10 (Day-7 measurement), 2026-06-13 (10-day window). Owner actions: populate beta_testers, triage P1 slow-login, prompt tester-01 to revisit /dashboard. Also added §6.5 WTP template to retention-nudges-v1.md. Docs-only, no migration, no app code, no destructive SQL, read-only verification of production state. |
 | 2026-06-06 | **ALE-186** — First weekly beta report Done. `docs/weekly-reports/weekly-report-2026-06-06.md` (~430 lines): full template filled with real Supabase data. Activation funnel (5 users, 1 power user, 1/5 = 20% completed full flow). Day-1 retention insufficient (n=1), Day-7 cannot measure (3-day window). 1 P1 feedback entry (slow login). 0 WTP signals. 0 beta_testers rows. **Nudge events N/A — ENUM migration for nudge_shown/nudge_clicked was committed to repo (PR #33) but never applied to production Supabase.** Decision gate: **WAITING** — 7/10 criteria unmet. Top urgent: apply ENUM migration, triage slow-login, populate beta_testers. Docs-only, no migration, no app code, no destructive SQL, all missing data clearly marked. |
 | 2026-06-06 | **ALE-187** — Baseline retention measurement Done (PR #32 squash → `e837b8a`). `docs/baseline-retention-measurement.md` (278 lines): read-only Supabase SQL queries, event summary (71 events / 5 users), Day-1 return rate (insufficient data — n=1), Day-7 (cannot measure — 3-day window), signup-to-login gap (4 signup-only users with 0 login events), workspace funnel stats, known limitations (7 items), re-measurement SQL guide, weekly report recommendations for ALE-186. Docs-only, no migration, no app code, no destructive SQL, missing data clearly marked. |
 | 2026-06-06 | **ALE-184** — Continue-where-you-left-off dashboard component Done (PR #31 merge → `cf3fe8a`). 4 files: `continue-queries.ts` batch query (3 boards + funnel status), `continue-where-you-left-off.tsx` client component (Vietnamese copy §5.4), dashboard `page.tsx` parallel fetch, `dashboard-view.tsx` nudge rendering below onboarding checklist. Funnel: board → content → analysis → remix → calendar. No migration, no schema change, no raw content exposure, ALE-180 preserved. Production smoke PASS. M13 first issue. |
