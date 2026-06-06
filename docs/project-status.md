@@ -246,7 +246,7 @@ M11 had two procedural guardrail breaches (ALE-174, ALE-175) where PRs were merg
 | Item | Detail |
 |------|--------|
 | **Issue** | [ALE-186](https://linear.app/alexgpt/issue/ALE-186/m13-first-weekly-beta-report-real-data) — First weekly beta report (real data) |
-| **PR** | TBD (PR #34 squash merge) |
+| **PR** | [#34](https://github.com/quanglopez/vietnamese-eden-mvp/pull/34) — squash merge → `a1319a8` |
 | **Deploy** | Docs-only — no Vercel deploy needed |
 | **What shipped** | `docs/weekly-reports/weekly-report-2026-06-06.md` (13 sections, ~430 lines): activation funnel (5 users, 1 power user, 1/5 completed full flow), Day-1 retention insufficient (n=1), Day-7 cannot measure (3-day window), 1 P1 feedback (slow login), 0 WTP signals, 0 beta_testers, **nudge events N/A (ENUM migration not applied to production)**. Decision gate: **WAITING** — 7/10 criteria unmet. Top urgent: apply ENUM migration, triage slow-login bug, populate beta_testers. |
 | **Migration** | None — docs-only, read-only SQL queries |
@@ -266,7 +266,7 @@ M11 had two procedural guardrail breaches (ALE-174, ALE-175) where PRs were merg
 | [ALE-184](https://linear.app/alexgpt/issue/ALE-184) | Continue-where-you-left-off dashboard component | [#31](https://github.com/quanglopez/vietnamese-eden-mvp/pull/31) | `cf3fe8a` | 2026-06-06 | No |
 
 | [ALE-187](https://linear.app/alexgpt/issue/ALE-187) | Baseline retention measurement | [#32](https://github.com/quanglopez/vietnamese-eden-mvp/pull/32) | `e837b8a` | 2026-06-06 | No |
-| [ALE-186](https://linear.app/alexgpt/issue/ALE-186) | First weekly beta report (real data) | [#34](https://github.com/quanglopez/vietnamese-eden-mvp/pull/34) | TBD | 2026-06-06 | No |
+| [ALE-186](https://linear.app/alexgpt/issue/ALE-186) | First weekly beta report (real data) | [#34](https://github.com/quanglopez/vietnamese-eden-mvp/pull/34) | `a1319a8` | 2026-06-06 | No |
 
 ### M12 — ALE-181 completion (2026-06-06)
 
