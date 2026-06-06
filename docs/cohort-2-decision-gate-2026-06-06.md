@@ -51,16 +51,16 @@ Criteria sourced from [weekly-beta-report-template.md §"Decision Gate"](./weekl
 | 6 | Feedback response rate | ≥60% | N/A — no tester correspondence | ⬜ | Manual intake |
 | 7 | Day-1 retention measurable | yes | no (n=1) | ❌ | baseline-retention-measurement.md |
 | 8 | Day-7 retention measurable | yes | no (3-day window) | ❌ | baseline-retention-measurement.md |
-| 9 | Nudge events tracked | yes | **YES — ENUM ready, zero events yet** | ⬜→in-progress | Production ENUM |
+| 9 | Nudge events tracked | yes | **YES — ENUM ready, zero events yet** | ⬜ | Production ENUM |
 | 10 | beta_testers populated | yes | 0 rows | ❌ | beta_testers table |
 | 11 | Production stable (health) | yes | HTTP 200, no errors | ✅ | Vercel /api/health |
 | 12 | No critical bugs blocking flow | none | 1 P1 (slow login) but doesn't block | ✅ | feedback analysis |
 
-**Score:** 4 ✅ + 1 ⬜ + 1 N/A + 6 ❌/in-progress
+**Score:** 3 ✅ + 3 ⬜ + 1 N/A + 5 ❌
 
 **Verdict mapping:**
 - **GO** requires: All ✅ or all ✅ + N/A
-- **WAIT** matches: 4 ✅ + 6 ❌/in-progress
+- **WAIT** matches: 3 ✅ + 3 ⬜ + 5 ❌
 - **NO-GO** matches: P0 open OR <2 testers completed full flow
 
 → **WAIT** is the correct call.
@@ -81,7 +81,7 @@ Criteria sourced from [weekly-beta-report-template.md §"Decision Gate"](./weekl
 
 4. **Low sample size for funnel metrics** — Only 1 of 5 users (20%) completed full flow. Power user dominates the data. **Mitigation: expand cohort or wait for more organic signups.**
 
-5. **0 WTP signals** — No feedback mentions pricing or willingness to pay. **Owner action: manually ask tester-01 (power user) using template in [retention-nudges-v1.md §6](./retention-nudges-v1.md).**
+5. **0 WTP signals** — No feedback mentions pricing or willingness to pay. **Owner action: manually ask tester-01 (power user) using template in [retention-nudges-v1.md §6.5](./retention-nudges-v1.md).**
 
 6. **No nudge event data yet** — ENUM is ready, but no nudge has fired in production since migration. **Mitigation: power user must visit `/dashboard` to generate first events. Manual reminder may help.**
 
@@ -136,7 +136,7 @@ Criteria sourced from [weekly-beta-report-template.md §"Decision Gate"](./weekl
 3. **[Owner] Manually prompt tester-01** (power user) to revisit `/dashboard` so first `nudge_shown` event fires
    - This will validate the nudge flow end-to-end
    - Priority: **HIGH** — validates ENUM migration
-4. **[Owner] Send WTP question to tester-01** (template in [retention-nudges-v1.md §6](./retention-nudges-v1.md))
+4. **[Owner] Send WTP question to tester-01** (template in [retention-nudges-v1.md §6.5](./retention-nudges-v1.md))
    - Priority: MEDIUM — needed for criterion #5
 
 ### Next week (2026-06-13 → 2026-06-20)

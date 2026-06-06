@@ -235,6 +235,26 @@ Cảm ơn lần nữa,
 [Tên team]
 ```
 
+### 6.5 Template: WTP (Willingness to Pay) question
+
+```
+Chào [Tên],
+
+Mình thấy bạn đã dùng Vietnamese Eden được [N] ngày — cảm ơn bạn 🙏
+
+Mình đang cân nhắc gói tháng cho app. Cho mình hỏi nhanh 2 câu thôi:
+
+1. Nếu Vietnamese Eden có gói tháng [X] VND, bạn có sẵn sàng trả không?
+   (Yes / No / Maybe — tuỳ bạn)
+
+2. Lý do: [để trống — để họ tự viết]
+
+Nếu bạn reply "bỏ qua" thì mình không hỏi lại. Cảm ơn bạn!
+[Tên team]
+```
+
+**Quy tắc WTP (WTP rule):** Chỉ ghi nhận nếu user nói rõ số tiền hoặc Yes/No/Maybe. Không suy diễn từ vắng mặt.
+
 ---
 
 ## 7. KHÔNG Tự động hóa
