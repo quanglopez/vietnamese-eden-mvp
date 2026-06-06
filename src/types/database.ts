@@ -764,7 +764,9 @@ export type Database = {
         | "content_add"
         | "breakdown_run"
         | "remix_run"
-        | "calendar_add";
+        | "calendar_add"
+        | "nudge_shown"
+        | "nudge_clicked";
       beta_persona:
         | "creator"
         | "agency"

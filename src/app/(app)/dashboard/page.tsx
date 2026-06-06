@@ -10,6 +10,7 @@ import { createClient } from "@/lib/supabase/server";
 import { listVoiceProfilesForUser } from "@/lib/voice/queries";
 import { getCurrentWorkspace } from "@/lib/workspaces/queries";
 import { getWorkspaceCalendarCount } from "@/lib/calendar/queries";
+import { getUserLastActivityDate } from "@/lib/users/activity";
 
 export const metadata: Metadata = {
   title: "Tổng quan · Vietnamese Eden",
@@ -46,6 +47,7 @@ export default async function DashboardPage() {
   let checklistProgress: OnboardingChecklistProgress | null = null;
   let fetchError: string | null = null;
   let continueData: Awaited<ReturnType<typeof getContinueWhereYouLeftOff>>["data"] = { boards: [] };
+  let lastActivityDate: string | null = null;
 
   if (user) {
     const { workspace, error: workspaceError } = await getCurrentWorkspace(supabase, user.id);
@@ -60,6 +62,7 @@ export default async function DashboardPage() {
         remixCount,
         calendarCount,
         continueResult,
+        activityResult,
       ] = await Promise.all([
         listBoardsForWorkspace(supabase, workspace.id),
         listVoiceProfilesForUser(supabase, workspace.id, user.id),
@@ -68,6 +71,7 @@ export default async function DashboardPage() {
         getWorkspaceRemixCount(supabase, workspace.id),
         getWorkspaceCalendarCount(supabase, workspace.id),
         getContinueWhereYouLeftOff(supabase, workspace.id),
+        getUserLastActivityDate(supabase, user.id),
       ]);
       const queryErrors = [boardsResult.error, voiceResult.error].filter(
         (message): message is string => Boolean(message),
@@ -79,6 +83,7 @@ export default async function DashboardPage() {
       boards = boardsResult.boards;
       const hasBoard = boards.length > 0;
       const hasVoiceProfile = (voiceResult.profiles?.length ?? 0) > 0;
+      lastActivityDate = activityResult as string | null;
 
       const firstBoardId = boards.length > 0 ? (boards[0]?.id ?? null) : null;
 
@@ -162,6 +167,7 @@ export default async function DashboardPage() {
       boards={boards}
       checklistProgress={checklistProgress}
       continueData={continueData}
+      lastActivityDate={lastActivityDate}
       fetchError={fetchError}
     />
   );

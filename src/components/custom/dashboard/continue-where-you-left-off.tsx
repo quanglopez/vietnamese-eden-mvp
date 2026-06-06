@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import { ArrowRight, Clock, Sparkles, Wand2, CalendarDays, FolderHeart } from "lucide-react";
+import { useEffect, useState } from "react";
+import { trackEvent } from "@/lib/analytics/tracker";
 
 import type { BoardFunnelStatus } from "@/lib/boards/continue-queries";
 import { getNextAction } from "@/lib/boards/continue-queries";
 
 type ContinueWhereYouLeftOffProps = {
   boards: BoardFunnelStatus[];
+  lastActivityDate?: string | null;
 };
 
 /**
@@ -38,12 +41,98 @@ const stepIcons: Record<string, React.ElementType> = {
   "Mở board": FolderHeart,
 };
 
+/**
+ * Returns true if this is considered a "returning user" for nudge purposes.
+ * - If no boards exist, false (no context to continue from).
+ * - If lastActivityDate exists and is older than 1 day ago, true.
+ * - If lastActivityDate exists but is today/yesterday, we still show (safe default:
+ *   user may have left mid-session days ago and returned now).
+ * - If lastActivityDate is unknown (new users), false — prefer ALE-180 first-run experience.
+ */
+function isReturningUser(boards: BoardFunnelStatus[], lastActivityDate: string | null | undefined): boolean {
+  if (boards.length === 0) {
+    return false;
+  }
+  // No timestamp data — assume returning if they have boards (fallback)
+  if (!lastActivityDate) {
+    return boards.length >= 1;
+  }
+  
+  const lastDate = new Date(lastActivityDate);
+  const now = new Date();
+  const oneDayAgo = new Date();
+  oneDayAgo.setDate(now.getDate() - 1);
+  
+  // Return true if last activity was more than 1 day ago OR if same day but earlier session (fallback safe)
+  return lastDate < oneDayAgo;
+}
+
 export function ContinueWhereYouLeftOff({
   boards,
+  lastActivityDate,
 }: ContinueWhereYouLeftOffProps) {
-  if (boards.length === 0) {
+  const [hasShown, setHasShown] = useState(false);
+
+  useEffect(() => {
+    // Session gating: check sessionStorage on mount
+    const sessionStorageKey = "ale183_nudge_shown_session";
+    const alreadyShown = sessionStorage.getItem(sessionStorageKey);
+    
+    if (alreadyShown) {
+      setHasShown(true);
+      return;
+    }
+    
+    // Returning-user detection
+    const shouldShow = isReturningUser(boards, lastActivityDate);
+    
+    if (shouldShow) {
+      setHasShown(false);
+    } else {
+      setHasShown(true);
+    }
+  }, [boards, lastActivityDate]);
+
+  /**
+   * Track nudge shown event once when the component renders for the first time in this session.
+   * Safe metadata only: board count, next step types — never raw content.
+   */
+  useEffect(() => {
+    if (hasShown || boards.length === 0) {
+      return;
+    }
+    
+    const actionTypes = new Set<string>();
+    boards.forEach((board) => {
+      const action = getNextAction(board);
+      actionTypes.add(action.label);
+    });
+    
+    void trackEvent("nudge_shown", {
+      board_count: boards.length,
+      next_steps: Array.from(actionTypes).join(","),
+      source: "dashboard",
+    });
+    
+    // Mark as shown in sessionStorage (max once per browser session)
+    const sessionStorageKey = "ale183_nudge_shown_session";
+    sessionStorage.setItem(sessionStorageKey, "true");
+    
+    setHasShown(true);
+  }, [boards, hasShown]);
+
+  if (hasShown || boards.length === 0) {
     return null;
   }
+
+  const handleCTAClick = async (boardId: string, actionLabel: string) => {
+    // Track click before navigation
+    await trackEvent("nudge_clicked", {
+      board_id: boardId,
+      next_step: actionLabel,
+      source: "dashboard_continue_where_left_off",
+    });
+  };
 
   return (
     <section
@@ -68,6 +157,11 @@ export function ContinueWhereYouLeftOff({
             <Link
               key={board.id}
               href={action.href}
+              onClick={(e) => {
+                e.preventDefault();
+                handleCTAClick(board.id, action.label);
+                window.location.href = action.href;
+              }}
               className="flex items-center gap-3 rounded-xl border border-border/80 bg-background/70 px-4 py-3 hover:border-brand/40 hover:shadow-sm transition group"
             >
               <div
