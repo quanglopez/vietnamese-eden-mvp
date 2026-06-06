@@ -21,7 +21,7 @@ function getPublishSupabase(): SupabaseClient {
 export const publishSupabase: SupabaseClient = new Proxy({} as SupabaseClient, {
   get(_target, prop) {
     const client = getPublishSupabase();
-    return (client as any)[prop];
+    return (client as Record<string, unknown>)[prop as string];
   },
 });
 

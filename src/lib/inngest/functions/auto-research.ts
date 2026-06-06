@@ -16,14 +16,28 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 
-const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-  auth: { autoRefreshToken: false, persistSession: false },
-});
+let _supabase: ReturnType<typeof createClient<Database>> | null = null;
+function getSupabase() {
+  if (!_supabase) {
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) throw new Error('Thiếu NEXT_PUBLIC_SUPABASE_URL hoặc SUPABASE_SERVICE_ROLE_KEY');
+    _supabase = createClient<Database>(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+  }
+  return _supabase;
+}
 
 /** Client không gắn Database — truy vấn bảng chưa có trong generated types */
-const supabaseUntyped: SupabaseClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-  auth: { autoRefreshToken: false, persistSession: false },
-});
+let _supabaseUntyped: SupabaseClient | null = null;
+function getSupabaseUntyped(): SupabaseClient {
+  if (!_supabaseUntyped) {
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) throw new Error('Thiếu NEXT_PUBLIC_SUPABASE_URL hoặc SUPABASE_SERVICE_ROLE_KEY');
+    _supabaseUntyped = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+  }
+  return _supabaseUntyped;
+}
 
 // =============================================================================
 // Hằng số truy vấn mặc định (Vietnamese viral content)
@@ -170,7 +184,7 @@ export const autoResearch = inngest.createFunction(
         try {
           const normalizedUrl = normalizeSourceUrl(item.sourceUrl);
 
-          const { data: existing } = await supabase
+          const { data: existing } = await getSupabase()
             .from("content_items")
             .select("id")
             .eq("workspace_id", context.workspaceId)
@@ -182,7 +196,7 @@ export const autoResearch = inngest.createFunction(
             continue;
           }
 
-          const linkResult = await insertAndLinkContentItem(supabase, {
+          const linkResult = await insertAndLinkContentItem(getSupabase(), {
             boardId: context.boardId,
             workspaceId: context.workspaceId,
             userId: context.userId,
@@ -201,7 +215,7 @@ export const autoResearch = inngest.createFunction(
             continue;
           }
 
-          const { error: metaError } = await supabaseUntyped
+          const { error: metaError } = await getSupabaseUntyped()
             .from("content_items")
             .update({
               saved_at: now,
@@ -279,7 +293,7 @@ async function resolveConnectedAccountId(
     return envFallback;
   }
 
-  const { data, error } = await supabaseUntyped
+  const { data, error } = await getSupabaseUntyped()
     .from("user_connected_accounts")
     .select("connected_account_id, status")
     .eq("user_id", userId)

@@ -38,7 +38,7 @@ export const publishToFacebook = inngest.createFunction(
 
     // STEP 2 — Fetch calendar item + generated output content
     const calendarItem = await step.run("fetch-calendar-item", async () => {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabase()
         .from("content_calendar_items")
         .select(
           `id, workspace_id, generated_output_id, content_item_id, title, platform, status, scheduled_at, notes, created_by`,
@@ -59,7 +59,7 @@ export const publishToFacebook = inngest.createFunction(
     // STEP 3 — Resolve the actual text to publish
     const publishBody = await step.run("resolve-content", async () => {
       if (calendarItem.generated_output_id) {
-        const { data, error } = await supabase
+        const { data, error } = await getSupabase()
           .from("generated_outputs")
           .select("content, title")
           .eq("id", calendarItem.generated_output_id)
@@ -71,7 +71,7 @@ export const publishToFacebook = inngest.createFunction(
       }
 
       if (calendarItem.content_item_id) {
-        const { data, error } = await supabase
+        const { data, error } = await getSupabase()
           .from("content_items")
           .select("raw_content, title")
           .eq("id", calendarItem.content_item_id)
@@ -112,7 +112,7 @@ export const publishToFacebook = inngest.createFunction(
         ? `Published via Composio at ${new Date().toISOString()}`
         : `Composio failed: ${composioResult.error ?? "unknown error"}`;
 
-      const { error } = await supabase
+      const { error } = await getSupabase()
         .from("content_calendar_items")
         .update({
           status: newStatus,

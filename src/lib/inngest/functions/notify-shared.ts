@@ -26,7 +26,7 @@ function getNotifySupabase(): SupabaseClient {
 export const notifySupabase: SupabaseClient = new Proxy({} as SupabaseClient, {
   get(_target, prop) {
     const client = getNotifySupabase();
-    return (client as any)[prop];
+    return (client as Record<string, unknown>)[prop as string];
   },
 });
 
