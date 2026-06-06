@@ -1,0 +1,38 @@
+[
+  {
+    "id": "breakdown-hook",
+    "category": "AI Breakdown",
+    "systemPrompt": "Bạn là chuyên gia phân tích nội dung người Việt. Trả lời bằng tiếng Việt.",
+    "userPrompt": "Đây là caption của một video TikTok viral:\n\n\"Mình từng nghĩ content creator là nghề dễ nhất thế giới. Cho đến khi mình tự làm. 3 tháng đầu không có nổi 100 follow. Bài đăng nào cũng dưới 50 view.\"\n\nPhân tích HOOK của bài viết này: (1) Loại hook là gì (curiosity gap, emotional trigger, etc.), (2) Tại sao nó hiệu quả, (3) Đề xuất 2 biến thể hook mạnh hơn."
+  },
+  {
+    "id": "breakdown-angle",
+    "category": "AI Breakdown",
+    "systemPrompt": "Bạn là chuyên gia phân tích nội dung người Việt. Trả lời bằng tiếng Việt.",
+    "userPrompt": "Phân tích ANGLE của bài viết sau:\n\n\"Thực tập 6 tháng không lương. Nhận việc lương 8 triệu. Nhảy việc lương 40 triệu. Đây là cách mình làm CV.\"\n\nTrả lời: (1) Angle gì (Personal story, Contrarian, How-to, Listicle), (2) Target audience là ai, (3) Insight chính."
+  },
+  {
+    "id": "breakdown-cta",
+    "category": "AI Breakdown",
+    "systemPrompt": "Bạn là chuyên gia phân tích nội dung người Việt. Trả lời bằng tiếng Việt.",
+    "userPrompt": "Phân tích CALL-TO-ACTION của bài viết này. CTA có tự nhiên không? Có thúc đẩy engagement không? Đề xuất CTA tốt hơn.\n\nNội dung: Một bài Facebook chia sẻ mẹo chọn chung cư giá dưới 2 tỷ ở Hà Nội. Kết thúc bằng: 'Bạn định mua chung cư ở đâu? Comment mình tư vấn free nhé!'"
+  },
+  {
+    "id": "remix-tone-shift",
+    "category": "Remix Generator",
+    "systemPrompt": "Bạn là copywriter người Việt chuyên nghiệp. Viết bằng tiếng Việt 100%.",
+    "userPrompt": "Viết lại nội dung sau với giọng văn HÀI HƯỚC, dí dỏm, phù hợp TikTok Gen Z:\n\n\"5 sai lầm khi học tiếng Anh: (1) Học ngữ pháp trước khi luyện nghe, (2) Dịch từng từ, (3) Sợ nói sai, (4) Chỉ học từ vựng riêng lẻ, (5) Không luyện tập hàng ngày.\""
+  },
+  {
+    "id": "remix-platform-adapt",
+    "category": "Remix Generator",
+    "systemPrompt": "Bạn là copywriter người Việt chuyên nghiệp. Viết bằng tiếng Việt 100%.",
+    "userPrompt": "Chuyển bài viết LinkedIn chuyên nghiệp này thành caption TikTok (tối đa 150 từ, dùng emoji, hashtag):\n\n\"Sau 5 năm làm quản lý sản phẩm, tôi nhận ra: KPI quan trọng nhất không nằm trong dashboard. Đó là niềm tin của team. Khi team tin bạn, họ sẽ làm việc bằng 200% năng lực. Khi họ nghi ngờ, dù KPI có xanh đến đâu, tổ chức cũng đang chết dần.\""
+  },
+  {
+    "id": "voice-analyze",
+    "category": "Voice Profile",
+    "systemPrompt": "Bạn là chuyên gia phân tích phong cách viết tiếng Việt. Trả lời bằng tiếng Việt.",
+    "userPrompt": "Phân tích phong cách viết của đoạn văn sau. Trả lời JSON với các trường: tone (trang_trong/suong_sa/hai_huoc/chuyen_nghiep/tam_tinh), audience (hoc_sinh/sinh_vien/nguoi_di_lam/doanh_nhan), signature_phrases (mảng các cụm từ đặc trưng), avg_sentence_length (số từ trung bình mỗi câu), emoji_density (số emoji trên 100 từ).\n\nBài viết: \"Mình là một đứa cực kỳ thích viết. Thích đến nỗi hồi cấp 3 tuần nào cũng viết nhật ký bằng tay, xong còn trang trí sticker các kiểu. Lên đại học cũng viết, mà chuyển sang blog. Đi làm rồi vẫn viết, nhưng toàn viết báo cáo với email. Cho đến một ngày mình nhận ra: đời mình toàn viết cho người khác đọc. Chưa bao giờ viết cho chính mình. Nên hôm nay mình viết cái post này. Không để bán gì cả. Chỉ để nói là: nếu bạn đang đọc đến đây, có lẽ bạn cũng giống mình. Một đứa mê viết, nhưng lâu rồi chưa viết cho chính mình. Thử viết gì đó hôm nay đi. Một dòng thôi cũng được.\""
+  }
+]
