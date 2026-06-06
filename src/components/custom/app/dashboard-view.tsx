@@ -27,6 +27,7 @@ type DashboardViewProps = {
   boards: BoardListItem[];
   checklistProgress: OnboardingChecklistProgress | null;
   continueData?: ContinueWhereYouLeftOffData;
+  lastActivityDate?: string | null;
   fetchError?: string | null;
 };
 
@@ -79,6 +80,7 @@ export function DashboardView({
   boards,
   checklistProgress,
   continueData,
+  lastActivityDate,
   fetchError,
 }: DashboardViewProps) {
   const hasContinueNudge = continueData && continueData.boards.length > 0;
@@ -96,7 +98,7 @@ export function DashboardView({
 
       {/* Continue where you left off — shown for returning users with boards */}
       {hasContinueNudge ? (
-        <ContinueWhereYouLeftOff boards={continueData.boards} />
+        <ContinueWhereYouLeftOff boards={continueData.boards} lastActivityDate={lastActivityDate} />
       ) : null}
 
       <div className="grid lg:grid-cols-4 gap-4 mb-8">

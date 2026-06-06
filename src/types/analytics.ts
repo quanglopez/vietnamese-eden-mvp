@@ -6,6 +6,8 @@ export const ANALYTICS_EVENT_TYPES = [
   "breakdown_run",
   "remix_run",
   "calendar_add",
+  "nudge_shown",
+  "nudge_clicked",
 ] as const;
 
 export type AnalyticsEventType = (typeof ANALYTICS_EVENT_TYPES)[number];

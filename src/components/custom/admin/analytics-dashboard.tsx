@@ -39,6 +39,8 @@ const EVENT_LABELS: Record<AnalyticsEventType, string> = {
   breakdown_run: "Breakdown",
   remix_run: "Remix",
   calendar_add: "Lên lịch",
+  nudge_shown: "Nudge shown",
+  nudge_clicked: "Nudge clicked",
 };
 
 const COUNT_EVENTS: AnalyticsEventType[] = [
@@ -48,6 +50,8 @@ const COUNT_EVENTS: AnalyticsEventType[] = [
   "breakdown_run",
   "remix_run",
   "calendar_add",
+  "nudge_shown",
+  "nudge_clicked",
 ];
 
 type AnalyticsRange = 7 | 30 | "all";

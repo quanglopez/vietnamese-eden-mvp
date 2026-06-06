@@ -47,6 +47,8 @@ describe("analytics dashboard helpers", () => {
       breakdown_run: 0,
       remix_run: 0,
       calendar_add: 0,
+      nudge_shown: 0,
+      nudge_clicked: 0,
     });
 
     assert.equal(funnel[0]?.conversionRate, 0);
