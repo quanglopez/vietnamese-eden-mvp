@@ -98,8 +98,8 @@ Criteria sourced from [weekly-beta-report-template.md §"Decision Gate"](./weekl
 **WAIT** — do not expand Cohort 2 yet.
 
 **Rationale:**
-- ✅ Production telemetry is unblocked (1 of 10 criteria upgraded)
-- ❌ But 6 of 12 criteria still unmet
+- ✅ Production telemetry is unblocked (1 of 12 criteria upgraded — criterion #9 nudge events tracked, status changed from ❌ to ⬜)
+- ❌ But 5 ❌ + 3 ⬜ = 8 of 12 criteria still unmet
 - ❌ No data-driven evidence to support GO
 - ❌ No critical reason to escalate to NO-GO (no P0, no disaster)
 
@@ -175,7 +175,7 @@ Criteria sourced from [weekly-beta-report-template.md §"Decision Gate"](./weekl
 | # | Rule | Status |
 |---|------|--------|
 | 1 | Mọi recommendation phải trace về data cụ thể trong weekly report hoặc Supabase query | ✅ All criteria reference specific source |
-| 2 | Verdict phải data-driven, không subjective | ✅ Verdict maps to 4 ✅ / 6 ❌/in-progress count |
+| 2 | Verdict phải data-driven, không subjective | ✅ Verdict maps to 3 ✅ / 3 ⬜ / 5 ❌ / 1 N/A count (matches §3 table) |
 | 3 | Không bịa metrics hoặc blocker status | ✅ All numbers verified via Supabase MCP 2026-06-06 03:12 UTC |
 | 4 | Missing data phải ghi rõ Unknown / Insufficient | ✅ Sample size, persona data, WTP all marked |
 | 5 | No app code, no migration, no schema change | ✅ Docs-only |
