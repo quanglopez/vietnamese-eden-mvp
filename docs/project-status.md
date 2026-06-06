@@ -2,7 +2,7 @@
 
 **Cập nhật:** 2026-06-06 (M13 COMPLETE — closeout & M14 recommendation)
 **Production:** [https://vietnamese-eden-mvp.vercel.app/](https://vietnamese-eden-mvp.vercel.app/)
-**Latest deploy:** commit `b33e00a` on main (ALE-190 project-status update 2026-06-06) — regions=[syd1] ✅ READY
+**Latest deploy:** commit `f05c15c` on main (ALE-190 vercel.json syd1 merged 2026-06-06) — regions=[syd1] ✅ READY
 **Tiếp theo:** Owner populates beta_testers, prompts tester-01 to revisit /dashboard, sends WTP question. M14 recommended start: 2026-06-10.
 **M13 closeout:** [m13-closeout-and-m14-recommendation.md](./m13-closeout-and-m14-recommendation.md) — COMPLETE, 7/7 canonical issues Done
 **Decision memo:** [cohort-2-decision-gate-2026-06-06.md](./cohort-2-decision-gate-2026-06-06.md) — Verdict: **WAIT** (3 ✅ / 3 ⬜ / 5 ❌ / 1 N/A)
