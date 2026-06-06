@@ -1,11 +1,11 @@
 # Project status — Vietnamese Eden MVP
 
-**Cập nhật:** 2026-06-06 (M13 — ALE-190 Done, P1 slow-login fixed)
+**Cập nhật:** 2026-06-06 (M13 COMPLETE — closeout & M14 recommendation)
 **Production:** [https://vietnamese-eden-mvp.vercel.app/](https://vietnamese-eden-mvp.vercel.app/)
 **Latest deploy:** commit `f05c15c` on main (ALE-190 vercel.json syd1 merged 2026-06-06) — regions=[syd1] ✅ READY
-**Tiếp theo:** Owner populates beta_testers, prompts tester-01 to revisit /dashboard, sends WTP question. Decision gate re-evaluation 2026-06-13.
-**First weekly report:** [weekly-report-2026-06-06.md](./weekly-reports/weekly-report-2026-06-06.md) — Gate: WAITING
-**Decision memo:** [cohort-2-decision-gate-2026-06-06.md](./cohort-2-decision-gate-2026-06-06.md) — Verdict: **WAIT** (12-criterion assessment; 3 ✅ / 3 ⬜ / 5 ❌ / 1 N/A)
+**Tiếp theo:** Owner populates beta_testers, prompts tester-01 to revisit /dashboard, sends WTP question. M14 recommended start: 2026-06-10.
+**M13 closeout:** [m13-closeout-and-m14-recommendation.md](./m13-closeout-and-m14-recommendation.md) — COMPLETE, 7/7 canonical issues Done
+**Decision memo:** [cohort-2-decision-gate-2026-06-06.md](./cohort-2-decision-gate-2026-06-06.md) — Verdict: **WAIT** (3 ✅ / 3 ⬜ / 5 ❌ / 1 N/A)
 **P1 triage:** [docs/triage/ale-190-slow-login-triage.md](./triage/ale-190-slow-login-triage.md) — Fixed: Vercel syd1 colocated with Supabase ap-southeast-2
 **⚡ Production state (2026-06-06 03:12 UTC):** `analytics_event_type` ENUM in production Postgres now includes `nudge_shown` and `nudge_clicked` (verified via `pg_enum` query). Nudge telemetry unblocked; no events recorded yet.
 Feedback source of truth:
@@ -56,8 +56,31 @@ Feedback source of truth:
 | **M11 progress** | ALE-171 ✅ Done · ALE-172 ✅ Done · ALE-173 ✅ Done · ALE-174 ✅ Done · ALE-175 ✅ Done |
 || **M12 milestone** | **COMPLETE** — Beta Launch & Activation (ALE-176→182) |
 || **M12 progress** | ALE-176 ✅ Done · ALE-177 ✅ Done · ALE-178 ✅ Done · ALE-179 ✅ Done · ALE-180 ✅ Done · ALE-181 ✅ Done · ALE-182 ✅ Done |
-|| **M13 milestone** | In Progress — Retention & Iteration (ALE-183→189 proposed) |
-|| **M13 progress** | ALE-183 ✅ Done · ALE-185 ✅ Done · ALE-186 ✅ Done · ALE-187 ✅ Done · ALE-189 ✅ Done · ALE-190 ✅ Done |
+|| **M13 milestone** | **COMPLETE** — Retention & Iteration (ALE-183→190, ALE-188 duplicate) |
+|| **M13 progress** | ALE-183 ✅ Done · ALE-184 ✅ Done · ALE-185 ✅ Done · ALE-186 ✅ Done · ALE-187 ✅ Done · ALE-189 ✅ Done · ALE-190 ✅ Done |
+|| **M13 closeout** | [m13-closeout-and-m14-recommendation.md](./m13-closeout-and-m14-recommendation.md) — 7/7 canonical issues Done, verdict WAIT, P1 fixed |
+
+### M13 COMPLETE
+
+All 7 canonical issues shipped to production (ALE-188 is duplicate of ALE-186, excluded from count).
+
+| Issue | Title | PR | Commit | Completed | Breach? |
+|-------|-------|----|--------|-----------|---------|
+| [ALE-183](https://linear.app/alexgpt/issue/ALE-183) | Continue-where-you-left-off full spec | [#33](https://github.com/quanglopez/vietnamese-eden-mvp/pull/33) | `ad77bc0` | 2026-06-06 | No |
+| [ALE-184](https://linear.app/alexgpt/issue/ALE-184) | Continue nudge component | [#31](https://github.com/quanglopez/vietnamese-eden-mvp/pull/31) | `cf3fe8a` | 2026-06-06 | No |
+| [ALE-185](https://linear.app/alexgpt/issue/ALE-185) | Baseline retention measurement + nudge events | [#33](https://github.com/quanglopez/vietnamese-eden-mvp/pull/33) | `ad77bc0` | 2026-06-06 | No |
+| [ALE-186](https://linear.app/alexgpt/issue/ALE-186) | First weekly beta report | [#34](https://github.com/quanglopez/vietnamese-eden-mvp/pull/34) | `a1319a8` | 2026-06-06 | No |
+| [ALE-187](https://linear.app/alexgpt/issue/ALE-187) | Day-7 retention baseline | [#32](https://github.com/quanglopez/vietnamese-eden-mvp/pull/32) | `e837b8a` | 2026-06-06 | No |
+| [ALE-189](https://linear.app/alexgpt/issue/ALE-189) | Cohort 2 decision gate evaluation | [#35](https://github.com/quanglopez/vietnamese-eden-mvp/pull/35) | `5fc63a4` | 2026-06-06 | No |
+| [ALE-190](https://linear.app/alexgpt/issue/ALE-190) | P1 slow-login fix | [#36](https://github.com/quanglopez/vietnamese-eden-mvp/pull/36) | `f05c15c` | 2026-06-06 | No |
+
+**Duplicate:** ALE-188 = duplicate of ALE-186 (weekly beta report). Not counted.
+
+**Key outcomes:**
+- Nudge component + analytics events shipped and ENUM applied to production
+- Cohort 2 decision gate verdict: **WAIT** (insufficient data, not milestone failure)
+- P1 slow-login fixed: Vercel region colocated with Supabase (syd1)
+- M14 recommended start: 2026-06-10 (after Day-7 data available)
 
 ### M11 COMPLETE
 
@@ -401,6 +424,7 @@ M11 had two procedural guardrail breaches (ALE-174, ALE-175) where PRs were merg
 ## Changelog
 | Date | Summary |
 |------|---------|
+| 2026-06-06 | **M13 closeout** — COMPLETE. 7/7 canonical issues Done. Closeout doc: `docs/m13-closeout-and-m14-recommendation.md` (~300 lines). M14 recommended: *Cohort 2 Data Collection & Decision*, start 2026-06-10. Key outcomes: nudge shipped, ENUM applied, decision gate WAIT, P1 slow-login fixed (syd1). No guardrail breaches. |
 | 2026-06-06 | **ALE-190** — P1 slow-login fix Done. `vercel.json` (NEW): `regions=[syd1]` colocates Vercel functions with Supabase ap-southeast-2. Root cause: Vercel defaulted to us-east-1, 3× sequential `getUser()` US↔Sydney round-trips (150-280ms each). `docs/triage/ale-190-slow-login-triage.md` (NEW): full triage evidence. PR #36 → `f05c15c`. Smoke: /api/health 200 ✅, /login 200 ✅, /dashboard 307 ✅, regions=[syd1] READY ✅. Expected improvement: 3-5s → <1s warm. |
 | 2026-06-06 | **ALE-189** — Cohort 2 decision gate evaluation Done. `docs/cohort-2-decision-gate-2026-06-06.md` (~280 lines, 8 sections): verdict **WAIT** (12-criterion assessment: 3 ✅ / 3 ⬜ / 5 ❌ / 1 N/A). Production ENUM migration applied 2026-06-06 03:12 UTC — nudge telemetry unblocked but no events yet. Verdict stays WAIT because: no Day-7 data, no beta_testers, no WTP, low sample size, P1 untriaged. Next milestones: 2026-06-10 (Day-7 measurement), 2026-06-13 (10-day window). Owner actions: populate beta_testers, triage P1 slow-login, prompt tester-01 to revisit /dashboard. Also added §6.5 WTP template to retention-nudges-v1.md. Docs-only, no migration, no app code, no destructive SQL, read-only verification of production state. |
 | 2026-06-06 | **ALE-186** — First weekly beta report Done. `docs/weekly-reports/weekly-report-2026-06-06.md` (~430 lines): full template filled with real Supabase data. Activation funnel (5 users, 1 power user, 1/5 = 20% completed full flow). Day-1 retention insufficient (n=1), Day-7 cannot measure (3-day window). 1 P1 feedback entry (slow login). 0 WTP signals. 0 beta_testers rows. **Nudge events N/A — ENUM migration for nudge_shown/nudge_clicked was committed to repo (PR #33) but never applied to production Supabase.** Decision gate: **WAITING** — 7/10 criteria unmet. Top urgent: apply ENUM migration, triage slow-login, populate beta_testers. Docs-only, no migration, no app code, no destructive SQL, all missing data clearly marked. |
