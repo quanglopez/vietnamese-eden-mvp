@@ -1,9 +1,9 @@
 # Project status — Vietnamese Eden MVP
 
-**Cập nhật:** 2026-06-06 (M12 — ALE-181 Done, M12 IN PROGRESS)
+**Cập nhật:** 2026-06-06 (M12 COMPLETE — ALE-182 Done)
 **Production:** [https://vietnamese-eden-mvp.vercel.app/](https://vietnamese-eden-mvp.vercel.app/)
-**Latest deploy:** commit `d3bb887` on main (ALE-181 PR #29 merged 2026-06-06)
-**Tiếp theo:** ALE-182 — Retention nudges v1
+**Latest deploy:** commit `df13ba1` on main (ALE-182 PR #30 merged 2026-06-06)
+**Tiếp theo:** M12 milestone closed. M13 planning pending owner review.
 Feedback source of truth:
 
 [https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/](https://docs.google.com/spreadsheets/d/15dJSsUpHUTsm96NNb2GIltsx1MnNuNlsWD04EP5jjx4/)
@@ -50,8 +50,8 @@ Feedback source of truth:
 | **Next recommended** | M11 — Beta Launch Readiness (ALE-171→175 proposed) |
 | **M11 milestone** | **COMPLETE** — Beta Launch Readiness (ALE-171, ALE-172, ALE-173, ALE-174, ALE-175) |
 | **M11 progress** | ALE-171 ✅ Done · ALE-172 ✅ Done · ALE-173 ✅ Done · ALE-174 ✅ Done · ALE-175 ✅ Done |
-| **M12 milestone** | **IN PROGRESS** — Beta Launch & Activation (ALE-176→182) |
-| **M12 progress** | ALE-176 ✅ Done · ALE-177 ✅ Done · ALE-178 ✅ Done · ALE-179 ✅ Done · ALE-180 ✅ Done · ALE-181 ✅ Done · ALE-182 Backlog |
+| **M12 milestone** | **COMPLETE** — Beta Launch & Activation (ALE-176→182) |
+| **M12 progress** | ALE-176 ✅ Done · ALE-177 ✅ Done · ALE-178 ✅ Done · ALE-179 ✅ Done · ALE-180 ✅ Done · ALE-181 ✅ Done · ALE-182 ✅ Done |
 
 ### M11 COMPLETE — Beta Launch Readiness closeout (2026-06-05)
 
@@ -194,6 +194,32 @@ M11 had two procedural guardrail breaches (ALE-174, ALE-175) where PRs were merg
 | **Guardrail** | No breach — owner confirmed "Confirm merge PR #27" before merge. Independent lint + type-check + build all PASS before merge. Linear auto-close status: pending check (Linear MCP tools not yet activated in session). |
 | **Next issue** | ALE-181 — Weekly report |
 
+### M12 — ALE-182 completion (2026-06-06)
+
+| Item | Detail |
+|------|--------|
+| **Issue** | [ALE-182](https://linear.app/alexgpt/issue/ALE-182/m12-retention-nudges-v1) — M12 Retention nudges v1 |
+| **PR** | [#30](https://github.com/quanglopez/vietnamese-eden-mvp/pull/30) — merged |
+| **Merge commit** | `df13ba1` |
+| **Deploy** | Docs-only — no Vercel deploy required |
+| **What shipped** | `docs/retention-nudges-v1.md` (379 lines): retention problem definition (Day-1/Day-7 drop-off, core funnel gaps), user segments (New/Active/At-risk/Inactive/Power), trigger rules for in-app nudges + manual follow-ups, lightweight in-app nudge proposal ("Tiếp tục từ lần trước" with UX spec + Vietnamese copy variants), 4 follow-up templates for inactive testers (7-day, 14-day escalation, post-core-flow, post-feedback), measurement plan with Supabase SQL baseline queries, guardrails (no automation, no migration, no scheduled jobs, owner review required, max 1 follow-up/7d, opt-out required), future implementation notes (M13+: component, email, bot, A/B, push). |
+| **Migration** | None — docs-only |
+| **Smoke** | Not required — docs-only, no app code changes |
+| **CodeRabbit** | N/A — docs-only PR |
+| **Guardrail** | No breach — docs-only, no app code, no migration, no schema change, no automation, no secrets. Independent review APPROVE (14/14 acceptance criteria). |
+
+**M12 COMPLETE** — All 7 issues shipped to production.
+
+| Issue | Title | PR | Commit | Completed | Breach? |
+|-------|-------|----|--------|-----------|---------|
+| [ALE-176](https://linear.app/alexgpt/issue/ALE-176) | Beta launch command center | [#23](https://github.com/quanglopez/vietnamese-eden-mvp/pull/23) | `a897221` | 2026-06-05 | No |
+| [ALE-177](https://linear.app/alexgpt/issue/ALE-177) | Beta tester onboarding guide + support checklist | [#24](https://github.com/quanglopez/vietnamese-eden-mvp/pull/24) | `6306531` | 2026-06-05 | No |
+| [ALE-178](https://linear.app/alexgpt/issue/ALE-178) | Cohort activation analytics | [#25](https://github.com/quanglopez/vietnamese-eden-mvp/pull/25) | `28b33ec` | 2026-06-05 | No |
+| [ALE-179](https://linear.app/alexgpt/issue/ALE-179) | Feedback-to-Linear candidate generator | [#26](https://github.com/quanglopez/vietnamese-eden-mvp/pull/26) | `3553fcc` | 2026-06-05 | No |
+| [ALE-180](https://linear.app/alexgpt/issue/ALE-180) | First-run activation improvements | [#27](https://github.com/quanglopez/vietnamese-eden-mvp/pull/27) | `3ff6328` | 2026-06-05 | No |
+| [ALE-181](https://linear.app/alexgpt/issue/ALE-181) | Weekly beta report template | [#29](https://github.com/quanglopez/vietnamese-eden-mvp/pull/29) | `d3bb887` | 2026-06-06 | No |
+| [ALE-182](https://linear.app/alexgpt/issue/ALE-182) | Retention nudges v1 | [#30](https://github.com/quanglopez/vietnamese-eden-mvp/pull/30) | `df13ba1` | 2026-06-06 | No |
+
 ### M12 — ALE-181 completion (2026-06-06)
 
 | Item | Detail |
@@ -313,6 +339,7 @@ M11 had two procedural guardrail breaches (ALE-174, ALE-175) where PRs were merg
 ## Changelog
 | Date | Summary |
 |------|---------|
+| 2026-06-06 | **ALE-182** — Retention nudges v1 Done (PR #30 merge → `df13ba1`). `docs/retention-nudges-v1.md` (379 lines): retention problem definition (Day-1/Day-7 drop-off, funnel gaps), user segments (5 tiers), trigger rules, in-app nudge proposal ("Tiếp tục từ lần trước"), Vietnamese copy variants, 4 follow-up templates (7d/14d/post-core/post-feedback), measurement plan with SQL baseline queries, guardrails (no automation, no migration, owner review, opt-out required), future M13+ implementation notes. Docs-only, no migration, no schema change, no app code, no automation. **M12 COMPLETE.** |
 | 2026-06-06 | **ALE-181** — Weekly beta report template Done (PR #29 squash → `d3bb887`). `docs/weekly-beta-report-template.md` (345 lines): activation metrics funnel, feedback patterns, top bugs/risks, WTP signals, product learnings, next actions, decision gate, data pull checklist + SQL, Hermes generation prompt, Vietnamese section headers. Docs-only, no migration, no schema change, no app code, no automation. Smoke not required. Next: ALE-182. |
 | 2026-06-06 | **ALE-180** — First-run activation improvements Done (PR #27 merge → `3ff6328`). Dashboard Next Best Action + calendar count, onboarding checklist NAB card, board "Thử nội dung mẫu" button, breakdown empty state, sample content prefill, `getWorkspaceCalendarCount()` query, `sample-content.ts`. 7 files, no migration. Authenticated production smoke PASS (11/11 checks: dashboard, boards, board detail empty state, "Thử nội dung mẫu" modal prefill, Paste text tab, breakdown no-analysis state, calendar, /admin/beta-launch, /admin/analytics, /admin/feedback, 0 JS errors). Independent lint + type-check + build all PASS. Next: ALE-181. |
 | 2026-06-05 | **ALE-179** — Feedback-to-Linear candidate generator Done (PR #26 squash → `3553fcc`). Preview-only Linear draft generator on `/admin/feedback`: `buildLinearCandidateDraft()` utility, `LinearCandidateModal` with markdown preview + copy + draft warning, feedback table action. No migration, no schema changes, no Linear API call. Production smoke PASS (owner manual). Authenticated preview smoke risk-accepted before merge. CodeRabbit: 1 non-blocking docstring warning. Next: ALE-180. |
