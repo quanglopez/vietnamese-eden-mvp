@@ -78,7 +78,7 @@ export function BreakdownView({
   const backHref = item.boardId ? `/boards/${item.boardId}` : "/boards";
   const remixHref = `/remix/${item.id}`;
   const latestOutput = outputs[0] ?? null;
-  const canAddToCalendar = latestOutput !== null;
+  const canAddToCalendar = analysis !== null;
   const isBlockedQuality =
     sourceQuality === "blocked" || sourceQuality === "manual_required";
   const showBlockedCallout = !canAnalyze && isBlockedQuality;
@@ -168,11 +168,7 @@ export function BreakdownView({
                 Add to Calendar
               </Button>
             </div>
-            {!canAddToCalendar ? (
-              <p className="mt-2 text-xs text-muted-foreground">
-                Chưa có remix output để đưa vào lịch. Hãy tạo remix trước.
-              </p>
-            ) : null}
+
           </div>
 
           <SourceQualityBadge
