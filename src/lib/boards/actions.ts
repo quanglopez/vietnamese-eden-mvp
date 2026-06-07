@@ -19,6 +19,13 @@ export async function createBoardAction(input: {
   if (name.length < 2) {
     return { success: false, error: "Tên bảng phải có ít nhất 2 ký tự." };
   }
+  if (name.length > 80) {
+    return { success: false, error: "Tên bảng không được vượt quá 80 ký tự." };
+  }
+  const description = input.description?.trim() || null;
+  if (description && description.length > 280) {
+    return { success: false, error: "Mô tả không được vượt quá 280 ký tự." };
+  }
 
   const supabase = createClient();
   const {
@@ -42,7 +49,7 @@ export async function createBoardAction(input: {
     .insert({
       workspace_id: input.workspaceId,
       name,
-      description: input.description?.trim() || null,
+      description: description,
       color: gradientClass,
       sort_order: sortOrder,
       created_by: user.id,

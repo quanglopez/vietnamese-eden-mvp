@@ -82,6 +82,12 @@ export async function generateRemixAction(input: {
   }
 
   const rawContent = item.rawContent?.trim() ?? "";
+  // Truncate long content to avoid AI timeout/context overflow
+  const MAX_CONTENT_CHARS = 4000;
+  const truncatedContent =
+    rawContent.length > MAX_CONTENT_CHARS
+      ? rawContent.slice(0, MAX_CONTENT_CHARS) + "…"
+      : rawContent;
   const { analysis, error: analysisError } = await getContentAnalysisByItemId(
     supabase,
     contentItemId,
@@ -138,7 +144,7 @@ export async function generateRemixAction(input: {
     remixResult = await generateRemixVariants({
       title: item.title,
       platform: getPlatformLabel(item.platform),
-      rawContent,
+      rawContent: truncatedContent,
       format,
       tone,
       variantCount,
@@ -150,7 +156,16 @@ export async function generateRemixAction(input: {
     return { success: false, error: mapAiProviderError(error, "remix") };
   }
 
-  const rows = remixResult.variants.map((variant, index) => ({
+  // Filter out variants where BOTH title and content are empty
+  const validVariants = remixResult.variants.filter(
+    (v) => v.content.trim().length > 0 && v.title.trim().length > 0,
+  );
+
+  if (validVariants.length === 0) {
+    return { success: false, error: "AI không tạo được nội dung remix. Hãy thử lại hoặc dùng nội dung ngắn hơn." };
+  }
+
+  const rows = validVariants.map((variant, index) => ({
     workspace_id: item.workspaceId,
     source_content_item_id: contentItemId,
     voice_profile_id: voiceProfile?.id ?? null,

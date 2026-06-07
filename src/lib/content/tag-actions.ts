@@ -27,8 +27,13 @@ export async function createTag(input: {
   if (name.length < 1) {
     return { success: false, error: "Tên tag không được để trống." };
   }
-
+  if (name.length > 50) {
+    return { success: false, error: "Tên tag không được vượt quá 50 ký tự." };
+  }
   const normalized = normalizeTagName(name);
+  if (normalized.length < 1) {
+    return { success: false, error: "Tên tag không hợp lệ." };
+  }
   const { data: existing, error: existingError } = await supabase
     .from("tags")
     .select("id, name, color")
