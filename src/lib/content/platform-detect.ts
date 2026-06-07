@@ -49,8 +49,8 @@ export function detectPlatformFromUrl(url: string): DetectedPlatform {
   }
 
   if (hostname === "linkedin.com" || hostname.endsWith(".linkedin.com")) {
-    return { platform: "other", label: "LinkedIn" };
-  }
+      return { platform: "linkedin", label: "LinkedIn" };
+    }
 
   if (
     hostname === "x.com" ||

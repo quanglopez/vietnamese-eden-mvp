@@ -14,7 +14,7 @@ import {
 } from "@/components/custom/calendar/calendar-weekly-view";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CALENDAR_NO_AUTO_POST_NOTICE } from "@/lib/calendar/constants";
+import { CALENDAR_AUTO_POST_NOTICE } from "@/lib/calendar/constants";
 import { getWeekStartMonday, splitUpcomingAndPast } from "@/lib/calendar/queries";
 import type { CalendarItemView } from "@/types/calendar";
 
@@ -62,7 +62,7 @@ export function CalendarView({ items, fetchError }: CalendarViewProps) {
           </div>
           <div className="mt-4 inline-flex items-center gap-2 rounded-lg bg-brand/10 px-3 py-2 text-xs text-brand">
             <Info className="h-4 w-4 shrink-0" />
-            <span>{CALENDAR_NO_AUTO_POST_NOTICE}</span>
+            <span>{CALENDAR_AUTO_POST_NOTICE}</span>
           </div>
         </div>
       ) : (

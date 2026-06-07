@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const platformValues = ["tiktok", "facebook", "instagram", "youtube", "other"] as const;
+const platformValues = ["tiktok", "facebook", "instagram", "youtube", "linkedin", "other"] as const;
 
 export const addContentTextSchema = z.object({
   boardId: z.string().uuid("Board không hợp lệ"),

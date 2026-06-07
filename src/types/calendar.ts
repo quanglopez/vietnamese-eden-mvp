@@ -5,6 +5,7 @@ export type CalendarStatus = "scheduled" | "published" | "skipped" | "failed";
 /** Kênh hiển thị UI — map xuống platform_type + notes JSON */
 export type CalendarChannel =
   | "facebook"
+  | "instagram"
   | "linkedin"
   | "tiktok"
   | "youtube_shorts"

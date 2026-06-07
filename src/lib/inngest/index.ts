@@ -1,4 +1,5 @@
 export { publishToYouTube } from "./functions/publish-to-youtube";
+export { publishToLinkedIn } from "./functions/publish-to-linkedin";
 export { helloVietnameseEden } from "@/inngest/hello-vietnamese-eden";
 export { inngest } from "./client";
 export { publishToFacebook } from "./functions/publish-to-facebook";
@@ -12,6 +13,7 @@ export { notifySlack } from "./functions/notify-slack";
 export { notifyTelegram } from "./functions/notify-telegram";
 
 import { publishToYouTube } from "./functions/publish-to-youtube";
+import { publishToLinkedIn } from "./functions/publish-to-linkedin";
 import { helloVietnameseEden } from "@/inngest/hello-vietnamese-eden";
 import { publishToFacebook } from "./functions/publish-to-facebook";
 import { publishToTikTok } from "./functions/publish-to-tiktok";
@@ -29,6 +31,7 @@ export const functions = [
   publishToTikTok,
   publishToInstagram,
   publishToYouTube,
+  publishToLinkedIn,
   analyzeContent,
   autoResearch,
   exportToNotion,

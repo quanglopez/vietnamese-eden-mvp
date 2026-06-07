@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { inngest } from "../client";
 import {
   fetchCalendarItemForPublish,
@@ -8,12 +7,12 @@ import {
   updateCalendarPublishStatus,
   isTargetPlatform,
 } from "./publish-calendar-shared";
-import { facebookPostMessage } from "../../composio/tools";
+import { linkedInPostShare } from "../../composio/tools";
 
-export const publishToFacebook = inngest.createFunction(
+export const publishToLinkedIn = inngest.createFunction(
   {
-    id: "publish-to-facebook",
-    name: "Publish scheduled content to Facebook",
+    id: "publish-to-linkedin",
+    name: "Publish scheduled content to LinkedIn",
     retries: 3,
   },
   { event: "calendar/scheduled" },
@@ -24,7 +23,7 @@ export const publishToFacebook = inngest.createFunction(
       scheduledAt: string;
     };
 
-    // STEP 1 — Sleep until the scheduled publish time
+    // STEP 1 — Sleep until scheduled time
     await step.sleepUntil("wait-for-schedule", new Date(scheduledAt));
 
     // STEP 2 — Fetch calendar item
@@ -32,9 +31,8 @@ export const publishToFacebook = inngest.createFunction(
       return fetchCalendarItemForPublish(calendarItemId, workspaceId);
     });
 
-    // Skip if not Facebook
-    if (!isTargetPlatform(calendarItem, "facebook")) {
-      return { calendarItemId, status: "skipped", reason: "not_facebook" };
+    if (!isTargetPlatform(calendarItem, "linkedin")) {
+      return { calendarItemId, status: "skipped", reason: "not_linkedin" };
     }
 
     // STEP 3 — Resolve content
@@ -43,21 +41,17 @@ export const publishToFacebook = inngest.createFunction(
     });
 
     // STEP 4 — Get connected account
-    const userId = requirePublishUserId(calendarItem, "Facebook");
+    const userId = requirePublishUserId(calendarItem, "LinkedIn");
     const connectedAccountId = await step.run("get-connected-account", async () => {
-      return getConnectedAccountId(userId, "facebook");
+      return getConnectedAccountId(userId, "linkedin");
     });
 
     // STEP 5 — Publish via Composio
     const composioResult = await step.run("composio-publish", async () => {
-      const pageId = process.env.COMPOSIO_FACEBOOK_PAGE_ID ?? "";
-      if (!pageId) {
-        throw new Error("Missing COMPOSIO_FACEBOOK_PAGE_ID env var.");
-      }
-      return facebookPostMessage({
+      return linkedInPostShare({
+        text: content.body.slice(0, 3000),
+        visibility: "PUBLIC",
         connectedAccountId,
-        pageId,
-        message: content.body.slice(0, 2200),
       });
     });
 
