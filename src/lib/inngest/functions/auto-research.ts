@@ -329,6 +329,22 @@ async function scrapeUrl(
   const normalizedUrl = normalizeSourceUrl(sourceUrl);
   const { platform } = detectPlatformFromUrl(normalizedUrl);
 
+  // Route social platforms through importSocialUrl — Firecrawl always fails on these
+  if (platform === "youtube" || platform === "tiktok" || platform === "instagram") {
+    const { importSocialUrl } = await import("@/lib/content/social-importer");
+    const result = await importSocialUrl(normalizedUrl);
+    const rawContent = (result.transcriptText ?? result.captionText ?? result.metadataText ?? "").trim();
+    if (rawContent.length < 20) {
+      throw new Error(`Nội dung ${platform} quá ngắn hoặc bị blocked — hãy dán text thủ công.`);
+    }
+    return {
+      title: (result.title ?? generateTitleFromUrl(normalizedUrl) ?? fallbackTitle).slice(0, 200),
+      platform,
+      rawContent: rawContent.slice(0, 50_000),
+      sourceUrl: normalizedUrl,
+    };
+  }
+
   const scrapeResponse = await firecrawlScrape({
     url: normalizedUrl,
     connectedAccountId,

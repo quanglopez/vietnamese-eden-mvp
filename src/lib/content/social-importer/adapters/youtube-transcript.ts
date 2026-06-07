@@ -1,9 +1,6 @@
-/**
- * Seam transcript YouTube — ALE-155 chỉ bật interface + implementation tắt.
- * Không gọi timedtext / scrape watch page trong production.
- */
+import { YoutubeTranscript } from "youtube-transcript";
 
-/** Lấy transcript/caption theo video ID (tương lai / opt-in). */
+/** Lấy transcript/caption theo video ID. */
 export interface TranscriptFetcher {
   fetchTranscript(videoId: string): Promise<string | null>;
 }
@@ -16,11 +13,25 @@ export class DisabledTranscriptFetcher implements TranscriptFetcher {
   }
 }
 
+/** Thật: dùng youtube-transcript npm package. */
+export class YoutubeTranscriptFetcher implements TranscriptFetcher {
+  async fetchTranscript(videoId: string): Promise<string | null> {
+    try {
+      const segments = await YoutubeTranscript.fetchTranscript(videoId);
+      if (!segments?.length) return null;
+      return segments.map((s) => s.text).join(" ").trim() || null;
+    } catch {
+      return null;
+    }
+  }
+}
+
 /**
- * Factory transcript — env `YOUTUBE_TRANSCRIPT_ENABLED` chỉ là seam tương lai;
- * ALE-155 luôn trả DisabledTranscriptFetcher (không HTTP transcript).
+ * Factory transcript — bật khi YOUTUBE_TRANSCRIPT_ENABLED=true.
  */
 export function createTranscriptFetcher(): TranscriptFetcher {
-  void process.env.YOUTUBE_TRANSCRIPT_ENABLED;
+  if (process.env.YOUTUBE_TRANSCRIPT_ENABLED === "true") {
+    return new YoutubeTranscriptFetcher();
+  }
   return new DisabledTranscriptFetcher();
 }
