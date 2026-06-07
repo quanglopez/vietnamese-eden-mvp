@@ -25,6 +25,8 @@ function parseSummaryPayload(summary: string | null): AnalysisSummaryPayload | n
       target_audience: "",
       why_it_works: summary,
       remix_suggestions: [],
+      emotional_triggers: [],
+      viral_signals: [],
     };
   }
 }
@@ -58,6 +60,8 @@ function mapAnalysisRow(row: {
     targetAudience: extra?.target_audience ?? "",
     whyItWorks: extra?.why_it_works ?? "",
     remixSuggestions: extra?.remix_suggestions ?? [],
+    emotionalTriggers: extra?.emotional_triggers ?? [],
+    viralSignals: extra?.viral_signals ?? [],
     aiModel: row.ai_model,
     status: row.status,
     analyzedAt: row.analyzed_at,
@@ -179,12 +183,16 @@ export function buildSummaryPayload(result: {
   target_audience: string;
   why_it_works: string;
   remix_suggestions: string[];
+  emotional_triggers?: string[];
+  viral_signals?: string[];
 }): string {
   const payload: AnalysisSummaryPayload = {
     emotion: result.emotion,
     target_audience: result.target_audience,
     why_it_works: result.why_it_works,
     remix_suggestions: result.remix_suggestions,
+    emotional_triggers: result.emotional_triggers ?? [],
+    viral_signals: result.viral_signals ?? [],
   };
   return JSON.stringify(payload);
 }

@@ -208,7 +208,7 @@ export function AddToCalendarDialog({
               disabled={isPending}
               className="h-4 w-4 rounded border-input"
             />
-            Đ đăng ngay (scheduled_at = hiện tại)
+            Đăng ngay (scheduled_at = hiện tại)
           </label>
 
           <DialogFooter>

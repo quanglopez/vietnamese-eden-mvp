@@ -6,6 +6,8 @@ export type AnalysisSummaryPayload = {
   target_audience: string;
   why_it_works: string;
   remix_suggestions: string[];
+  emotional_triggers: string[];
+  viral_signals: string[];
 };
 
 export type ContentAnalysisView = {
@@ -19,6 +21,8 @@ export type ContentAnalysisView = {
   targetAudience: string;
   whyItWorks: string;
   remixSuggestions: string[];
+  emotionalTriggers: string[];
+  viralSignals: string[];
   aiModel: string | null;
   status: AnalysisStatus;
   analyzedAt: string | null;

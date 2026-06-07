@@ -9,8 +9,10 @@ import {
   Megaphone,
   Sparkles,
   Target,
+  TrendingUp,
   Users,
   Wand2,
+  Zap,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -132,6 +134,62 @@ export function BreakdownSections({ analysis }: BreakdownSectionsProps) {
                     className="text-sm text-foreground pl-3 border-l-2 border-brand/40"
                   >
                     {suggestion}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </article>
+      ) : null}
+
+      {analysis.emotionalTriggers.length > 0 ? (
+        <article className="rounded-2xl border border-border/60 bg-surface-elev p-6">
+          <div className="flex items-start gap-4">
+            <div className="h-11 w-11 rounded-xl bg-gradient-brand grid place-items-center shadow-glow shrink-0">
+              <Zap className="h-5 w-5 text-white" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-3">
+                <h3 className="font-display text-lg font-bold">Emotional Triggers</h3>
+                <span className="text-[10px] uppercase tracking-wider text-brand font-semibold bg-brand/10 px-2 py-0.5 rounded-full">
+                  Emotional Triggers
+                </span>
+              </div>
+              <ul className="space-y-2">
+                {analysis.emotionalTriggers.map((trigger) => (
+                  <li
+                    key={trigger}
+                    className="text-sm text-foreground pl-3 border-l-2 border-brand/40"
+                  >
+                    {trigger}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </article>
+      ) : null}
+
+      {analysis.viralSignals.length > 0 ? (
+        <article className="rounded-2xl border border-border/60 bg-surface-elev p-6">
+          <div className="flex items-start gap-4">
+            <div className="h-11 w-11 rounded-xl bg-gradient-brand grid place-items-center shadow-glow shrink-0">
+              <TrendingUp className="h-5 w-5 text-white" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-3">
+                <h3 className="font-display text-lg font-bold">Viral Signals</h3>
+                <span className="text-[10px] uppercase tracking-wider text-brand font-semibold bg-brand/10 px-2 py-0.5 rounded-full">
+                  Viral Signals
+                </span>
+              </div>
+              <ul className="space-y-2">
+                {analysis.viralSignals.map((signal) => (
+                  <li
+                    key={signal}
+                    className="text-sm text-foreground pl-3 border-l-2 border-brand/40"
+                  >
+                    {signal}
                   </li>
                 ))}
               </ul>
