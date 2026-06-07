@@ -30,7 +30,8 @@ export type SocialImportWarningCode =
   | "LOGIN_REQUIRED"
   | "RATE_LIMITED"
   | "UNSUPPORTED_URL"
-  | "NON_VIETNAMESE_DETECTED";
+  | "NON_VIETNAMESE_DETECTED"
+  | "APIFY_FALLBACK";
 
 /** Cảnh báo hiển thị cho user (tiếng Việt). */
 export interface SocialImportWarning {

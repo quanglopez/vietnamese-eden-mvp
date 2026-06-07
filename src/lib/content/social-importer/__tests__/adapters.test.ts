@@ -4,11 +4,13 @@ import { describe, it } from "node:test";
 import { FacebookImporter } from "@/lib/content/social-importer/adapters/facebook";
 import {
   InstagramImporter,
+  type InstagramApifyFetchResult,
   type InstagramOEmbedFetchResult,
 } from "@/lib/content/social-importer/adapters/instagram";
 import { LinkedInImporter } from "@/lib/content/social-importer/adapters/linkedin";
 import {
   TikTokImporter,
+  type TikTokApifyFetchResult,
   type TikTokOEmbedFetchResult,
 } from "@/lib/content/social-importer/adapters/tiktok";
 import { UnknownUrlImporter } from "@/lib/content/social-importer/adapters/unknown";
@@ -145,6 +147,64 @@ describe("TikTokImporter", () => {
     assert.equal(result.sourceQuality, "manual_required");
     assert.ok(result.warnings.some((w) => w.code === "UNSUPPORTED_URL"));
   });
+
+  it("import Apify success → caption khi text đủ dài", async () => {
+    const previousToken = process.env.APIFY_API_TOKEN;
+    process.env.APIFY_API_TOKEN = "test-token";
+    try {
+      const importer = new TikTokImporter({
+        fetchApify: async (): Promise<TikTokApifyFetchResult> => ({
+          ok: true,
+          items: [
+            {
+              text: TIKTOK_LONG_TITLE,
+              authorMeta: { nickName: "@creator" },
+              thumbnailUrl: TIKTOK_THUMB,
+              webVideoUrl: TIKTOK_URL,
+            },
+          ],
+        }),
+        fetchOEmbed: async () => {
+          throw new Error("oEmbed should not be called");
+        },
+      });
+      const result = await importer.import(TIKTOK_URL);
+      assert.equal(result.sourceQuality, "caption");
+      assert.equal(result.captionText, TIKTOK_LONG_TITLE);
+      assert.equal(result.author, "@creator");
+    } finally {
+      if (previousToken === undefined) {
+        delete process.env.APIFY_API_TOKEN;
+      } else {
+        process.env.APIFY_API_TOKEN = previousToken;
+      }
+    }
+  });
+
+  it("import Apify fail → APIFY_FALLBACK + oEmbed path", async () => {
+    const previousToken = process.env.APIFY_API_TOKEN;
+    process.env.APIFY_API_TOKEN = "test-token";
+    try {
+      const importer = new TikTokImporter({
+        fetchApify: async (): Promise<TikTokApifyFetchResult> => ({ ok: false, status: 500 }),
+        fetchOEmbed: async (): Promise<TikTokOEmbedFetchResult> => ({
+          ok: true,
+          title: TIKTOK_LONG_TITLE,
+          author: "@creator",
+          thumbnailUrl: TIKTOK_THUMB,
+        }),
+      });
+      const result = await importer.import(TIKTOK_URL);
+      assert.equal(result.sourceQuality, "caption");
+      assert.ok(result.warnings.some((w) => w.code === "APIFY_FALLBACK"));
+    } finally {
+      if (previousToken === undefined) {
+        delete process.env.APIFY_API_TOKEN;
+      } else {
+        process.env.APIFY_API_TOKEN = previousToken;
+      }
+    }
+  });
 });
 
 describe("InstagramImporter", () => {
@@ -206,6 +266,64 @@ describe("InstagramImporter", () => {
     const result = await importer.import(INSTAGRAM_INVALID_URL);
     assert.equal(result.sourceQuality, "manual_required");
     assert.ok(result.warnings.some((w) => w.code === "UNSUPPORTED_URL"));
+  });
+
+  it("import Apify success → caption khi caption đủ dài", async () => {
+    const previousToken = process.env.APIFY_API_TOKEN;
+    process.env.APIFY_API_TOKEN = "test-token";
+    try {
+      const importer = new InstagramImporter({
+        fetchApify: async (): Promise<InstagramApifyFetchResult> => ({
+          ok: true,
+          items: [
+            {
+              caption: INSTAGRAM_LONG_TITLE,
+              ownerUsername: "creator",
+              displayUrl: INSTAGRAM_THUMB,
+              url: INSTAGRAM_URL,
+            },
+          ],
+        }),
+        fetchOEmbed: async () => {
+          throw new Error("oEmbed should not be called");
+        },
+      });
+      const result = await importer.import(INSTAGRAM_URL);
+      assert.equal(result.sourceQuality, "caption");
+      assert.equal(result.captionText, INSTAGRAM_LONG_TITLE);
+      assert.equal(result.author, "creator");
+    } finally {
+      if (previousToken === undefined) {
+        delete process.env.APIFY_API_TOKEN;
+      } else {
+        process.env.APIFY_API_TOKEN = previousToken;
+      }
+    }
+  });
+
+  it("import Apify fail → APIFY_FALLBACK + oEmbed path", async () => {
+    const previousToken = process.env.APIFY_API_TOKEN;
+    process.env.APIFY_API_TOKEN = "test-token";
+    try {
+      const importer = new InstagramImporter({
+        fetchApify: async (): Promise<InstagramApifyFetchResult> => ({ ok: false, status: 500 }),
+        fetchOEmbed: async (): Promise<InstagramOEmbedFetchResult> => ({
+          ok: true,
+          title: INSTAGRAM_LONG_TITLE,
+          author: "@creator",
+          thumbnailUrl: INSTAGRAM_THUMB,
+        }),
+      });
+      const result = await importer.import(INSTAGRAM_URL);
+      assert.equal(result.sourceQuality, "caption");
+      assert.ok(result.warnings.some((w) => w.code === "APIFY_FALLBACK"));
+    } finally {
+      if (previousToken === undefined) {
+        delete process.env.APIFY_API_TOKEN;
+      } else {
+        process.env.APIFY_API_TOKEN = previousToken;
+      }
+    }
   });
 });
 

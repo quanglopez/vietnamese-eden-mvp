@@ -7,13 +7,25 @@ import type {
 } from "@/lib/content/social-importer/types";
 
 const OEMBED_TIMEOUT_MS = 8_000;
+const APIFY_TIMEOUT_MS = 30_000;
 const MIN_CAPTION_LENGTH = 50;
 const INSTAGRAM_OEMBED_BASE = "https://api.instagram.com/oembed";
+const APIFY_ACTOR_ID = "apify~instagram-scraper";
 
 type InstagramOEmbedResponse = {
   title?: string;
   author_name?: string;
   thumbnail_url?: string;
+};
+
+export type InstagramApifyItem = {
+  id?: string;
+  type?: "Image" | "Video" | "Sidecar" | string;
+  caption?: string;
+  ownerUsername?: string;
+  displayUrl?: string;
+  videoUrl?: string;
+  url?: string;
 };
 
 /** Kết quả fetch oEmbed — inject trong test, không gọi network. */
@@ -26,9 +38,18 @@ export type InstagramOEmbedFetchResult =
     }
   | { ok: false; status?: number };
 
+export type InstagramApifyFetchResult =
+  | { ok: true; items: InstagramApifyItem[] }
+  | { ok: false; status?: number };
+
 export type InstagramImporterDeps = {
   fetchOEmbed?: (sourceUrl: string) => Promise<InstagramOEmbedFetchResult>;
+  fetchApify?: (sourceUrl: string) => Promise<InstagramApifyFetchResult>;
 };
+
+function isApifyEnabled(): boolean {
+  return Boolean(process.env.APIFY_API_TOKEN?.trim());
+}
 
 function buildInstagramOEmbedRequestUrl(sourceUrl: string): string {
   const token = process.env.INSTAGRAM_OEMBED_TOKEN;
@@ -90,6 +111,39 @@ async function defaultFetchOEmbed(
   }
 }
 
+async function defaultFetchApify(sourceUrl: string): Promise<InstagramApifyFetchResult> {
+  const token = process.env.APIFY_API_TOKEN?.trim();
+  if (!token) {
+    return { ok: false };
+  }
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), APIFY_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(
+      `https://api.apify.com/v2/acts/${APIFY_ACTOR_ID}/run-sync-get-dataset-items?token=${encodeURIComponent(token)}`,
+      {
+        method: "POST",
+        signal: controller.signal,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ startUrls: [{ url: sourceUrl }] }),
+      },
+    );
+
+    if (!response.ok) {
+      return { ok: false, status: response.status };
+    }
+
+    const items = (await response.json()) as InstagramApifyItem[];
+    return { ok: true, items: Array.isArray(items) ? items : [] };
+  } catch {
+    return { ok: false };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 function buildMetadataText(title: string | null, author: string | null): string | undefined {
   const parts: string[] = [];
   if (title) {
@@ -99,6 +153,65 @@ function buildMetadataText(title: string | null, author: string | null): string 
     parts.push(`Kênh/tác giả: ${author}`);
   }
   return parts.length > 0 ? parts.join("\n\n") : undefined;
+}
+
+function apifyFallbackWarning(): SocialImportWarning {
+  return makeWarning(
+    "APIFY_FALLBACK",
+    "Không lấy được dữ liệu từ Apify — đang dùng oEmbed dự phòng.",
+    "info",
+  );
+}
+
+function withOptionalWarning(
+  result: SocialImportResult,
+  warning: SocialImportWarning | null,
+): SocialImportResult {
+  if (!warning) {
+    return result;
+  }
+  return {
+    ...result,
+    warnings: [warning, ...result.warnings],
+  };
+}
+
+function mapApifyItemToResult(item: InstagramApifyItem, sourceUrl: string): SocialImportResult {
+  const author = item.ownerUsername?.trim() || undefined;
+  const thumbnailUrl = item.displayUrl?.trim() || undefined;
+  const captionCandidate = item.caption?.trim() ?? "";
+  const hasLongCaption = captionCandidate.length >= MIN_CAPTION_LENGTH;
+  const title = captionCandidate || undefined;
+  const metadataText = buildMetadataText(title ?? null, author ?? null);
+
+  if (hasLongCaption) {
+    return {
+      platform: "instagram",
+      sourceUrl,
+      canonicalUrl: item.url?.trim() || undefined,
+      title,
+      author,
+      thumbnailUrl,
+      captionText: captionCandidate,
+      metadataText,
+      sourceQuality: "caption",
+      warnings: captionWarnings(thumbnailUrl ?? null),
+      fetchedAt: nowIso(),
+    };
+  }
+
+  return {
+    platform: "instagram",
+    sourceUrl,
+    canonicalUrl: item.url?.trim() || undefined,
+    title,
+    author,
+    thumbnailUrl,
+    metadataText,
+    sourceQuality: "metadata_only",
+    warnings: metadataOnlyWarnings(thumbnailUrl ?? null),
+    fetchedAt: nowIso(),
+  };
 }
 
 function blockedResult(sourceUrl: string, status?: number): SocialImportResult {
@@ -177,16 +290,57 @@ function metadataOnlyWarnings(thumbnailUrl: string | null): SocialImportWarning[
   return warnings;
 }
 
+function buildFromOEmbed(
+  url: string,
+  oembed: Extract<InstagramOEmbedFetchResult, { ok: true }>,
+): SocialImportResult {
+  const title = oembed.title;
+  const author = oembed.author;
+  const thumbnailUrl = oembed.thumbnailUrl;
+  const captionCandidate = title?.trim() ?? "";
+  const hasLongCaption = captionCandidate.length >= MIN_CAPTION_LENGTH;
+  const metadataText = buildMetadataText(title, author);
+
+  if (hasLongCaption) {
+    return {
+      platform: "instagram",
+      sourceUrl: url,
+      title: title ?? undefined,
+      author: author ?? undefined,
+      thumbnailUrl: thumbnailUrl ?? undefined,
+      captionText: captionCandidate,
+      metadataText,
+      sourceQuality: "caption",
+      warnings: captionWarnings(thumbnailUrl),
+      fetchedAt: nowIso(),
+    };
+  }
+
+  return {
+    platform: "instagram",
+    sourceUrl: url,
+    title: title ?? undefined,
+    author: author ?? undefined,
+    thumbnailUrl: thumbnailUrl ?? undefined,
+    metadataText,
+    sourceQuality: "metadata_only",
+    warnings: metadataOnlyWarnings(thumbnailUrl),
+    fetchedAt: nowIso(),
+  };
+}
+
 /**
- * Instagram — oEmbed best-effort (ALE-157). Không scrape, không transcript, không tải media.
+ * Instagram — oEmbed best-effort (ALE-157). Apify caption khi APIFY_API_TOKEN có (ALE-197).
  */
 export class InstagramImporter implements SocialUrlImporter {
   private readonly fetchOEmbed: (
     sourceUrl: string,
   ) => Promise<InstagramOEmbedFetchResult>;
+  private readonly fetchApify: (sourceUrl: string) => Promise<InstagramApifyFetchResult>;
 
   constructor(deps: InstagramImporterDeps = {}) {
     this.fetchOEmbed = deps.fetchOEmbed ?? defaultFetchOEmbed;
+    this.fetchApify = deps.fetchApify ?? defaultFetchApify;
   }
 
   canHandle(url: string): boolean {
@@ -210,43 +364,22 @@ export class InstagramImporter implements SocialUrlImporter {
       };
     }
 
+    let apifyFallback: SocialImportWarning | null = null;
+
+    if (isApifyEnabled()) {
+      const apify = await this.fetchApify(url);
+      const firstItem = apify.ok ? apify.items[0] : undefined;
+      if (apify.ok && firstItem) {
+        return mapApifyItemToResult(firstItem, url);
+      }
+      apifyFallback = apifyFallbackWarning();
+    }
+
     const oembed = await this.fetchOEmbed(url);
     if (!oembed.ok) {
-      return blockedResult(url, oembed.status);
+      return withOptionalWarning(blockedResult(url, oembed.status), apifyFallback);
     }
 
-    const title = oembed.title;
-    const author = oembed.author;
-    const thumbnailUrl = oembed.thumbnailUrl;
-    const captionCandidate = title?.trim() ?? "";
-    const hasLongCaption = captionCandidate.length >= MIN_CAPTION_LENGTH;
-    const metadataText = buildMetadataText(title, author);
-
-    if (hasLongCaption) {
-      return {
-        platform: "instagram",
-        sourceUrl: url,
-        title: title ?? undefined,
-        author: author ?? undefined,
-        thumbnailUrl: thumbnailUrl ?? undefined,
-        captionText: captionCandidate,
-        metadataText,
-        sourceQuality: "caption",
-        warnings: captionWarnings(thumbnailUrl),
-        fetchedAt: nowIso(),
-      };
-    }
-
-    return {
-      platform: "instagram",
-      sourceUrl: url,
-      title: title ?? undefined,
-      author: author ?? undefined,
-      thumbnailUrl: thumbnailUrl ?? undefined,
-      metadataText,
-      sourceQuality: "metadata_only",
-      warnings: metadataOnlyWarnings(thumbnailUrl),
-      fetchedAt: nowIso(),
-    };
+    return withOptionalWarning(buildFromOEmbed(url, oembed), apifyFallback);
   }
 }
