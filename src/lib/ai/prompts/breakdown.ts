@@ -14,6 +14,8 @@ export const breakdownAnalysisSchema = z.object({
   emotion: z.string().min(1),
   target_audience: z.string().min(1),
   why_it_works: z.string().min(1),
+  emotional_triggers: z.array(z.string().min(1)).min(1),
+  viral_signals: z.array(z.string().min(1)).min(1),
   remix_suggestions: z.array(z.string().min(1)).min(1),
 });
 
@@ -26,13 +28,17 @@ Quy tắc:
 - Viết **100% tiếng Việt** (có thể dùng thuật ngữ Anh thông dụng: AI, marketing, video, content).
 - Không dùng từ/câu tiếng Bồ Đào Nha, Tây Ban Nha, Pháp hoặc ngôn ngữ Latin khác.
 - Súc tích, thực chiến.
-- Hook: 0–3 giây mở đầu — trích hoặc diễn giải câu mở.
-- Angle: góc nhìn / positioning.
-- Structure: dàn ý từng phần (numbered list OK).
-- CTA: l lời kêu gọi hành động.
-- emotion: cảm xúc chính kích hoạt.
+
+Phân tích chi tiết:
+- hook: 0–3 giây mở đầu — trích hoặc diễn giải câu mở, nêu pattern (câu hỏi/sock/thuyết/truyện).
+- angle: góc nhìn / positioning / unique value proposition.
+- structure: dàn ý từng phần — pattern (PAS, Story Arc, Listicle, Timeline).
+- cta: lời kêu gọi hành động — kiểu (explicit/implicit/soft/fear-of-missing-out).
+- emotion: cảm xúc chính kích hoạt (1 cảm xúc).
 - target_audience: đối tượng mục tiêu cụ thể.
-- why_it_works: vì sao công thức này hiệu quả với audience Việt.
+- why_it_works: vì sao công thức này hiệu quả với audience Việt — yếu tố viral cốt lõi.
+- emotional_triggers: danh sách 2–5 trigger cụ thể (ví dụ: FOMO, sự đồng cảm, tò mò, nghi ngờ, khát vọng thay đổi, sợ bị bỏ lỡ, muốn thuộc về).
+- viral_signals: danh sách 2–5 yếu tố khiến content dễ share/saves (ví dụ: câu quote khả memorable, statistic gây shock, relatable moment, plot twist, visual pattern).
 - remix_suggestions: 2–4 gợi ý remix ngắn, actionable.
 
 Chỉ trả JSON đúng schema:
@@ -44,6 +50,8 @@ Chỉ trả JSON đúng schema:
   "emotion": string,
   "target_audience": string,
   "why_it_works": string,
+  "emotional_triggers": string[],
+  "viral_signals": string[],
   "remix_suggestions": string[]
 }`;
 

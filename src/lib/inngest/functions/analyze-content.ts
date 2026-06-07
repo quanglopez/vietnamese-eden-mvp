@@ -155,11 +155,13 @@ export const analyzeContent = inngest.createFunction(
     // STEP 6 — Persist completed analysis
     const analyzedAt = new Date().toISOString();
     const summary = {
-      emotion: analysisResult.emotion,
-      target_audience: analysisResult.target_audience,
-      why_it_works: analysisResult.why_it_works,
-      remix_suggestions: analysisResult.remix_suggestions,
-    };
+          emotion: analysisResult.emotion,
+          target_audience: analysisResult.target_audience,
+          why_it_works: analysisResult.why_it_works,
+          emotional_triggers: analysisResult.emotional_triggers,
+          viral_signals: analysisResult.viral_signals,
+          remix_suggestions: analysisResult.remix_suggestions,
+        };
 
     await step.run("persist-result", async () => {
       if (existingAnalysis?.id) {
