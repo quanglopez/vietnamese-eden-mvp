@@ -497,7 +497,7 @@ export type Database = {
           id: string;
           workspace_id: string;
           title: string;
-          platform: "tiktok" | "facebook" | "instagram" | "youtube" | "other";
+          platform: "tiktok" | "facebook" | "instagram" | "youtube" | "linkedin" | "other";
           source_url: string | null;
           raw_content: string | null;
           author_name: string | null;
@@ -510,7 +510,7 @@ export type Database = {
           id?: string;
           workspace_id: string;
           title: string;
-          platform?: "tiktok" | "facebook" | "instagram" | "youtube" | "other";
+          platform?: "tiktok" | "facebook" | "instagram" | "youtube" | "linkedin" | "other";
           source_url?: string | null;
           raw_content?: string | null;
           author_name?: string | null;
@@ -523,7 +523,7 @@ export type Database = {
           id?: string;
           workspace_id?: string;
           title?: string;
-          platform?: "tiktok" | "facebook" | "instagram" | "youtube" | "other";
+          platform?: "tiktok" | "facebook" | "instagram" | "youtube" | "linkedin" | "other";
           source_url?: string | null;
           raw_content?: string | null;
           author_name?: string | null;
@@ -676,7 +676,7 @@ export type Database = {
           generated_output_id: string | null;
           content_item_id: string | null;
           title: string;
-          platform: "tiktok" | "facebook" | "instagram" | "youtube" | "other";
+          platform: "tiktok" | "facebook" | "instagram" | "youtube" | "linkedin" | "other";
           scheduled_at: string;
           status: "scheduled" | "published" | "skipped" | "failed";
           notes: string | null;
@@ -690,7 +690,7 @@ export type Database = {
           generated_output_id?: string | null;
           content_item_id?: string | null;
           title: string;
-          platform?: "tiktok" | "facebook" | "instagram" | "youtube" | "other";
+          platform?: "tiktok" | "facebook" | "instagram" | "youtube" | "linkedin" | "other";
           scheduled_at: string;
           status?: "scheduled" | "published" | "skipped" | "failed";
           notes?: string | null;
@@ -704,7 +704,7 @@ export type Database = {
           generated_output_id?: string | null;
           content_item_id?: string | null;
           title?: string;
-          platform?: "tiktok" | "facebook" | "instagram" | "youtube" | "other";
+          platform?: "tiktok" | "facebook" | "instagram" | "youtube" | "linkedin" | "other";
           scheduled_at?: string;
           status?: "scheduled" | "published" | "skipped" | "failed";
           notes?: string | null;
@@ -856,7 +856,7 @@ export type Database = {
         | "received"
         | "n/a";
       workspace_role: "owner" | "admin" | "member" | "viewer";
-      platform_type: "tiktok" | "facebook" | "instagram" | "youtube" | "other";
+      platform_type: "tiktok" | "facebook" | "instagram" | "youtube" | "linkedin" | "other";
       analysis_status: "pending" | "completed" | "failed";
       output_status: "draft" | "ready" | "published" | "archived";
       calendar_status: "scheduled" | "published" | "skipped" | "failed";

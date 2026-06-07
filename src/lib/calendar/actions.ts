@@ -17,6 +17,7 @@ import type { CalendarChannel, CalendarStatus } from "@/types/calendar";
 
 const CHANNEL_SET = new Set<CalendarChannel>([
   "facebook",
+  "instagram",
   "linkedin",
   "tiktok",
   "youtube_shorts",
@@ -38,6 +39,7 @@ export async function addToCalendarAction(input: {
   channel: CalendarChannel;
   status?: CalendarStatus;
   notes?: string;
+  publishNow?: boolean;
 }): Promise<ActionResult<{ calendarItemId: string }>> {
   const {
     generatedOutputId,

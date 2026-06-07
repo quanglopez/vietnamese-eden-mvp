@@ -1,11 +1,12 @@
 import type { CalendarChannel, CalendarStatus } from "@/types/calendar";
 import type { PlatformType } from "@/types/content";
 
-export const CALENDAR_NO_AUTO_POST_NOTICE =
-  "Calendar chỉ lên lịch và nhắc nhở. Không tự động đăng nội dung lên bất kỳ nền tảng nào.";
+export const CALENDAR_AUTO_POST_NOTICE =
+  "Nội dung sẽ được tự động đăng lên nền tảng đã chọn vào thời gian lên lịch. Đảm bảo bạn đã liên kết tài khoản OAuth.";
 
 export const CALENDAR_CHANNEL_OPTIONS: { value: CalendarChannel; label: string }[] = [
   { value: "facebook", label: "Facebook" },
+  { value: "instagram", label: "Instagram" },
   { value: "linkedin", label: "LinkedIn" },
   { value: "tiktok", label: "TikTok" },
   { value: "youtube_shorts", label: "YouTube Shorts" },
@@ -32,11 +33,14 @@ export function channelToPlatform(channel: CalendarChannel): PlatformType {
   switch (channel) {
     case "facebook":
       return "facebook";
+    case "instagram":
+      return "instagram";
     case "tiktok":
       return "tiktok";
     case "youtube_shorts":
       return "youtube";
     case "linkedin":
+      return "linkedin";
     case "email":
     case "blog":
     case "other":

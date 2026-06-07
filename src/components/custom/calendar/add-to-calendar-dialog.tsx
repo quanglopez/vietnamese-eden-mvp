@@ -52,6 +52,7 @@ export function AddToCalendarDialog({
   const [scheduledTime, setScheduledTime] = useState("09:00");
   const [channel, setChannel] = useState<CalendarChannel>("facebook");
   const [status, setStatus] = useState<CalendarStatus>("scheduled");
+  const [publishNow, setPublishNow] = useState(false);
   const [notes, setNotes] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -77,11 +78,12 @@ export function AddToCalendarDialog({
         generatedOutputId: output.id,
         contentItemId,
         title,
-        scheduledDate,
-        scheduledTime,
+        scheduledDate: publishNow ? new Date().toISOString().slice(0, 10) : scheduledDate,
+        scheduledTime: publishNow ? new Date().toTimeString().slice(0, 5) : scheduledTime,
         channel,
         status,
         notes: notes || undefined,
+        publishNow,
       });
       if (!result.success) {
         setError(result.error);
@@ -101,8 +103,7 @@ export function AddToCalendarDialog({
             Đưa vào lịch
           </DialogTitle>
           <DialogDescription>
-            Lên lịch đăng nội dung remix. Calendar là công cụ nhắc lịch — bạn vẫn phải tự đăng
-            thủ công trên Facebook, TikTok, LinkedIn, v.v.
+            Lên lịch đăng nội dung remix. Nội dung sẽ được tự động đăng lên nền tảng đã chọn vào thời gian lên lịch.
           </DialogDescription>
         </DialogHeader>
 
@@ -196,9 +197,19 @@ export function AddToCalendarDialog({
           ) : null}
 
           <div className="rounded-lg bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
-            💡 Sau khi lên lịch, bạn sẽ nhận nhắc nhở (hoặc tự kiểm tra) để copy-paste nội dung và
-            đăng thủ công.
+            💡 Nội dung sẽ được tự động đăng lên nền tảng đã chọn. Đảm bảo bạn đã liên kết tài khoản OAuth trong Settings.
           </div>
+
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={publishNow}
+              onChange={(e) => setPublishNow(e.target.checked)}
+              disabled={isPending}
+              className="h-4 w-4 rounded border-input"
+            />
+            Đ đăng ngay (scheduled_at = hiện tại)
+          </label>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

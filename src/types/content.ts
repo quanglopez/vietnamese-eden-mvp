@@ -5,6 +5,7 @@ export type PlatformType =
   | "facebook"
   | "instagram"
   | "youtube"
+  | "linkedin"
   | "other";
 
 export type BoardContentItem = {

@@ -5,6 +5,7 @@ export const PLATFORM_GRADIENTS: Record<PlatformType, string> = {
   instagram: "from-[#f7931e] to-[#e84393]",
   youtube: "from-[#ff0000] to-[#ff6b35]",
   facebook: "from-[#1877f2] to-[#6c5ce7]",
+  linkedin: "from-[#0a66c2] to-[#0077b5]",
   other: "from-brand to-brand-3",
 };
 
@@ -13,6 +14,7 @@ export const PLATFORM_LABELS: Record<PlatformType, string> = {
   instagram: "Instagram",
   youtube: "YouTube",
   facebook: "Facebook",
+  linkedin: "LinkedIn",
   other: "Khác",
 };
 

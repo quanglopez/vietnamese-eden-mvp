@@ -9,7 +9,7 @@ export type UserProfile = {
 export type ContentPost = {
   id: string;
   title: string;
-  platform: "tiktok" | "facebook" | "instagram" | "youtube" | "other";
+  platform: "tiktok" | "facebook" | "instagram" | "youtube" | "linkedin" | "other";
   url: string;
   hook: string | null;
   angle: string | null;

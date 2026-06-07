@@ -36,20 +36,10 @@
 36|Accept the local version as-is.
 37|
 38|**Current (committed, broken):**
-39|```ts
-40|await page.fill('[data-testid="login-email"]', c.testEmail);
-41|await page.fill('[data-testid="login-password"]', c.testPassword);
-42|await page.click('[data-testid="login-submit"]');
-43|await page.waitForURL(/\/(dashboard|dashboards)/, { timeout: 15_000 });
-44|```
+39|`ts 40|await page.fill('[data-testid="login-email"]', c.testEmail); 41|await page.fill('[data-testid="login-password"]', c.testPassword); 42|await page.click('[data-testid="login-submit"]'); 43|await page.waitForURL(/\/(dashboard|dashboards)/, { timeout: 15_000 }); 44|`
 45|
 46|**Target (local, fixed):**
-47|```ts
-48|await page.fill('input[type="email"]', c.testEmail);
-49|await page.fill('input[type="password"]', c.testPassword);
-50|await page.click('button:has-text("Đăng nhập")');
-51|await page.waitForURL(/\/(dashboard|boards)/, { timeout: 15_000 });
-52|```
+47|`ts 48|await page.fill('input[type="email"]', c.testEmail); 49|await page.fill('input[type="password"]', c.testPassword); 50|await page.click('button:has-text("Đăng nhập")'); 51|await page.waitForURL(/\/(dashboard|boards)/, { timeout: 15_000 }); 52|`
 53|
 54|Also apply the same selector pattern to `tasks/tags.ts` — it uses `[data-testid="tag-manager-dialog"]`, `[data-testid="tag-input"]`, `[data-testid="create-tag-button"]`, `[data-testid="manage-tags-button"]`, `[data-testid="content-item-card"]`, `[data-testid="add-content-button"]`. These may not exist in the production DOM.
 55|
@@ -68,14 +58,7 @@
 68|The standalone script (417 lines) does login + board navigate + saved view CRUD + regression.
 69|Convert it to the runner task interface:
 70|
-71|```ts
-72|import type { SmokeContext, SmokeResult, SmokeStep } from "../types";
-73|
-74|export default async function runSavedViews(context: SmokeContext): Promise<SmokeResult> {
-75|  // ... use context.page, context.config, context.log
-76|  // Same logic, restructured as steps array
-77|}
-78|```
+71|`ts 72|import type { SmokeContext, SmokeResult, SmokeStep } from "../types"; 73| 74|export default async function runSavedViews(context: SmokeContext): Promise<SmokeResult> { 75|  // ... use context.page, context.config, context.log 76|  // Same logic, restructured as steps array 77|} 78|`
 79|
 80|**Steps to extract from the standalone script:**
 81|1. Login (reuse auth pattern)
@@ -138,47 +121,24 @@
 138|
 139|After refactoring, the TASKS map should be:
 140|
-141|```ts
-142|const TASKS: Record<string, () => Promise<{ default: SmokeTaskFn }>> = {
-143|  auth: () => import("./tasks/auth"),
-144|  board: () => import("./tasks/board"),
-145|  "ai-breakdown": () => import("./tasks/ai-breakdown"),
-146|  remix: () => import("./tasks/remix"),
-147|  "voice-profile": () => import("./tasks/voice-profile"),
-148|  calendar: () => import("./tasks/calendar"),
-149|  "m8-source-quality": () => import("./tasks/m8-source-quality"),
-150|  tags: () => import("./tasks/tags"),
-151|  "saved-views": () => import("./tasks/saved-views"),
-152|  "content-detail": () => import("./tasks/content-detail"),
-153|};
-154|```
+141|`ts 142|const TASKS: Record<string, () => Promise<{ default: SmokeTaskFn }>> = { 143|  auth: () => import("./tasks/auth"), 144|  board: () => import("./tasks/board"), 145|  "ai-breakdown": () => import("./tasks/ai-breakdown"), 146|  remix: () => import("./tasks/remix"), 147|  "voice-profile": () => import("./tasks/voice-profile"), 148|  calendar: () => import("./tasks/calendar"), 149|  "m8-source-quality": () => import("./tasks/m8-source-quality"), 150|  tags: () => import("./tasks/tags"), 151|  "saved-views": () => import("./tasks/saved-views"), 152|  "content-detail": () => import("./tasks/content-detail"), 153|}; 154|`
 155|
 156|---
 157|
 158|## Task 5: .gitignore additions
 159|
 160|Add to `.gitignore`:
-161|```
-162|# Browser Use screenshots (generated, never commit)
-163|scripts/browser-use/screenshots/
-164|```
+161| `162|# Browser Use screenshots (generated, never commit) 163|scripts/browser-use/screenshots/ 164|`
 165|
 166|---
 167|
 168|## Task 6: Fix .env.browser-use.example
 169|
 170|Current file has a broken line (password line merges with comment):
-171|```
-172|BROWSER_USE_TEST_PASSWORD=*** Screenshot output directory (optional, defaults to ./screenshots)
-173|```
+171| `172|BROWSER_USE_TEST_PASSWORD=*** Screenshot output directory (optional, defaults to ./screenshots) 173|`
 174|
 175|Fix to:
-176|```
-177|BROWSER_USE_TEST_PASSWORD=
-178|
-179|# Screenshot output directory (optional, defaults to ./scripts/browser-use/screenshots)
-180|# BROWSER_USE_SCREENSHOT_DIR=./scripts/browser-use/screenshots
-181|```
+176| `177|BROWSER_USE_TEST_PASSWORD= 178| 179|# Screenshot output directory (optional, defaults to ./scripts/browser-use/screenshots) 180|# BROWSER_USE_SCREENSHOT_DIR=./scripts/browser-use/screenshots 181|`
 182|
 183|---
 184|
@@ -186,20 +146,7 @@
 186|
 187|Create `scripts/browser-use/README.md`:
 188|
-189|```markdown
-190|# Browser Use QA Smoke Suite
-191|
-192|Playwright-based production smoke tests for Vietnamese Eden MVP.
-193|
-194|## Setup
-195|
-196|1. Copy `.env.browser-use.example` to `.env.browser-use`
-197|2. Fill in `BROWSER_USE_TEST_EMAIL` and `BROWSER_USE_TEST_PASSWORD`
-198|3. Install deps: `npx playwright install chromium`
-199|
-200|## Run
-201|
-202|```bash
+189|`markdown 190|# Browser Use QA Smoke Suite 191| 192|Playwright-based production smoke tests for Vietnamese Eden MVP. 193| 194|## Setup 195| 196|1. Copy `.env.browser-use.example` to `.env.browser-use` 197|2. Fill in `BROWSER_USE_TEST_EMAIL` and `BROWSER_USE_TEST_PASSWORD` 198|3. Install deps: `npx playwright install chromium` 199| 200|## Run 201| 202|`bash
 203|# Run all tasks
 204|npx tsx scripts/browser-use/index.ts
 205|
@@ -208,36 +155,7 @@
 208|
 209|# Non-headless (watch browser)
 210|BROWSER_USE_HEADLESS=false npx tsx scripts/browser-use/index.ts auth
-211|```
-212|
-213|## Tasks
-214|
-215|| Task | Description |
-216||------|-------------|
-217|| auth | Login + session cookie verify |
-218|| board | Board list + content card |
-219|| ai-breakdown | AI breakdown page sections |
-220|| remix | Remix form + output |
-221|| voice-profile | Voice profile setup |
-222|| calendar | Calendar section |
-223|| m8-source-quality | M8 source quality badges |
-224|| tags | ALE-162 tag manager CRUD |
-225|| saved-views | ALE-163 saved board views CRUD |
-226|| content-detail | ALE-165 content detail page |
-227|
-228|## Environment
-229|
-230|- Target: `https://vietnamese-eden-mvp.vercel.app` (production)
-231|- Allowed domains enforced in `config.ts`
-232|- Credentials: `.env.browser-use` (gitignored, never commit)
-233|- Screenshots: `screenshots/` (gitignored)
-234|
-235|## Adding a new task
-236|
-237|1. Create `tasks/your-task.ts` with default export `SmokeTaskFn`
-238|2. Add entry to `TASKS` map in `index.ts`
-239|3. Run: `npx tsx scripts/browser-use/index.ts your-task`
-240|```
+211| `212| 213|## Tasks 214| 215|| Task | Description | 216||------|-------------| 217|| auth | Login + session cookie verify | 218|| board | Board list + content card | 219|| ai-breakdown | AI breakdown page sections | 220|| remix | Remix form + output | 221|| voice-profile | Voice profile setup | 222|| calendar | Calendar section | 223|| m8-source-quality | M8 source quality badges | 224|| tags | ALE-162 tag manager CRUD | 225|| saved-views | ALE-163 saved board views CRUD | 226|| content-detail | ALE-165 content detail page | 227| 228|## Environment 229| 230|- Target: `https://vietnamese-eden-mvp.vercel.app` (production) 231|- Allowed domains enforced in `config.ts` 232|- Credentials: `.env.browser-use` (gitignored, never commit) 233|- Screenshots: `screenshots/` (gitignored) 234| 235|## Adding a new task 236| 237|1. Create `tasks/your-task.ts` with default export `SmokeTaskFn` 238|2. Add entry to `TASKS` map in `index.ts` 239|3. Run: `npx tsx scripts/browser-use/index.ts your-task` 240|`
 241|
 242|---
 243|
@@ -272,20 +190,7 @@
 272|
 273|After implementation, run locally:
 274|
-275|```bash
-276|# 1. Verify TypeScript compiles
-277|cd vietnamese-eden-mvp
-278|npx tsc --noEmit scripts/browser-use/index.ts scripts/browser-use/tasks/*.ts
-279|
-280|# 2. Run auth task only (quick verify)
-281|npx tsx scripts/browser-use/index.ts auth
-282|
-283|# 3. Run full suite (takes ~5 min)
-284|npx tsx scripts/browser-use/index.ts
-285|
-286|# 4. Verify no secrets in staged files
-287|git diff --cached --name-only | xargs grep -l "password\|secret\|key" || echo "clean"
-288|```
+275|`bash 276|# 1. Verify TypeScript compiles 277|cd vietnamese-eden-mvp 278|npx tsc --noEmit scripts/browser-use/index.ts scripts/browser-use/tasks/*.ts 279| 280|# 2. Run auth task only (quick verify) 281|npx tsx scripts/browser-use/index.ts auth 282| 283|# 3. Run full suite (takes ~5 min) 284|npx tsx scripts/browser-use/index.ts 285| 286|# 4. Verify no secrets in staged files 287|git diff --cached --name-only | xargs grep -l "password\|secret\|key" || echo "clean" 288|`
 289|
 290|---
 291|
