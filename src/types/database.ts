@@ -753,6 +753,65 @@ export type Database = {
         };
         Relationships: [];
       };
+      user_connected_accounts: {
+        Row: {
+          id: string;
+          user_id: string;
+          provider:
+            | "facebook"
+            | "tiktok"
+            | "linkedin"
+            | "notion"
+            | "googlesheets"
+            | "telegram"
+            | "slack";
+          connected_account_id: string;
+          status: "initiated" | "active" | "failed" | "revoked";
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          provider:
+            | "facebook"
+            | "tiktok"
+            | "linkedin"
+            | "notion"
+            | "googlesheets"
+            | "telegram"
+            | "slack";
+          connected_account_id: string;
+          status?: "initiated" | "active" | "failed" | "revoked";
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          provider?:
+            | "facebook"
+            | "tiktok"
+            | "linkedin"
+            | "notion"
+            | "googlesheets"
+            | "telegram"
+            | "slack";
+          connected_account_id?: string;
+          status?: "initiated" | "active" | "failed" | "revoked";
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_connected_accounts_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
