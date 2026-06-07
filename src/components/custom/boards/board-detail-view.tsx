@@ -729,13 +729,13 @@ export function BoardDetailView({
             );
           })}
           <div className="ml-auto flex gap-1">
-          <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Lưới">
+          <Button variant="ghost" size="icon" className="h-11 w-11" aria-label="Lưới">
             <Grid3x3 className="h-4 w-4" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            className="h-9 w-9"
+            className="h-11 w-11"
             disabled
             title="Sắp ra mắt"
             aria-label="Danh sách"

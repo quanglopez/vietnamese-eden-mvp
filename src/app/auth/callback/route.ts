@@ -17,6 +17,6 @@ export async function GET(request: Request) {
   }
 
   return NextResponse.redirect(
-    `${origin}/login?error=Không thể xác thực phiên đăng nhập`,
+    `${origin}/login?error=${encodeURIComponent("Không thể xác thực phiên đăng nhập")}`,
   );
 }
