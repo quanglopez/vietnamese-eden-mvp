@@ -162,7 +162,6 @@ export function BreakdownView({
                 variant="outline"
                 className="gap-2"
                 onClick={() => setCalendarOpen(true)}
-                disabled={!canAddToCalendar}
               >
                 <CalendarPlus className="h-4 w-4" />
                 Add to Calendar
