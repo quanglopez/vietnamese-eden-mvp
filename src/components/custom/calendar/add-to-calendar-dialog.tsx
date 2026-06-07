@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition, useRef } from "react";
-import { CalendarPlus, Loader2, Paperclip, X } from "lucide-react";
+import { CalendarPlus, Check, ClipboardCopy, Loader2, Paperclip, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -63,6 +63,8 @@ export function AddToCalendarDialog({
   onOpenChange,
   onSuccess,
 }: AddToCalendarDialogProps) {
+  const [copied, setCopied] = useState(false);
+  const [mode, setMode] = useState<"schedule" | "copy">("schedule");
   const [title, setTitle] = useState("");
   const [scheduledDate, setScheduledDate] = useState(defaultDateString);
   const [scheduledTime, setScheduledTime] = useState("09:00");
@@ -84,7 +86,6 @@ export function AddToCalendarDialog({
       setError(null);
     }
     if (!isOpen) {
-      // Reset media state when closing
       setMediaFile(null);
       setMediaPreview(null);
     }
@@ -95,48 +96,43 @@ export function AddToCalendarDialog({
     const file = e.target.files?.[0] ?? null;
     if (!file) return;
     setMediaFile(file);
-
-    // Generate preview URL
-    const url = URL.createObjectURL(file);
-    setMediaPreview(url);
+    setMediaPreview(URL.createObjectURL(file));
   };
 
   const handleRemoveFile = () => {
     setMediaFile(null);
-    if (mediaPreview) {
-      URL.revokeObjectURL(mediaPreview);
-      setMediaPreview(null);
-    }
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    if (mediaPreview) URL.revokeObjectURL(mediaPreview);
+    setMediaPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const uploadMedia = async (file: File): Promise<string> => {
     const supabase = createClient();
     const ext = file.name.split(".").pop() ?? "bin";
     const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-
     const { error: uploadError } = await supabase.storage
       .from("calendar-media")
       .upload(path, file, { upsert: false });
-
-    if (uploadError) {
-      throw new Error(`Không thể tải lên file: ${uploadError.message}`);
-    }
-
+    if (uploadError) throw new Error(`Không thể tải lên file: ${uploadError.message}`);
     const { data } = supabase.storage.from("calendar-media").getPublicUrl(path);
     return data.publicUrl;
+  };
+
+  const handleCopy = () => {
+    const text = output?.content ?? title;
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
   };
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     if (!output) return;
-
     setError(null);
     startTransition(async () => {
       let mediaUrl: string | undefined;
-
       if (mediaFile) {
         setIsUploading(true);
         try {
@@ -148,7 +144,6 @@ export function AddToCalendarDialog({
         }
         setIsUploading(false);
       }
-
       const result = await addToCalendarAction({
         generatedOutputId: output.id,
         contentItemId,
@@ -161,7 +156,6 @@ export function AddToCalendarDialog({
         publishNow,
         mediaUrl,
       });
-
       if (!result.success) {
         setError(result.error);
         return;
@@ -183,189 +177,235 @@ export function AddToCalendarDialog({
             Đưa vào lịch
           </DialogTitle>
           <DialogDescription>
-            Lên lịch đăng nội dung remix. Nội dung sẽ được tự động đăng lên nền tảng đã chọn vào thời gian lên lịch.
+            Lên lịch tự động hoặc copy nội dung để đăng thủ công.
           </DialogDescription>
+          <div className="flex gap-1 mt-2 rounded-lg border bg-muted/40 p-1">
+            <button
+              type="button"
+              onClick={() => setMode("schedule")}
+              className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${mode === "schedule" ? "bg-background shadow text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              📅 Lên lịch tự động
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode("copy")}
+              className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${mode === "copy" ? "bg-background shadow text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              📋 Copy để đăng thủ công
+            </button>
+          </div>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="cal-title">Tiêu đề</Label>
-            <Input
-              id="cal-title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              disabled={isBusy}
-              required
-            />
+        {mode === "copy" ? (
+          <div className="space-y-3">
+            <div className="rounded-lg border bg-muted/30 p-3 space-y-2 max-h-60 overflow-y-auto">
+              <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Nội dung</p>
+              <p className="text-sm whitespace-pre-wrap leading-relaxed">
+                {output?.content ?? title ?? "Chưa có nội dung — hãy tạo remix trước."}
+              </p>
+            </div>
+            <Button
+              type="button"
+              className="w-full gap-2"
+              onClick={handleCopy}
+              disabled={!output?.content && !title}
+            >
+              {copied ? (
+                <><Check className="h-4 w-4" /> Đã copy!</>
+              ) : (
+                <><ClipboardCopy className="h-4 w-4" /> Copy nội dung</>
+              )}
+            </Button>
+            <p className="text-xs text-muted-foreground text-center">
+              Paste nội dung trực tiếp vào Facebook, TikTok, Instagram...
+            </p>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                Đóng
+              </Button>
+            </DialogFooter>
           </div>
-
-          <div className="grid grid-cols-2 gap-4">
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="cal-date">Ngày</Label>
+              <Label htmlFor="cal-title">Tiêu đề</Label>
               <Input
-                id="cal-date"
-                type="date"
-                value={scheduledDate}
-                onChange={(e) => setScheduledDate(e.target.value)}
+                id="cal-title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
                 disabled={isBusy}
                 required
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="cal-time">Giờ (tuỳ chọn)</Label>
-              <Input
-                id="cal-time"
-                type="time"
-                value={scheduledTime}
-                onChange={(e) => setScheduledTime(e.target.value)}
-                disabled={isBusy}
-              />
-            </div>
-          </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="cal-channel">Kênh</Label>
-              <Select
-                value={channel}
-                onValueChange={(v) => setChannel(v as CalendarChannel)}
-                disabled={isBusy}
-              >
-                <SelectTrigger id="cal-channel">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CALENDAR_CHANNEL_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      {CHANNEL_ICONS[opt.value]} {opt.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="cal-status">Trạng thái</Label>
-              <Select
-                value={status}
-                onValueChange={(v) => setStatus(v as CalendarStatus)}
-                disabled={isBusy}
-              >
-                <SelectTrigger id="cal-status">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CALENDAR_STATUS_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="cal-notes">Ghi chú (tuỳ chọn)</Label>
-            <Textarea
-              id="cal-notes"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              disabled={isBusy}
-              className="min-h-[72px] resize-none"
-              placeholder="VD: Đăng kèm ảnh cover…"
-            />
-          </div>
-
-          {/* Media upload */}
-          <div className="space-y-2">
-            <Label htmlFor="cal-media">Ảnh / Video (tuỳ chọn)</Label>
-            {mediaFile ? (
-              <div className="relative rounded-lg border bg-muted/40 p-2">
-                {isVideo ? (
-                  <video
-                    src={mediaPreview ?? undefined}
-                    className="max-h-40 w-full rounded object-contain"
-                    controls
-                  />
-                ) : (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={mediaPreview ?? undefined}
-                    alt="Preview"
-                    className="max-h-40 w-full rounded object-contain"
-                  />
-                )}
-                <button
-                  type="button"
-                  onClick={handleRemoveFile}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="cal-date">Ngày</Label>
+                <Input
+                  id="cal-date"
+                  type="date"
+                  value={scheduledDate}
+                  onChange={(e) => setScheduledDate(e.target.value)}
                   disabled={isBusy}
-                  className="absolute right-1 top-1 rounded-full bg-background/80 p-0.5 text-muted-foreground hover:text-foreground"
-                  aria-label="Xoá file"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-                <p className="mt-1 truncate text-xs text-muted-foreground">{mediaFile.name}</p>
+                  required
+                />
               </div>
-            ) : (
-              <label
-                htmlFor="cal-media"
-                className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed px-3 py-2 text-sm text-muted-foreground hover:border-foreground/40 hover:text-foreground"
-              >
-                <Paperclip className="h-4 w-4 shrink-0" />
-                <span>Chọn ảnh hoặc video…</span>
-                <input
-                  ref={fileInputRef}
-                  id="cal-media"
-                  type="file"
-                  accept="image/*,video/*"
-                  className="sr-only"
-                  onChange={handleFileChange}
+              <div className="space-y-2">
+                <Label htmlFor="cal-time">Giờ (tuỳ chọn)</Label>
+                <Input
+                  id="cal-time"
+                  type="time"
+                  value={scheduledTime}
+                  onChange={(e) => setScheduledTime(e.target.value)}
                   disabled={isBusy}
                 />
-              </label>
-            )}
-          </div>
+              </div>
+            </div>
 
-          {error ? (
-            <p className="text-sm text-destructive bg-destructive/5 rounded-lg px-3 py-2">
-              {error}
-            </p>
-          ) : null}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="cal-channel">Kênh</Label>
+                <Select
+                  value={channel}
+                  onValueChange={(v) => setChannel(v as CalendarChannel)}
+                  disabled={isBusy}
+                >
+                  <SelectTrigger id="cal-channel">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CALENDAR_CHANNEL_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {CHANNEL_ICONS[opt.value]} {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="cal-status">Trạng thái</Label>
+                <Select
+                  value={status}
+                  onValueChange={(v) => setStatus(v as CalendarStatus)}
+                  disabled={isBusy}
+                >
+                  <SelectTrigger id="cal-status">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CALENDAR_STATUS_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
 
-          <div className="rounded-lg bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
-            💡 Nội dung sẽ được tự động đăng lên nền tảng đã chọn. Đảm bảo bạn đã liên kết tài khoản OAuth trong Settings.
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="cal-notes">Ghi chú (tuỳ chọn)</Label>
+              <Textarea
+                id="cal-notes"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                disabled={isBusy}
+                className="min-h-[72px] resize-none"
+                placeholder="VD: Đăng kèm ảnh cover…"
+              />
+            </div>
 
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={publishNow}
-              onChange={(e) => setPublishNow(e.target.checked)}
-              disabled={isBusy}
-              className="h-4 w-4 rounded border-input"
-            />
-            Đăng ngay (scheduled_at = hiện tại)
-          </label>
-
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Huỷ
-            </Button>
-            <Button type="submit" disabled={isBusy || !output} className="gap-2">
-              {isBusy ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  {isUploading ? "Đang tải lên…" : "Đang lưu…"}
-                </>
+            <div className="space-y-2">
+              <Label htmlFor="cal-media">Ảnh / Video (tuỳ chọn)</Label>
+              {mediaFile ? (
+                <div className="relative rounded-lg border bg-muted/40 p-2">
+                  {isVideo ? (
+                    <video
+                      src={mediaPreview ?? undefined}
+                      className="max-h-40 w-full rounded object-contain"
+                      controls
+                    />
+                  ) : (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={mediaPreview ?? undefined}
+                      alt="Preview"
+                      className="max-h-40 w-full rounded object-contain"
+                    />
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleRemoveFile}
+                    disabled={isBusy}
+                    className="absolute right-1 top-1 rounded-full bg-background/80 p-0.5 text-muted-foreground hover:text-foreground"
+                    aria-label="Xoá file"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                  <p className="mt-1 truncate text-xs text-muted-foreground">{mediaFile.name}</p>
+                </div>
               ) : (
-                <>
-                  <CalendarPlus className="h-4 w-4" />
-                  Thêm vào lịch
-                </>
+                <label
+                  htmlFor="cal-media"
+                  className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed px-3 py-2 text-sm text-muted-foreground hover:border-foreground/40 hover:text-foreground"
+                >
+                  <Paperclip className="h-4 w-4 shrink-0" />
+                  <span>Chọn ảnh hoặc video…</span>
+                  <input
+                    ref={fileInputRef}
+                    id="cal-media"
+                    type="file"
+                    accept="image/*,video/*"
+                    className="sr-only"
+                    onChange={handleFileChange}
+                    disabled={isBusy}
+                  />
+                </label>
               )}
-            </Button>
-          </DialogFooter>
-        </form>
+            </div>
+
+            {error ? (
+              <p className="text-sm text-destructive bg-destructive/5 rounded-lg px-3 py-2">
+                {error}
+              </p>
+            ) : null}
+
+            <div className="rounded-lg bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
+              💡 Nội dung sẽ được tự động đăng lên nền tảng đã chọn. Đảm bảo bạn đã liên kết tài khoản OAuth trong Settings.
+            </div>
+
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={publishNow}
+                onChange={(e) => setPublishNow(e.target.checked)}
+                disabled={isBusy}
+                className="h-4 w-4 rounded border-input"
+              />
+              Đăng ngay
+            </label>
+
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                Huỷ
+              </Button>
+              <Button type="submit" disabled={isBusy || !output} className="gap-2">
+                {isBusy ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {isUploading ? "Đang tải lên…" : "Đang lưu…"}
+                  </>
+                ) : (
+                  <>
+                    <CalendarPlus className="h-4 w-4" />
+                    Thêm vào lịch
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        )}
       </DialogContent>
     </Dialog>
   );
