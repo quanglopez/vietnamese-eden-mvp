@@ -183,6 +183,29 @@ export async function instagramPostMedia(params: {
 }
 
 // ---------------------------------------------------------------------------
+// 2c. SOCIAL MEDIA — YouTube
+// ---------------------------------------------------------------------------
+
+export async function youTubeUploadVideo(params: {
+  title: string;
+  description?: string;
+  videoUrl: string;
+  privacyStatus?: "public" | "private" | "unlisted";
+  connectedAccountId: string;
+}) {
+  return composioExecute({
+    actionName: "YOUTUBE_UPLOAD_VIDEO",
+    params: {
+      title: params.title.slice(0, 100),
+      description: (params.description ?? "").slice(0, 5000),
+      video_url: params.videoUrl,
+      privacy_status: params.privacyStatus ?? "public",
+    },
+    connectedAccountId: params.connectedAccountId,
+  });
+}
+
+// ---------------------------------------------------------------------------
 // 3. SOCIAL MEDIA — LinkedIn
 // ---------------------------------------------------------------------------
 

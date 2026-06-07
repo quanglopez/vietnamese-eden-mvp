@@ -760,6 +760,8 @@ export type Database = {
           provider:
             | "facebook"
             | "tiktok"
+            | "instagram"
+            | "youtube"
             | "linkedin"
             | "notion"
             | "googlesheets"
@@ -776,6 +778,8 @@ export type Database = {
           provider:
             | "facebook"
             | "tiktok"
+            | "instagram"
+            | "youtube"
             | "linkedin"
             | "notion"
             | "googlesheets"
@@ -792,6 +796,8 @@ export type Database = {
           provider?:
             | "facebook"
             | "tiktok"
+            | "instagram"
+            | "youtube"
             | "linkedin"
             | "notion"
             | "googlesheets"

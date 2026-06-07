@@ -25,7 +25,7 @@ export type CalendarScheduledEventData = {
   scheduledAt: string;
 };
 
-export type CalendarPlatform = "tiktok" | "instagram" | "facebook";
+export type CalendarPlatform = "tiktok" | "instagram" | "facebook" | "youtube";
 
 export type CalendarItemForPublish = {
   id: string;
