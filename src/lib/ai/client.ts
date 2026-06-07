@@ -76,7 +76,27 @@ export async function generateRemixVariants(
   input: Parameters<RemixGeneratorProvider["generateVariants"]>[0],
 ) {
   const provider = getRemixGeneratorProvider();
-  return provider.generateVariants(input);
+  let lastError: unknown;
+
+  // Single retry on invalid_response or timeout — provider has its own internal retry,
+  // so we only retry once here to avoid 6x amplification (provider×2 × client×3).
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      return await provider.generateVariants(input);
+    } catch (error) {
+      lastError = error;
+      if (
+        error instanceof AiProviderError &&
+        (error.code === "invalid_response" || error.code === "timeout") &&
+        attempt < 1
+      ) {
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  throw lastError;
 }
 
 export async function analyzeVoiceProfile(
