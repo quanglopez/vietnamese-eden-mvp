@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { inngest } from "../client";
 import { createClient } from "@supabase/supabase-js";
 import { analyzeContentText, getActiveAiModelLabel } from "@/lib/ai/client";
@@ -15,11 +16,10 @@ import type { SourceQuality } from "@/lib/content/social-importer/types";
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-
 let _supabase: ReturnType<typeof createClient> | null = null;
 function getSupabase() {
   if (!_supabase) {
-    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) throw new Error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
     _supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
       auth: { autoRefreshToken: false, persistSession: false },
     });
@@ -47,8 +47,8 @@ export const analyzeContent = inngest.createFunction(
     };
 
     // STEP 1 — Fetch content item + existing analysis
-    const result = await step.run("fetch-item", async () => {
-      const { data: fetchedItem, error: itemError } = await getSupabase()
+    const { item, existingAnalysis } = await step.run("fetch-item", async (): Promise<{ item: NonNullable<Awaited<ReturnType<ReturnType<typeof getSupabase>["from"]>>["data"]>; existingAnalysis: { id: string; status: string } | null }> => {
+      const { data: item, error: itemError } = await getSupabase()
         .from("content_items")
         .select("id, workspace_id, title, platform, source_url, raw_content, saved_by")
         .eq("id", contentItemId)
@@ -56,7 +56,7 @@ export const analyzeContent = inngest.createFunction(
         .single();
 
       if (itemError) throw new Error(`Fetch content item failed: ${itemError.message}`);
-      if (!fetchedItem) throw new Error("Content item not found");
+      if (!item) throw new Error("Content item not found");
 
       const { data: existingAnalysis } = await getSupabase()
         .from("content_analyses")
@@ -64,22 +64,20 @@ export const analyzeContent = inngest.createFunction(
         .eq("content_item_id", contentItemId)
         .maybeSingle();
 
-      return { item: fetchedItem, existingAnalysis };
+      return { item, existingAnalysis };
     });
-    const item = result.item;
-    const existingAnalysis = result.existingAnalysis;
 
     // STEP 2 — Mark pending (create or update row)
     await step.run("mark-pending", async () => {
       const now = new Date().toISOString();
       if (existingAnalysis?.id) {
-        const { error } = await getSupabase()
+        const { error } = await (getSupabase() as any)
           .from("content_analyses")
           .update({ status: "pending", updated_at: now })
           .eq("id", existingAnalysis.id);
         if (error) throw new Error(`Mark pending failed: ${error.message}`);
       } else {
-        const { error } = await getSupabase().from("content_analyses").insert({
+        const { error } = await (getSupabase() as any).from("content_analyses").insert({
           content_item_id: contentItemId,
           workspace_id: workspaceId,
           status: "pending",
@@ -88,7 +86,7 @@ export const analyzeContent = inngest.createFunction(
         });
         if (error) throw new Error(`Create pending analysis failed: ${error.message}`);
       }
-
+    });
 
     // STEP 3 — Rate-limit check (uses ai_rate_limits table)
     const effectiveUserId = userId ?? item.saved_by;
@@ -162,7 +160,7 @@ export const analyzeContent = inngest.createFunction(
 
     await step.run("persist-result", async () => {
       if (existingAnalysis?.id) {
-        const { error } = await getSupabase()
+        const { error } = await (getSupabase() as any)
           .from("content_analyses")
           .update({
             hook: analysisResult.hook,
@@ -178,7 +176,7 @@ export const analyzeContent = inngest.createFunction(
           .eq("id", existingAnalysis.id);
         if (error) throw new Error(`Update analysis failed: ${error.message}`);
       } else {
-        const { error } = await getSupabase().from("content_analyses").insert({
+        const { error } = await (getSupabase() as any).from("content_analyses").insert({
           content_item_id: contentItemId,
           workspace_id: workspaceId,
           hook: analysisResult.hook,
@@ -194,7 +192,7 @@ export const analyzeContent = inngest.createFunction(
         });
         if (error) throw new Error(`Insert analysis failed: ${error.message}`);
       }
-
+    });
 
     if (effectiveUserId) {
       await step.sendEvent("notify-analysis-completed", {
@@ -224,7 +222,7 @@ export const analyzeContent = inngest.createFunction(
 async function markFailed(contentItemId: string, reason: string) {
   const now = new Date().toISOString();
   console.error(`[analyze-content] markFailed: ${contentItemId} — ${reason}`);
-  const { error } = await getSupabase()
+  const { error } = await (getSupabase() as any)
     .from("content_analyses")
     .update({ status: "failed", updated_at: now })
     .eq("content_item_id", contentItemId);

@@ -10,9 +10,24 @@ import type { Database } from "@/types/database";
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+import type { SupabaseClient } from "@supabase/supabase-js";
 
-export const exportSupabase = createClient<Database>(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-  auth: { autoRefreshToken: false, persistSession: false },
+let _exportSupabase: SupabaseClient | null = null;
+function getExportSupabase(): SupabaseClient {
+  if (!_exportSupabase) {
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) throw new Error("Thiếu NEXT_PUBLIC_SUPABASE_URL hoặc SUPABASE_SERVICE_ROLE_KEY");
+    _exportSupabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+  }
+  return _exportSupabase;
+}
+
+export const exportSupabase: SupabaseClient = new Proxy({} as SupabaseClient, {
+  get(_target, prop) {
+    const client = getExportSupabase();
+    return (client as unknown as Record<string, unknown>)[prop as string];
+  },
 });
 
 export { MAX_EXPORT_BATCH };

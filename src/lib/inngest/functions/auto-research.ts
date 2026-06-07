@@ -5,7 +5,6 @@ import { detectPlatformFromUrl, generateTitleFromUrl, normalizeSourceUrl } from 
 import { insertAndLinkContentItem } from "@/lib/content/link-content";
 import { firecrawlScrape, tavilySearch } from "@/lib/composio/tools";
 import type { PlatformType } from "@/types/content";
-import type { Database } from "@/types/database";
 import { inngest } from "../client";
 
 // =============================================================================
@@ -15,12 +14,11 @@ import { inngest } from "../client";
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-
-let _supabase: ReturnType<typeof createClient<Database>> | null = null;
-function getSupabase() {
+let _supabase: SupabaseClient | null = null;
+function getSupabase(): SupabaseClient {
   if (!_supabase) {
-    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) throw new Error('Thiếu NEXT_PUBLIC_SUPABASE_URL hoặc SUPABASE_SERVICE_ROLE_KEY');
-    _supabase = createClient<Database>(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) throw new Error("Thiếu NEXT_PUBLIC_SUPABASE_URL hoặc SUPABASE_SERVICE_ROLE_KEY");
+    _supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
       auth: { autoRefreshToken: false, persistSession: false },
     });
   }
@@ -31,7 +29,7 @@ function getSupabase() {
 let _supabaseUntyped: SupabaseClient | null = null;
 function getSupabaseUntyped(): SupabaseClient {
   if (!_supabaseUntyped) {
-    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) throw new Error('Thiếu NEXT_PUBLIC_SUPABASE_URL hoặc SUPABASE_SERVICE_ROLE_KEY');
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) throw new Error("Thiếu NEXT_PUBLIC_SUPABASE_URL hoặc SUPABASE_SERVICE_ROLE_KEY");
     _supabaseUntyped = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
       auth: { autoRefreshToken: false, persistSession: false },
     });

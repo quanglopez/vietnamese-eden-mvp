@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { inngest } from "../client";
 import { createClient } from "@supabase/supabase-js";
 import { composioExecute } from "../../composio";
@@ -9,10 +10,15 @@ import { composioExecute } from "../../composio";
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+let _supabase: ReturnType<typeof createClient> | null = null;
 function getSupabase() {
-    return createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
+  if (!_supabase) {
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) throw new Error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
+    _supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+  }
+  return _supabase;
 }
 
 // =============================================================================
@@ -38,7 +44,7 @@ export const publishToFacebook = inngest.createFunction(
 
     // STEP 2 — Fetch calendar item + generated output content
     const calendarItem = await step.run("fetch-calendar-item", async () => {
-      const { data, error } = await getSupabase()
+      const { data, error } = await (getSupabase() as any)
         .from("content_calendar_items")
         .select(
           `id, workspace_id, generated_output_id, content_item_id, title, platform, status, scheduled_at, notes, created_by`,
@@ -59,7 +65,7 @@ export const publishToFacebook = inngest.createFunction(
     // STEP 3 — Resolve the actual text to publish
     const publishBody = await step.run("resolve-content", async () => {
       if (calendarItem.generated_output_id) {
-        const { data, error } = await getSupabase()
+        const { data, error } = await (getSupabase() as any)
           .from("generated_outputs")
           .select("content, title")
           .eq("id", calendarItem.generated_output_id)
@@ -71,7 +77,7 @@ export const publishToFacebook = inngest.createFunction(
       }
 
       if (calendarItem.content_item_id) {
-        const { data, error } = await getSupabase()
+        const { data, error } = await (getSupabase() as any)
           .from("content_items")
           .select("raw_content, title")
           .eq("id", calendarItem.content_item_id)
@@ -112,7 +118,7 @@ export const publishToFacebook = inngest.createFunction(
         ? `Published via Composio at ${new Date().toISOString()}`
         : `Composio failed: ${composioResult.error ?? "unknown error"}`;
 
-      const { error } = await getSupabase()
+      const { error } = await (getSupabase() as any)
         .from("content_calendar_items")
         .update({
           status: newStatus,
