@@ -8,19 +8,16 @@ import type { PlatformType } from "@/types/content";
 // ENV — Supabase service role
 // =============================================================================
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-  throw new Error("Thiếu NEXT_PUBLIC_SUPABASE_URL hoặc SUPABASE_SERVICE_ROLE_KEY");
+let _notifySupabase: SupabaseClient | null = null;
+function getNotifySupabase(): SupabaseClient {
+  if (!_notifySupabase) {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) throw new Error("Thiếu NEXT_PUBLIC_SUPABASE_URL hoặc SUPABASE_SERVICE_ROLE_KEY");
+    _notifySupabase = createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } });
+  }
+  return _notifySupabase;
 }
-
-/** Client không gắn Database — bảng user_connected_accounts chưa có trong generated types */
-export const notifySupabase: SupabaseClient = createClient(
-  SUPABASE_URL,
-  SUPABASE_SERVICE_ROLE_KEY,
-  { auth: { autoRefreshToken: false, persistSession: false } },
-);
 
 // =============================================================================
 // Event schemas
@@ -97,7 +94,7 @@ export async function fetchNotificationDestination(
   userId: string,
   provider: NotificationProvider,
 ): Promise<NotificationDestination | null> {
-  const { data, error } = await notifySupabase
+  const { data, error } = await getNotifySupabase()
     .from("user_connected_accounts")
     .select("connected_account_id, status, channel_id, chat_id, destination_id")
     .eq("user_id", userId)

@@ -4,18 +4,16 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 // ENV + Supabase (service role — bypasses RLS)
 // =============================================================================
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-  throw new Error("Thiếu NEXT_PUBLIC_SUPABASE_URL hoặc SUPABASE_SERVICE_ROLE_KEY");
+let _publishSupabase: SupabaseClient | null = null;
+function getPublishSupabase(): SupabaseClient {
+  if (!_publishSupabase) {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) throw new Error("Thiếu NEXT_PUBLIC_SUPABASE_URL hoặc SUPABASE_SERVICE_ROLE_KEY");
+    _publishSupabase = createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } });
+  }
+  return _publishSupabase;
 }
-
-export const publishSupabase: SupabaseClient = createClient(
-  SUPABASE_URL,
-  SUPABASE_SERVICE_ROLE_KEY,
-  { auth: { autoRefreshToken: false, persistSession: false } },
-);
 
 // =============================================================================
 // Types
@@ -65,7 +63,7 @@ export async function fetchCalendarItemForPublish(
   calendarItemId: string,
   workspaceId: string,
 ): Promise<CalendarItemForPublish> {
-  const { data, error } = await publishSupabase
+  const { data, error } = await getPublishSupabase()
     .from("content_calendar_items")
     .select(
       "id, workspace_id, generated_output_id, content_item_id, title, platform, status, scheduled_at, notes, created_by",
@@ -96,7 +94,7 @@ export async function resolvePublishContent(
   let sourceUrl: string | null = null;
 
   if (calendarItem.generated_output_id) {
-    const { data, error } = await publishSupabase
+    const { data, error } = await getPublishSupabase()
       .from("generated_outputs")
       .select("content, title")
       .eq("id", calendarItem.generated_output_id)
@@ -110,7 +108,7 @@ export async function resolvePublishContent(
     body = data?.content ?? calendarItem.title;
     title = data?.title ?? calendarItem.title;
   } else if (calendarItem.content_item_id) {
-    const { data, error } = await publishSupabase
+    const { data, error } = await getPublishSupabase()
       .from("content_items")
       .select("raw_content, title, source_url")
       .eq("id", calendarItem.content_item_id)
@@ -186,7 +184,7 @@ export async function getConnectedAccountId(
   userId: string,
   provider: CalendarPlatform,
 ): Promise<string> {
-  const { data, error } = await publishSupabase
+  const { data, error } = await getPublishSupabase()
     .from("user_connected_accounts")
     .select("connected_account_id, status")
     .eq("user_id", userId)
@@ -234,7 +232,7 @@ export async function updateCalendarPublishStatus(params: {
   const newStatus = success ? "published" : "failed";
   const note = success ? successNote : failureNote;
 
-  const { error } = await publishSupabase
+  const { error } = await getPublishSupabase()
     .from("content_calendar_items")
     .update({
       status: newStatus,

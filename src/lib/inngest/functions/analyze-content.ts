@@ -47,7 +47,7 @@ export const analyzeContent = inngest.createFunction(
     };
 
     // STEP 1 — Fetch content item + existing analysis
-    const { item, existingAnalysis } = await step.run("fetch-item", async (): Promise<{ item: NonNullable<Awaited<ReturnType<ReturnType<typeof getSupabase>["from"]>>["data"]>; existingAnalysis: { id: string; status: string } | null }> => {
+    const { item, existingAnalysis } = (await step.run("fetch-item", async () => {
       const { data: item, error: itemError } = await getSupabase()
         .from("content_items")
         .select("id, workspace_id, title, platform, source_url, raw_content, saved_by")
@@ -65,7 +65,7 @@ export const analyzeContent = inngest.createFunction(
         .maybeSingle();
 
       return { item, existingAnalysis };
-    });
+    })) as any;
 
     // STEP 2 — Mark pending (create or update row)
     await step.run("mark-pending", async () => {
