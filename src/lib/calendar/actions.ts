@@ -11,6 +11,7 @@ import {
   channelToPlatform,
 } from "@/lib/calendar/constants";
 import { buildCalendarNotes } from "@/lib/calendar/notes";
+import { schedulePublishEvent } from "@/lib/calendar/schedule-publish";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/workspaces/queries";
 import type { CalendarChannel, CalendarStatus } from "@/types/calendar";
@@ -49,6 +50,7 @@ export async function addToCalendarAction(input: {
     scheduledTime,
     channel,
     status = "scheduled",
+    publishNow,
   } = input;
 
   if (!isValidUuid(generatedOutputId) || !isValidUuid(contentItemId)) {
@@ -97,12 +99,18 @@ export async function addToCalendarAction(input: {
     return { success: false, error: "Không tìm thấy remix output." };
   }
 
-  let scheduledAt: string;
-  try {
-    scheduledAt = buildScheduledAtIso(scheduledDate, scheduledTime);
-  } catch {
-    return { success: false, error: "Ngày hoặc giờ không hợp lệ." };
+  let scheduledAt: Date;
+  if (publishNow) {
+    scheduledAt = new Date();
+  } else {
+    try {
+      scheduledAt = new Date(buildScheduledAtIso(scheduledDate, scheduledTime));
+    } catch {
+      return { success: false, error: "Ngày hoặc giờ không hợp lệ." };
+    }
   }
+
+  const resolvedStatus: CalendarStatus = publishNow ? "scheduled" : status;
 
   const { data, error } = await supabase
     .from("content_calendar_items")
@@ -112,8 +120,8 @@ export async function addToCalendarAction(input: {
       content_item_id: contentItemId,
       title: title.trim(),
       platform: channelToPlatform(channel),
-      scheduled_at: scheduledAt,
-      status,
+      scheduled_at: scheduledAt.toISOString(),
+      status: resolvedStatus,
       notes: buildCalendarNotes(channel, input.notes),
       created_by: user.id,
     })
@@ -123,6 +131,13 @@ export async function addToCalendarAction(input: {
   if (error || !data) {
     return { success: false, error: error?.message ?? "Không thể thêm vào lịch." };
   }
+
+  // Trigger Inngest publish job cho cả publishNow và scheduled thông thường
+  await schedulePublishEvent({
+    calendarItemId: data.id,
+    workspaceId: workspace.id,
+    scheduledAt: scheduledAt.toISOString(),
+  });
 
   revalidateCalendarPaths(contentItemId);
   await trackEvent(

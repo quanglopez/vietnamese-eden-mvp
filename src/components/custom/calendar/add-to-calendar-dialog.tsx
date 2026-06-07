@@ -14,6 +14,13 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { addToCalendarAction } from "@/lib/calendar/actions";
 import {
@@ -23,8 +30,16 @@ import {
 import type { CalendarChannel, CalendarStatus } from "@/types/calendar";
 import type { GeneratedOutputView } from "@/types/remix";
 
-const selectClassName =
-  "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50";
+const CHANNEL_ICONS: Record<string, string> = {
+  facebook: "📘",
+  tiktok: "🎵",
+  instagram: "📸",
+  youtube_shorts: "🎬",
+  linkedin: "💼",
+  email: "📧",
+  blog: "📝",
+  other: "🔗",
+};
 
 function defaultDateString(): string {
   const d = new Date();
@@ -146,35 +161,41 @@ export function AddToCalendarDialog({
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="cal-channel">Kênh</Label>
-              <select
-                id="cal-channel"
+              <Select
                 value={channel}
-                onChange={(e) => setChannel(e.target.value as CalendarChannel)}
+                onValueChange={(v) => setChannel(v as CalendarChannel)}
                 disabled={isPending}
-                className={selectClassName}
               >
-                {CALENDAR_CHANNEL_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger id="cal-channel">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CALENDAR_CHANNEL_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {CHANNEL_ICONS[opt.value]} {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="cal-status">Trạng thái</Label>
-              <select
-                id="cal-status"
+              <Select
                 value={status}
-                onChange={(e) => setStatus(e.target.value as CalendarStatus)}
+                onValueChange={(v) => setStatus(v as CalendarStatus)}
                 disabled={isPending}
-                className={selectClassName}
               >
-                {CALENDAR_STATUS_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger id="cal-status">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CALENDAR_STATUS_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
