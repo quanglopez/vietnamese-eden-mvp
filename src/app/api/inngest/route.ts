@@ -5,5 +5,6 @@ import { inngest, functions } from "@/lib/inngest";
 export const { GET, POST, PUT } = serve({
   client: inngest,
   functions,
+  signingKey: process.env.INNGEST_SIGNING_KEY,
+  signingKeyFallback: process.env.INNGEST_SIGNING_KEY_FALLBACK,
 });
-// 07 Thg6 2026  4:02:11 CH
