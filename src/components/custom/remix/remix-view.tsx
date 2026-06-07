@@ -77,7 +77,7 @@ export function RemixView({ context, outputs, voiceProfiles, fetchError }: Remix
           ) : null}
         </div>
       ) : (
-        <div className="grid lg:grid-cols-[380px_1fr] gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-8">
           <div ref={formRef} className="space-y-4 scroll-mt-24">
             <RemixForm
               contentItemId={context.itemId}

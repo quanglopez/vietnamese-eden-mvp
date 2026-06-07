@@ -122,7 +122,7 @@ export function BreakdownView({
         <FetchErrorBanner message={`Không tải được dữ liệu: ${fetchError}`} />
       ) : null}
 
-      <div className="grid lg:grid-cols-[360px_1fr] gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-8">
         <aside>
           <div className="relative rounded-2xl overflow-hidden border border-border/60 aspect-[3/4] sticky top-24">
             <ContentMediaCover

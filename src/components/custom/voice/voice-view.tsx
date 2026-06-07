@@ -32,7 +32,7 @@ export function VoiceView({ profiles: initialProfiles, fetchError }: VoiceViewPr
         <FetchErrorBanner message={`Không tải được voice profiles: ${fetchError}`} />
       ) : null}
 
-      <div className="grid lg:grid-cols-[380px_1fr] gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-8">
         <div className="space-y-6">
           <VoiceProfileForm onSuccess={() => router.refresh()} />
 
@@ -56,7 +56,7 @@ export function VoiceView({ profiles: initialProfiles, fetchError }: VoiceViewPr
                       <div className="font-semibold flex items-center gap-2">
                         {profile.name}
                         {profile.isDefault ? (
-                          <span className="text-[9px] uppercase text-brand font-bold">Mặc định</span>
+                          <span className="text-[11px] uppercase text-brand font-bold">Mặc định</span>
                         ) : null}
                       </div>
                       <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">

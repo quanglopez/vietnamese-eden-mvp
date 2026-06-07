@@ -101,7 +101,7 @@ export function DashboardView({
         <ContinueWhereYouLeftOff boards={continueData.boards} lastActivityDate={lastActivityDate} />
       ) : null}
 
-      <div className="grid lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {[
           { label: "Bước 1", value: "Board", hint: "Tạo & quản lý content", icon: FolderHeart },
           { label: "Bước 2", value: "Breakdown", hint: "Phân tích AI", icon: Sparkles },
@@ -119,7 +119,7 @@ export function DashboardView({
         ))}
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 gap-6 md:grid-cols-2">
         <div className="lg:col-span-2 space-y-4">
           <h2 className="font-display text-xl font-bold">Truy cập nhanh</h2>
           <div className="grid sm:grid-cols-3 gap-4">

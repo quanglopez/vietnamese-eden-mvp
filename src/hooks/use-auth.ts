@@ -68,7 +68,11 @@ export function useAuth(): UseAuthReturn {
 
   const signOut = useCallback(async () => {
     const supabase = createClient();
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error("Sign out error:", error);
+    }
     setUser(null);
     router.push("/login");
     router.refresh();

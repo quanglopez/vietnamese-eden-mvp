@@ -54,6 +54,7 @@ export async function updateSession(request: NextRequest) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/login";
     redirectUrl.searchParams.set("next", pathname);
+    redirectUrl.searchParams.set("error", encodeURIComponent("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại."));
     return NextResponse.redirect(redirectUrl);
   }
 
