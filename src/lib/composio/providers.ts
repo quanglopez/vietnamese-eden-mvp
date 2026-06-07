@@ -1,6 +1,8 @@
 export const INTEGRATION_PROVIDERS = [
   "facebook",
   "tiktok",
+  "instagram",
+  "youtube",
   "linkedin",
   "notion",
   "googlesheets",
@@ -13,6 +15,8 @@ export type IntegrationProvider = (typeof INTEGRATION_PROVIDERS)[number];
 export const COMPOSIO_APP_NAME_BY_PROVIDER: Record<IntegrationProvider, string> = {
   facebook: "FACEBOOK",
   tiktok: "TIKTOK",
+  instagram: "INSTAGRAM",
+  youtube: "YOUTUBE",
   linkedin: "LINKEDIN",
   notion: "NOTION",
   googlesheets: "GOOGLESHEETS",
@@ -39,6 +43,8 @@ export function isIntegrationProvider(value: string): value is IntegrationProvid
 export const INTEGRATION_PROVIDER_LABELS: Record<IntegrationProvider, string> = {
   facebook: "Facebook",
   tiktok: "TikTok",
+  instagram: "Instagram",
+  youtube: "YouTube",
   linkedin: "LinkedIn",
   notion: "Notion",
   googlesheets: "Google Sheets",
@@ -49,6 +55,8 @@ export const INTEGRATION_PROVIDER_LABELS: Record<IntegrationProvider, string> = 
 export const INTEGRATION_PROVIDER_DESCRIPTIONS: Record<IntegrationProvider, string> = {
   facebook: "Đăng bài và quản lý trang Facebook.",
   tiktok: "Đăng video lên TikTok.",
+  instagram: "Đăng ảnh và video lên Instagram.",
+  youtube: "Đăng video lên YouTube.",
   linkedin: "Chia sẻ nội dung lên LinkedIn.",
   notion: "Xuất breakdown và lịch nội dung sang Notion.",
   googlesheets: "Xuất dữ liệu nội dung sang Google Sheets.",
