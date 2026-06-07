@@ -31,7 +31,10 @@ export type InstagramImporterDeps = {
 };
 
 function buildInstagramOEmbedRequestUrl(sourceUrl: string): string {
-  return `${INSTAGRAM_OEMBED_BASE}?url=${encodeURIComponent(sourceUrl)}`;
+  const token = process.env.INSTAGRAM_OEMBED_TOKEN;
+  const params = new URLSearchParams({ url: sourceUrl });
+  if (token) params.set("access_token", token);
+  return `${INSTAGRAM_OEMBED_BASE}?${params.toString()}`;
 }
 
 /** URL Instagram trỏ tới post/reel/TV (không chỉ homepage). */

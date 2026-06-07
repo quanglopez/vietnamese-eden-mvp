@@ -144,7 +144,7 @@ export class YouTubeImporter implements SocialUrlImporter {
       metadataText,
       analysisInput,
       transcriptText,
-      sourceQuality: "metadata_only",
+      sourceQuality: hasTranscript ? "transcript" : "metadata_only",
       warnings: buildBaseWarnings(hasTranscript, thumbnailUrl),
       fetchedAt: nowIso(),
     };
