@@ -78,7 +78,6 @@ export function BreakdownView({
   const backHref = item.boardId ? `/boards/${item.boardId}` : "/boards";
   const remixHref = `/remix/${item.id}`;
   const latestOutput = outputs[0] ?? null;
-  const canAddToCalendar = analysis !== null;
   const isBlockedQuality =
     sourceQuality === "blocked" || sourceQuality === "manual_required";
   const showBlockedCallout = !canAnalyze && isBlockedQuality;
