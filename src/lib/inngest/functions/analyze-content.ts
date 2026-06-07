@@ -77,13 +77,13 @@ export const analyzeContent = inngest.createFunction(
           .eq("id", existingAnalysis.id);
         if (error) throw new Error(`Mark pending failed: ${error.message}`);
       } else {
-        const { error } = await (getSupabase() as any).from("content_analyses").insert({
+        const { error } = await (getSupabase() as any).from("content_analyses").upsert({
           content_item_id: contentItemId,
           workspace_id: workspaceId,
           status: "pending",
           created_at: now,
           updated_at: now,
-        });
+        }, { onConflict: "content_item_id", ignoreDuplicates: false });
         if (error) throw new Error(`Create pending analysis failed: ${error.message}`);
       }
     });
@@ -181,7 +181,7 @@ export const analyzeContent = inngest.createFunction(
           .eq("id", existingAnalysis.id);
         if (error) throw new Error(`Update analysis failed: ${error.message}`);
       } else {
-        const { error } = await (getSupabase() as any).from("content_analyses").insert({
+        const { error } = await (getSupabase() as any).from("content_analyses").upsert({
           content_item_id: contentItemId,
           workspace_id: workspaceId,
           hook: analysisResult.hook,
@@ -194,8 +194,8 @@ export const analyzeContent = inngest.createFunction(
           analyzed_at: analyzedAt,
           created_at: analyzedAt,
           updated_at: analyzedAt,
-        });
-        if (error) throw new Error(`Insert analysis failed: ${error.message}`);
+        }, { onConflict: "content_item_id", ignoreDuplicates: false });
+        if (error) throw new Error(`Upsert analysis failed: ${error.message}`);
       }
     });
 
