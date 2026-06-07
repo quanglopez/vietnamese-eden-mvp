@@ -102,7 +102,9 @@ export const analyzeContent = inngest.createFunction(
     // STEP 4 — Resolve source quality + validate we have text
     const rawContent = item.raw_content?.trim() ?? "";
     if (!rawContent) {
-      await markFailed(contentItemId, "Content item has no text to analyze.");
+      await step.run("mark-failed-empty", async () => {
+        await markFailed(contentItemId, workspaceId, "Content item has no text to analyze.");
+      });
       return { contentItemId, status: "failed", reason: "empty_content" };
     }
 
@@ -113,10 +115,9 @@ export const analyzeContent = inngest.createFunction(
     });
 
     if (sourceQuality === "blocked" || sourceQuality === "manual_required") {
-      await markFailed(
-        contentItemId,
-        "Could not extract caption/transcript from source. User must paste text manually.",
-      );
+      await step.run("mark-failed-quality", async () => {
+        await markFailed(contentItemId, workspaceId, "Could not extract caption/transcript from source. User must paste text manually.");
+      });
       return { contentItemId, status: "failed", reason: "source_quality" };
     }
 
@@ -145,7 +146,9 @@ export const analyzeContent = inngest.createFunction(
       }
 
       console.warn("AI breakdown failed", getSafeAiErrorLog(error));
-      await markFailed(contentItemId, message);
+      await step.run("mark-failed-ai", async () => {
+        await markFailed(contentItemId, workspaceId, message);
+      });
       return { contentItemId, status: "failed", reason };
     }
 
@@ -219,13 +222,14 @@ export const analyzeContent = inngest.createFunction(
 // HELPERS
 // =============================================================================
 
-async function markFailed(contentItemId: string, reason: string) {
+async function markFailed(contentItemId: string, workspaceId: string, reason: string) {
   const now = new Date().toISOString();
   console.error(`[analyze-content] markFailed: ${contentItemId} — ${reason}`);
   const { error } = await (getSupabase() as any)
     .from("content_analyses")
     .update({ status: "failed", updated_at: now })
-    .eq("content_item_id", contentItemId);
+    .eq("content_item_id", contentItemId)
+    .eq("workspace_id", workspaceId);
 
   if (error) {
     console.error(`Failed to mark analysis as failed: ${error.message}`);

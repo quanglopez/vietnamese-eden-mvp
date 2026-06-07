@@ -1,5 +1,5 @@
 import { assertBreakdownNoNonVietnamese } from "@/lib/ai/json";
-import { BreakdownContentError } from "@/lib/ai/errors";
+import { BreakdownContentError, AiProviderError } from "@/lib/ai/errors";
 import {
   getContentAnalysisProvider,
   getRemixGeneratorProvider,
@@ -30,17 +30,46 @@ export async function analyzeContentText(input: {
   sourceUrl?: string | null;
   sourceQuality?: AnalysisSourceQualityHint | null;
 }): Promise<BreakdownAnalysisResult> {
-  try {
-    return await analyzeContentTextOnce(input);
-  } catch (error) {
-    if (error instanceof BreakdownContentError) {
-      return analyzeContentTextOnce({
-        ...input,
-        vietnameseOnlyRepair: true,
-      });
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      return await analyzeContentTextOnce(
+        attempt === 0
+          ? input
+          : { ...input, vietnameseOnlyRepair: attempt === 2 },
+      );
+    } catch (error) {
+      lastError = error;
+
+      // BreakdownContentError: retry once with vietnameseOnlyRepair
+      if (error instanceof BreakdownContentError && attempt < 2) {
+        continue;
+      }
+
+      // AiProviderError with "invalid_response" (empty response): retry
+      if (
+        error instanceof AiProviderError &&
+        error.code === "invalid_response" &&
+        attempt < 2
+      ) {
+        continue;
+      }
+
+      // AiProviderError with "timeout": retry once
+      if (
+        error instanceof AiProviderError &&
+        error.code === "timeout" &&
+        attempt < 1
+      ) {
+        continue;
+      }
+
+      throw error;
     }
-    throw error;
   }
+
+  throw lastError;
 }
 
 export async function generateRemixVariants(
