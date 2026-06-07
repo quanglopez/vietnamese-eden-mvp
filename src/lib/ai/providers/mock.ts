@@ -18,8 +18,10 @@ export class MockContentAnalysisProvider implements ContentAnalysisProvider {
       emotion: "Tò mò + tin tưởng (social proof cá nhân)",
       target_audience: "Creator và người tiêu dùng Gen Z/Millennial Việt Nam quan tâm niche này.",
       why_it_works:
-        "Kết hợp số liệu cụ thể, giọng thật và CTA cá nhân hóa — pattern quen thuộc trên TikTok/Reels VN.",
-      remix_suggestions: [
+              "Kết hợp số liệu cụ thể, giọng thật và CTA cá nhân hóa — pattern quen thuộc trên TikTok/Reels VN.",
+            emotional_triggers: ["FOMO", "sự đồng cảm", "tò mò"],
+            viral_signals: ["con số gây shock ở hook", "CTA cá nhân hóa", "giọng thật relatable"],
+            remix_suggestions: [
         "Đổi hook sang dạng 'Tôi đã tốn X triệu để học bài này…'",
         "Thêm proof screenshot/DM khách hàng ở giữa video.",
         "CTA: 'Gõ 1 nếu bạn muốn mình gửi template caption'.",
