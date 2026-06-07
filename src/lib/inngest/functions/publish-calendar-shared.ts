@@ -38,6 +38,7 @@ export type CalendarItemForPublish = {
   scheduled_at: string;
   notes: string | null;
   created_by: string | null;
+  media_url: string | null;
 };
 
 export type ResolvedPublishContent = {
@@ -66,7 +67,7 @@ export async function fetchCalendarItemForPublish(
   const { data, error } = await getPublishSupabase()
     .from("content_calendar_items")
     .select(
-      "id, workspace_id, generated_output_id, content_item_id, title, platform, status, scheduled_at, notes, created_by",
+      "id, workspace_id, generated_output_id, content_item_id, title, platform, status, scheduled_at, notes, created_by, media_url",
     )
     .eq("id", calendarItemId)
     .eq("workspace_id", workspaceId)
@@ -125,7 +126,7 @@ export async function resolvePublishContent(
   }
 
   const mediaUrls = extractMediaUrls(body, sourceUrl);
-  const mediaUrl = mediaUrls[0] ?? null;
+  const mediaUrl = calendarItem.media_url ?? mediaUrls[0] ?? null;
 
   return {
     body: body.trim(),

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { CalendarPlus, Loader2 } from "lucide-react";
+import { useState, useTransition, useRef } from "react";
+import { CalendarPlus, Loader2, Paperclip, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +27,7 @@ import {
   CALENDAR_CHANNEL_OPTIONS,
   CALENDAR_STATUS_OPTIONS,
 } from "@/lib/calendar/constants";
+import { createClient } from "@/lib/supabase/client";
 import type { CalendarChannel, CalendarStatus } from "@/types/calendar";
 import type { GeneratedOutputView } from "@/types/remix";
 
@@ -69,8 +70,12 @@ export function AddToCalendarDialog({
   const [status, setStatus] = useState<CalendarStatus>("scheduled");
   const [publishNow, setPublishNow] = useState(false);
   const [notes, setNotes] = useState("");
+  const [mediaFile, setMediaFile] = useState<File | null>(null);
+  const [mediaPreview, setMediaPreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const openWithOutput = (next: GeneratedOutputView | null, isOpen: boolean) => {
     if (isOpen && next) {
@@ -78,17 +83,72 @@ export function AddToCalendarDialog({
       setScheduledDate(defaultDateString());
       setError(null);
     }
+    if (!isOpen) {
+      // Reset media state when closing
+      setMediaFile(null);
+      setMediaPreview(null);
+    }
     onOpenChange(isOpen);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    if (!file) return;
+    setMediaFile(file);
+
+    // Generate preview URL
+    const url = URL.createObjectURL(file);
+    setMediaPreview(url);
+  };
+
+  const handleRemoveFile = () => {
+    setMediaFile(null);
+    if (mediaPreview) {
+      URL.revokeObjectURL(mediaPreview);
+      setMediaPreview(null);
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const uploadMedia = async (file: File): Promise<string> => {
+    const supabase = createClient();
+    const ext = file.name.split(".").pop() ?? "bin";
+    const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("calendar-media")
+      .upload(path, file, { upsert: false });
+
+    if (uploadError) {
+      throw new Error(`Không thể tải lên file: ${uploadError.message}`);
+    }
+
+    const { data } = supabase.storage.from("calendar-media").getPublicUrl(path);
+    return data.publicUrl;
   };
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    if (!output) {
-      return;
-    }
+    if (!output) return;
 
     setError(null);
     startTransition(async () => {
+      let mediaUrl: string | undefined;
+
+      if (mediaFile) {
+        setIsUploading(true);
+        try {
+          mediaUrl = await uploadMedia(mediaFile);
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "Lỗi khi tải lên file.");
+          setIsUploading(false);
+          return;
+        }
+        setIsUploading(false);
+      }
+
       const result = await addToCalendarAction({
         generatedOutputId: output.id,
         contentItemId,
@@ -99,7 +159,9 @@ export function AddToCalendarDialog({
         status,
         notes: notes || undefined,
         publishNow,
+        mediaUrl,
       });
+
       if (!result.success) {
         setError(result.error);
         return;
@@ -108,6 +170,9 @@ export function AddToCalendarDialog({
       onSuccess?.();
     });
   };
+
+  const isBusy = isPending || isUploading;
+  const isVideo = mediaFile?.type.startsWith("video/");
 
   return (
     <Dialog open={open} onOpenChange={(v) => openWithOutput(output, v)}>
@@ -129,7 +194,7 @@ export function AddToCalendarDialog({
               id="cal-title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              disabled={isPending}
+              disabled={isBusy}
               required
             />
           </div>
@@ -142,7 +207,7 @@ export function AddToCalendarDialog({
                 type="date"
                 value={scheduledDate}
                 onChange={(e) => setScheduledDate(e.target.value)}
-                disabled={isPending}
+                disabled={isBusy}
                 required
               />
             </div>
@@ -153,7 +218,7 @@ export function AddToCalendarDialog({
                 type="time"
                 value={scheduledTime}
                 onChange={(e) => setScheduledTime(e.target.value)}
-                disabled={isPending}
+                disabled={isBusy}
               />
             </div>
           </div>
@@ -164,7 +229,7 @@ export function AddToCalendarDialog({
               <Select
                 value={channel}
                 onValueChange={(v) => setChannel(v as CalendarChannel)}
-                disabled={isPending}
+                disabled={isBusy}
               >
                 <SelectTrigger id="cal-channel">
                   <SelectValue />
@@ -183,7 +248,7 @@ export function AddToCalendarDialog({
               <Select
                 value={status}
                 onValueChange={(v) => setStatus(v as CalendarStatus)}
-                disabled={isPending}
+                disabled={isBusy}
               >
                 <SelectTrigger id="cal-status">
                   <SelectValue />
@@ -205,10 +270,60 @@ export function AddToCalendarDialog({
               id="cal-notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              disabled={isPending}
+              disabled={isBusy}
               className="min-h-[72px] resize-none"
               placeholder="VD: Đăng kèm ảnh cover…"
             />
+          </div>
+
+          {/* Media upload */}
+          <div className="space-y-2">
+            <Label htmlFor="cal-media">Ảnh / Video (tuỳ chọn)</Label>
+            {mediaFile ? (
+              <div className="relative rounded-lg border bg-muted/40 p-2">
+                {isVideo ? (
+                  <video
+                    src={mediaPreview ?? undefined}
+                    className="max-h-40 w-full rounded object-contain"
+                    controls
+                  />
+                ) : (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={mediaPreview ?? undefined}
+                    alt="Preview"
+                    className="max-h-40 w-full rounded object-contain"
+                  />
+                )}
+                <button
+                  type="button"
+                  onClick={handleRemoveFile}
+                  disabled={isBusy}
+                  className="absolute right-1 top-1 rounded-full bg-background/80 p-0.5 text-muted-foreground hover:text-foreground"
+                  aria-label="Xoá file"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+                <p className="mt-1 truncate text-xs text-muted-foreground">{mediaFile.name}</p>
+              </div>
+            ) : (
+              <label
+                htmlFor="cal-media"
+                className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed px-3 py-2 text-sm text-muted-foreground hover:border-foreground/40 hover:text-foreground"
+              >
+                <Paperclip className="h-4 w-4 shrink-0" />
+                <span>Chọn ảnh hoặc video…</span>
+                <input
+                  ref={fileInputRef}
+                  id="cal-media"
+                  type="file"
+                  accept="image/*,video/*"
+                  className="sr-only"
+                  onChange={handleFileChange}
+                  disabled={isBusy}
+                />
+              </label>
+            )}
           </div>
 
           {error ? (
@@ -226,7 +341,7 @@ export function AddToCalendarDialog({
               type="checkbox"
               checked={publishNow}
               onChange={(e) => setPublishNow(e.target.checked)}
-              disabled={isPending}
+              disabled={isBusy}
               className="h-4 w-4 rounded border-input"
             />
             Đăng ngay (scheduled_at = hiện tại)
@@ -236,11 +351,11 @@ export function AddToCalendarDialog({
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Huỷ
             </Button>
-            <Button type="submit" disabled={isPending || !output} className="gap-2">
-              {isPending ? (
+            <Button type="submit" disabled={isBusy || !output} className="gap-2">
+              {isBusy ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Đang lưu…
+                  {isUploading ? "Đang tải lên…" : "Đang lưu…"}
                 </>
               ) : (
                 <>

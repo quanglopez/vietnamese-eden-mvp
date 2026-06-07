@@ -41,6 +41,7 @@ export async function addToCalendarAction(input: {
   status?: CalendarStatus;
   notes?: string;
   publishNow?: boolean;
+  mediaUrl?: string;
 }): Promise<ActionResult<{ calendarItemId: string }>> {
   const {
     generatedOutputId,
@@ -51,6 +52,7 @@ export async function addToCalendarAction(input: {
     channel,
     status = "scheduled",
     publishNow,
+    mediaUrl,
   } = input;
 
   if (!isValidUuid(generatedOutputId) || !isValidUuid(contentItemId)) {
@@ -124,6 +126,8 @@ export async function addToCalendarAction(input: {
       status: resolvedStatus,
       notes: buildCalendarNotes(channel, input.notes),
       created_by: user.id,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ...(mediaUrl != null ? { media_url: mediaUrl } as any : {}),
     })
     .select("id")
     .single();
