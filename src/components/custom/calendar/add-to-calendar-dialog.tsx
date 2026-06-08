@@ -93,20 +93,13 @@ export function AddToCalendarDialog({
   };
 
   const handleTabKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    const tabs = ["schedule", "copy"];
-    const current = tabs.indexOf(mode);
-    if (current < 0) return;
+    const current = mode === "schedule" ? 0 : 1;
 
     const focusCurrent = () => {
-      const selectors = [
-        '[aria-controls="schedule-panel"]',
-        '[aria-controls="copy-panel"]',
-      ];
-      const el = selectors[current]
-        ? (event.currentTarget.querySelector(
-            selectors[current],
-          ) as HTMLElement | null)
-        : null;
+      const selectors = ['[aria-controls="schedule-panel"]', '[aria-controls="copy-panel"]'];
+      const el = (selectors[current]
+        ? event.currentTarget.querySelector(selectors[current])
+        : null) as HTMLElement | null;
       el?.focus();
     };
 
@@ -114,25 +107,19 @@ export function AddToCalendarDialog({
       case "ArrowLeft":
       case "ArrowRight": {
         event.preventDefault();
-        const nextIndex =
-          event.key === "ArrowRight"
-            ? (current + 1) % tabs.length
-            : (current - 1 + tabs.length) % tabs.length;
-        setMode(tabs[nextIndex]);
+        setMode(current === 0 ? "copy" : "schedule");
         break;
       }
       case "Home":
       case "End": {
         event.preventDefault();
-        const nextIndex = event.key === "Home" ? 0 : tabs.length - 1;
-        setMode(tabs[nextIndex]);
+        setMode(event.key === "Home" ? "schedule" : "copy");
         break;
       }
       default:
         return;
     }
 
-    // Delay focus to next render after mode switch
     setTimeout(focusCurrent, 0);
   };
 
