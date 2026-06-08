@@ -29,15 +29,16 @@ function buildBaseWarnings(
   hasTranscript: boolean,
   thumbnailUrl: string | null,
 ): SocialImportWarning[] {
-  const warnings: SocialImportWarning[] = [
-    makeWarning(
-      "METADATA_ONLY",
-      "Chỉ lấy được metadata — chưa có transcript/caption đầy đủ.",
-      "info",
-    ),
-  ];
+  const warnings: SocialImportWarning[] = [];
 
   if (!hasTranscript) {
+    warnings.push(
+      makeWarning(
+        "METADATA_ONLY",
+        "Chỉ lấy được metadata — chưa có transcript/caption đầy đủ.",
+        "info",
+      ),
+    );
     warnings.push(
       makeWarning(
         "TRANSCRIPT_UNAVAILABLE",
@@ -131,8 +132,8 @@ export class YouTubeImporter implements SocialUrlImporter {
         : undefined;
 
     const metadataText = buildEnrichedRawContent(meta, canonicalUrl);
-    const analysisInput = metadataText;
     const hasTranscript = Boolean(transcriptText);
+    const analysisInput = hasTranscript ? transcriptText : metadataText; // Use real transcript when available; fallback to metadata-only.
 
     return {
       platform: "youtube",

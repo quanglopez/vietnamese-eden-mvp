@@ -12,13 +12,15 @@ import type { Database } from "@/types/database";
 import type { ContentItemDetail } from "@/types/analysis";
 
 const METADATA_HEADER = `${METADATA_AUTO_MARKER} — không phải transcript/caption đầy đủ. Để phân tích sâu hơn, hãy dán caption/script qua Paste text.]`;
+const TRANSCRIPT_HEADER = "[Transcript/caption tự động từ YouTube — dùng để phân tích nội dung.]";
 
 function buildEnrichedRawContentFromImport(
   importResult: SocialImportResult,
   analysisInput: string,
   warnings: SocialImportWarning[],
 ): string {
-  const parts: string[] = [METADATA_HEADER, ""];
+  const header = importResult.sourceQuality === "transcript" ? TRANSCRIPT_HEADER : METADATA_HEADER;
+  const parts: string[] = [header, ""];
 
   if (importResult.title?.trim()) {
     parts.push(`Tiêu đề: ${importResult.title.trim()}`);

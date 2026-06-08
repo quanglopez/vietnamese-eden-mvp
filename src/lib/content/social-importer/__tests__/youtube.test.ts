@@ -119,6 +119,10 @@ describe("YouTubeImporter.import (mock, không HTTP)", () => {
     });
     const longResult = await longImporter.import(URL_FORMS[0]);
     assert.equal(longResult.transcriptText, long);
+    assert.equal(longResult.analysisInput, long);
+    assert.ok(
+      !longResult.warnings.some((w) => w.code === "METADATA_ONLY"),
+    );
     assert.ok(
       !longResult.warnings.some((w) => w.code === "TRANSCRIPT_UNAVAILABLE"),
     );
