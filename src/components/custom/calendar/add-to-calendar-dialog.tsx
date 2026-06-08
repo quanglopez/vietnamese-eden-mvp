@@ -64,7 +64,7 @@ export function AddToCalendarDialog({
   onSuccess,
 }: AddToCalendarDialogProps) {
   const [copied, setCopied] = useState(false);
-  const [mode, setMode] = useState<"schedule" | "copy">("schedule");
+  const [mode, setMode] = useState<"schedule" | "copy">("copy");
   const [title, setTitle] = useState("");
   const [scheduledDate, setScheduledDate] = useState(defaultDateString);
   const [scheduledTime, setScheduledTime] = useState("09:00");
