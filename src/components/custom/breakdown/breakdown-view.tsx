@@ -3,7 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, CalendarPlus, Link2, Sparkles, Wand2 } from "lucide-react";
+import { ArrowLeft, CalendarPlus, Link2, Loader2, Sparkles, Wand2 } from "lucide-react";
 
 import { AppShell } from "@/components/custom/app/app-shell";
 import { FetchErrorBanner } from "@/components/custom/app/fetch-error-banner";
@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { formatOutputCreatedAt } from "@/lib/remix/output-display";
 import { getPlatformLabel } from "@/lib/content/platform-styles";
 import { runContentAnalysisAction } from "@/lib/content/analysis-actions";
+import { updateContentTranscriptAction } from "@/lib/content/transcript-paste-action";
 import type { ContentAnalysisView, ContentItemDetail } from "@/types/analysis";
 import type { CalendarItemView } from "@/types/calendar";
 import type { GeneratedOutputView } from "@/types/remix";
@@ -69,6 +70,9 @@ export function BreakdownView({
   const [formError, setFormError] = useState<string | null>(null);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [transcriptText, setTranscriptText] = useState("");
+  const [transcriptSaving, setTranscriptSaving] = useState(false);
+  const [transcriptSaved, setTranscriptSaved] = useState(false);
   const loading = useAiLoadingTimer(isPending, "breakdown");
 
   useEffect(() => {
@@ -95,6 +99,33 @@ export function BreakdownView({
       }
       router.refresh();
     });
+  };
+
+  const handleTranscriptSave = async () => {
+    if (!transcriptText.trim()) return;
+    setTranscriptSaving(true);
+    try {
+      const result = await updateContentTranscriptAction(item.id, transcriptText);
+      if (!result.success) {
+        setFormError(result.error);
+        return;
+      }
+      setTranscriptSaved(true);
+      setTranscriptText("");
+      // Trigger re-analysis after saving transcript
+      startTransition(async () => {
+        const analysisResult = await runContentAnalysisAction(item.id);
+        if (!analysisResult.success) {
+          setFormError(analysisResult.error);
+          return;
+        }
+        router.refresh();
+      });
+    } catch (err) {
+      setFormError(err instanceof Error ? err.message : "Lỗi khi lưu transcript.");
+    } finally {
+      setTranscriptSaving(false);
+    }
   };
 
   return (
@@ -206,11 +237,51 @@ export function BreakdownView({
           ) : null}
 
           {showMetadataCalloutWhenBlocked ? (
-            <SourceQualityBadge
-              quality={sourceQuality}
-              showDescription
-              boardId={item.boardId}
-            />
+            <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 px-5 py-4 text-sm space-y-3">
+              <p className="font-semibold text-foreground">
+                Chỉ có metadata — cần transcript để phân tích sâu
+              </p>
+              <p className="text-muted-foreground">
+                Không lấy được caption/transcript tự động từ link. Dán transcript hoặc script thủ công bên dưới để AI phân tích đầy đủ.
+              </p>
+              {transcriptSaved ? (
+                <div className="rounded-lg bg-green-500/10 border border-green-500/30 px-4 py-3 text-sm text-green-700 dark:text-green-300">
+                  ✅ Transcript đã lưu — đang phân tích lại...
+                </div>
+              ) : (
+                <>
+                  <textarea
+                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm min-h-[120px] resize-y placeholder:text-muted-foreground"
+                    placeholder="Dán transcript hoặc script tại đây...&#10;&#10;VD: Transcript từ YouTube, caption TikTok, hoặc script của video..."
+                    value={transcriptText}
+                    onChange={(e) => setTranscriptText(e.target.value)}
+                    disabled={transcriptSaving}
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      onClick={handleTranscriptSave}
+                      disabled={!transcriptText.trim() || transcriptSaving}
+                      className="gap-2"
+                    >
+                      {transcriptSaving ? (
+                        <><Loader2 className="h-4 w-4 animate-spin" /> Đang lưu...</>
+                      ) : (
+                        <><Sparkles className="h-4 w-4" /> Phân tích lại với transcript này</>
+                      )}
+                    </Button>
+                    {item.boardId ? (
+                      <Button asChild variant="outline" size="sm">
+                        <Link href={`/boards/${item.boardId}`}>Quay lại bảng</Link>
+                      </Button>
+                    ) : null}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    💡 Sau khi lưu transcript, AI sẽ tự động phân tích lại nội dung với dữ liệu đầy đủ.
+                  </p>
+                </>
+              )}
+            </div>
           ) : null}
 
           {showAmberFallback ? (
