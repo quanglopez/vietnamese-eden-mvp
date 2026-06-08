@@ -92,6 +92,50 @@ export function AddToCalendarDialog({
     onOpenChange(isOpen);
   };
 
+  const handleTabKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    const tabs = ["schedule", "copy"];
+    const current = tabs.indexOf(mode);
+    if (current < 0) return;
+
+    const focusCurrent = () => {
+      const selectors = [
+        '[aria-controls="schedule-panel"]',
+        '[aria-controls="copy-panel"]',
+      ];
+      const el = selectors[current]
+        ? (event.currentTarget.querySelector(
+            selectors[current],
+          ) as HTMLElement | null)
+        : null;
+      el?.focus();
+    };
+
+    switch (event.key) {
+      case "ArrowLeft":
+      case "ArrowRight": {
+        event.preventDefault();
+        const nextIndex =
+          event.key === "ArrowRight"
+            ? (current + 1) % tabs.length
+            : (current - 1 + tabs.length) % tabs.length;
+        setMode(tabs[nextIndex]);
+        break;
+      }
+      case "Home":
+      case "End": {
+        event.preventDefault();
+        const nextIndex = event.key === "Home" ? 0 : tabs.length - 1;
+        setMode(tabs[nextIndex]);
+        break;
+      }
+      default:
+        return;
+    }
+
+    // Delay focus to next render after mode switch
+    setTimeout(focusCurrent, 0);
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
     if (!file) return;
@@ -179,7 +223,12 @@ export function AddToCalendarDialog({
           <DialogDescription>
             Lên lịch tự động hoặc copy nội dung để đăng thủ công.
           </DialogDescription>
-          <div className="flex gap-1 mt-2 rounded-lg border bg-muted/40 p-1" role="tablist" aria-label="Chế độ đăng">
+          <div
+            className="flex gap-1 mt-2 rounded-lg border bg-muted/40 p-1"
+            role="tablist"
+            aria-label="Chế độ đăng"
+            onKeyDown={handleTabKeyDown}
+          >
             <button
               type="button"
               onClick={() => setMode("schedule")}
@@ -233,7 +282,7 @@ export function AddToCalendarDialog({
             </DialogFooter>
           </div>
         ) : (
-          <form id="schedule-panel" role="tabpanel" className="space-y-4">
+          <form id="schedule-panel" role="tabpanel" onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="cal-title">Tiêu đề</Label>
               <Input

@@ -2,7 +2,7 @@
 
 > **Copy the prompt in the block below and paste into Claude Code.**
 > **Mandatory context: đọc các file được liệt kê trong READ FIRST trước khi làm bất cứ điều gì.**
-> **Production URL: https://vietnamese-eden-mvp.vercel.app**
+> **Production URL: [https://vietnamese-eden-mvp.vercel.app](https://vietnamese-eden-mvp.vercel.app)**
 
 ---
 
@@ -116,3 +116,4 @@ DONE WHEN
 3. Nếu Step 2 fail (AI Breakdown timeout): kiểm tra Inngest Dashboard → Runs tab xem error
 4. Nếu Step 5 warn: kiểm tra `src/lib/calendar/schedule-publish.ts` xem schedulePublishEvent có được gọi không
 5. Cleanup: script sẽ tạo test data trong DB — có thể xóa thủ công sau khi smoke xong
+
