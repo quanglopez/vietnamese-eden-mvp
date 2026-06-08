@@ -93,7 +93,9 @@ export function AddToCalendarDialog({
   };
 
   const handleTabKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    const current = mode === "schedule" ? 0 : 1;
+    const tabs = ["schedule", "copy"] as const;
+    const current = tabs.indexOf(mode);
+    if (current < 0) return;
 
     const focusCurrent = () => {
       const selectors = ['[aria-controls="schedule-panel"]', '[aria-controls="copy-panel"]'];
