@@ -1,9 +1,9 @@
 # Project status — Vietnamese Eden MVP
 
-**Cập nhật:** 2026-06-06 (M13 COMPLETE — closeout & M14 recommendation)
+**Cập nhật:** 2026-06-08 (Manual posting happy path + production smoke PASS)
 **Production:** [https://vietnamese-eden-mvp.vercel.app/](https://vietnamese-eden-mvp.vercel.app/)
-**Latest deploy:** commit `f05c15c` on main (ALE-190 vercel.json syd1 merged 2026-06-06) — regions=[syd1] ✅ READY
-**Tiếp theo:** Owner populates beta_testers, prompts tester-01 to revisit /dashboard, sends WTP question. M14 recommended start: 2026-06-10.
+**Latest deploy:** commit `b863e21` on main (manual copy posting default path) ✅ READY
+**Tiếp theo:** Verify fresh YouTube captioned URL in production after ALE-205 deploy, then continue ALE-206 manual transcript fallback and ALE-208 onboarding.
 **M13 closeout:** [m13-closeout-and-m14-recommendation.md](./m13-closeout-and-m14-recommendation.md) — COMPLETE, 7/7 canonical issues Done
 **Decision memo:** [cohort-2-decision-gate-2026-06-06.md](./cohort-2-decision-gate-2026-06-06.md) — Verdict: **WAIT** (3 ✅ / 3 ⬜ / 5 ❌ / 1 N/A)
 **P1 triage:** [docs/triage/ale-190-slow-login-triage.md](./triage/ale-190-slow-login-triage.md) — Fixed: Vercel syd1 colocated with Supabase ap-southeast-2
@@ -60,6 +60,22 @@ Feedback source of truth:
 || **M13 milestone** | **COMPLETE** — Retention & Iteration (ALE-183→190, ALE-188 duplicate) |
 || **M13 progress** | ALE-183 ✅ Done · ALE-184 ✅ Done · ALE-185 ✅ Done · ALE-186 ✅ Done · ALE-187 ✅ Done · ALE-189 ✅ Done · ALE-190 ✅ Done |
 || **M13 closeout** | [m13-closeout-and-m14-recommendation.md](./m13-closeout-and-m14-recommendation.md) — 7/7 canonical issues Done, verdict WAIT, P1 fixed |
+
+### 2026-06-08 — Manual posting happy path + production smoke
+
+| Check | Result | Evidence |
+|-------|--------|----------|
+| Production health | ✅ PASS | `/api/health` HTTP 200 |
+| Content item creation | ✅ PASS | Smoke item `0a9f4817` |
+| AI breakdown + viral fields | ✅ PASS | `emotional_triggers=3`, `viral_signals=3` |
+| Manual copy happy path data | ✅ PASS | Latest `generated_outputs.content` length 999 |
+| Add to calendar DB write | ✅ PASS | Calendar item `68ad8391`, `status=scheduled` |
+| Storage media upload/read | ✅ PASS | `calendar-media` public read HTTP 200 |
+| Step 5 publish UX | ✅ PASS | Manual copy/posting is happy path; OAuth auto-publish is advanced path, not required for normal user smoke |
+
+**Verdict:** Production smoke PASS. Normal user flow is simplified to: Breakdown/Remix → **Copy để đăng thủ công** → paste into social platform. Auto-publish remains available only for connected-account users.
+
+**Related commits:** `ab6e134` (YouTube transcript fix + diagnostics), `b863e21` (manual copy default path).
 
 ### M13 COMPLETE
 

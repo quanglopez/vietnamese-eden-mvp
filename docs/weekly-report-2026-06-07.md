@@ -111,14 +111,16 @@ Chưa có data — không có feedback_entries với WTP signal tuần này.
 | # | Feature/flow | Signal | Ghi chú |
 |---|-------------|--------|---------|
 | 1 | Core flow end-to-end | 1 user hoàn thành board→content→breakdown→remix→calendar | Owner verified full flow |
-| 2 | Login session | 67 logins từ 1 user — không có auth error | Session stability tốt sau PR #41 fix |
+| 2 | Manual copy/posting happy path | Production smoke PASS ngày 2026-06-08 | Normal user không cần OAuth để lấy giá trị: copy nội dung và tự đăng |
+| 3 | Login session | 67 logins từ 1 user — không có auth error | Session stability tốt sau PR #41 fix |
 
 ### Những gì cần cải thiện
 
 | # | Feature/flow | Signal | Ghi chú |
 |---|-------------|--------|---------|
-| 1 | Post-signup activation | 3/4 signups không có event nào sau signup | Onboarding unclear hoặc testers chưa active |
-| 2 | beta_testers tracking | Table empty | Invite flow chưa setup |
+| 1 | YouTube transcript ingestion | User tested multiple captioned videos but production still returned metadata-only before ALE-205 | Fix pushed in `ab6e134`; needs fresh-URL production verification |
+| 2 | Post-signup activation | 3/4 signups không có event nào sau signup | Onboarding unclear hoặc testers chưa active |
+| 3 | beta_testers tracking | Table empty | Invite flow chưa setup |
 
 ### Feature requests đáng chú ý
 
@@ -130,9 +132,10 @@ Chưa có data tuần này.
 
 ### Urgent (tuần này)
 
-1. [ ] Điền beta_testers table với danh sách Cohort 2 testers (invite_status, persona)
-2. [ ] Review P1 bug entry tại /admin/feedback — triage + tạo Linear issue nếu cần
-3. [ ] Follow up 3 users signup nhưng chưa active — gửi onboarding guide
+1. [ ] Verify fresh captioned YouTube URL sau fix `ab6e134` — confirm transcript thật, không metadata-only
+2. [ ] Điền beta_testers table với danh sách Cohort 2 testers (invite_status, persona)
+3. [ ] Review P1 bug entry tại /admin/feedback — triage + tạo Linear issue nếu cần
+4. [ ] Follow up 3 users signup nhưng chưa active — gửi onboarding guide
 
 ### Sprint backlog
 
