@@ -179,10 +179,13 @@ export function AddToCalendarDialog({
           <DialogDescription>
             Lên lịch tự động hoặc copy nội dung để đăng thủ công.
           </DialogDescription>
-          <div className="flex gap-1 mt-2 rounded-lg border bg-muted/40 p-1">
+          <div className="flex gap-1 mt-2 rounded-lg border bg-muted/40 p-1" role="tablist" aria-label="Chế độ đăng">
             <button
               type="button"
               onClick={() => setMode("schedule")}
+              role="tab"
+              aria-selected={mode === "schedule"}
+              aria-controls="schedule-panel"
               className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${mode === "schedule" ? "bg-background shadow text-foreground" : "text-muted-foreground hover:text-foreground"}`}
             >
               📅 Lên lịch tự động
@@ -190,6 +193,9 @@ export function AddToCalendarDialog({
             <button
               type="button"
               onClick={() => setMode("copy")}
+              role="tab"
+              aria-selected={mode === "copy"}
+              aria-controls="copy-panel"
               className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${mode === "copy" ? "bg-background shadow text-foreground" : "text-muted-foreground hover:text-foreground"}`}
             >
               📋 Copy để đăng thủ công
@@ -198,7 +204,7 @@ export function AddToCalendarDialog({
         </DialogHeader>
 
         {mode === "copy" ? (
-          <div className="space-y-3">
+          <div id="copy-panel" role="tabpanel" className="space-y-3">
             <div className="rounded-lg border bg-muted/30 p-3 space-y-2 max-h-60 overflow-y-auto">
               <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Nội dung</p>
               <p className="text-sm whitespace-pre-wrap leading-relaxed">
@@ -227,7 +233,7 @@ export function AddToCalendarDialog({
             </DialogFooter>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form id="schedule-panel" role="tabpanel" className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="cal-title">Tiêu đề</Label>
               <Input
@@ -366,7 +372,7 @@ export function AddToCalendarDialog({
             </div>
 
             {error ? (
-              <p className="text-sm text-destructive bg-destructive/5 rounded-lg px-3 py-2">
+              <p id="calendar-form-status" role="status" aria-live="polite" className="text-sm text-destructive bg-destructive/5 rounded-lg px-3 py-2">
                 {error}
               </p>
             ) : null}
