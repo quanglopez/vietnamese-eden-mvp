@@ -6,6 +6,7 @@ import {
   BarChart3,
   CalendarDays,
   FolderHeart,
+  HeartPulse,
   LayoutDashboard,
   MessageSquare,
   Mic,
@@ -34,6 +35,7 @@ const nav = [
   { href: "/admin/beta-testers", label: "Quản tester", icon: UserRoundCog, exact: false as const },
   { href: "/admin/feedback", label: "Phản hồi", icon: MessageSquare, exact: false as const },
   { href: "/admin/beta-launch", label: "Beta Launch", icon: Rocket, exact: false as const },
+  { href: "/admin/smoke", label: "Smoke", icon: HeartPulse, exact: false as const },
 ] as const;
 
 function getInitials(fullName: string | null, email: string | undefined) {
